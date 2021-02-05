@@ -20,7 +20,7 @@ In the examples folder, there are some examples on how to work with this framewo
 - PFScene : AStar path finding algorithm (A to set start point, space to toggle simplifaction, r to reset, mouse left to set unwalkable, mouse right to reset to walkable)
 
 
-##Base
+## Base
 
 - Boot is the entry point. It launches the avenyrh engine and adds the first scene
 
@@ -33,14 +33,14 @@ In the examples folder, there are some examples on how to work with this framewo
 - Component is where you will moslty write code for the gameplay and add it to one or more GameObjects
 
 
-##Inspector
+## Inspector
 
 You have an Inspector that can help you to debug the game. Press F4 to show the Inspector window and click on the GameObject you want to inspect
 It shows different informations about the object, its components and its children
 You can put you own debug informations by overriding the `getInfo()` method
 
 
-##UI
+## UI
 There are some UI components that can help with most of UI work :
 
 - Button : Simple button with colors or custom graphics
@@ -62,7 +62,7 @@ There are some UI components that can help with most of UI work :
 You can Tween elements by addind tween to you objects.
 
 
-##Others
+## Others
 
 - AMath is a maths library
 
@@ -73,7 +73,7 @@ You can Tween elements by addind tween to you objects.
 - Input config is where you can define some custom keybindings
 
 
-#Misc
+# Misc
 
 Thanks to the Haxe and Heaps community for the help when creating this.
 This is (and might always will be) a work in progress, so there might be some bugs, feel free to let me know.
