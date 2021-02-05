@@ -1,0 +1,12 @@
+{
+	"name": "avenyrhEngine",
+	"url" : "https://github.com/AveNyrh/AvenyrhEngine.git",
+	"license": "MIT",
+	"tags": ["Heaps","Hashlink","package","Nyrh"],
+	"description": "The framework on which I make games",
+	"version": "0.1.0",
+	"classPath": "src/",
+	"releasenote": "First verion",
+	"contributors": ["adeconti"],
+	"dependencies": {}
+}

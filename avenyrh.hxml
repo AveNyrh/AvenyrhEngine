@@ -1,0 +1,9 @@
+-cp src
+-lib heaps
+-lib hlsdl
+
+-D windowTitle=AveNyrhEngine
+-D windowSize=1280x720
+
+-main Boot
+-hl avenyrh.hl
