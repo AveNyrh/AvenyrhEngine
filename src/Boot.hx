@@ -1,4 +1,3 @@
-import examples.src.*;
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
 
@@ -26,7 +25,7 @@ class Boot extends hxd.App
 
         avenyrhEngine = new Engine(s2d);
 
-        avenyrhEngine.addScene(new GameObjectScene());
+        //avenyrhEngine.addScene(new GameObjectScene());
         //avenyrhEngine.addScene(new UIScene());
         //avenyrhEngine.addScene(new PFScene());
     }
