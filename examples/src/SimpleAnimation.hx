@@ -1,4 +1,4 @@
-package avenyrh.examples;
+package examples.src;
 
 import avenyrh.animation.Animation;
 

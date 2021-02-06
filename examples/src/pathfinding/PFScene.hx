@@ -1,4 +1,4 @@
-package avenyrh.examples.pathfinding;
+package examples.src.pathfinding;
 
 import avenyrh.engine.Engine;
 import h2d.Text;

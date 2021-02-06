@@ -1,6 +1,7 @@
-package avenyrh.examples;
+package examples.src;
 
-import avenyrh.examples.pathfinding.PFScene;
+import avenyrh.InputManager;
+import examples.src.pathfinding.PFScene;
 import avenyrh.engine.Engine;
 import avenyrh.gameObject.GameObject;
 import avenyrh.engine.Scene;

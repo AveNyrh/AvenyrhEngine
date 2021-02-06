@@ -1,4 +1,4 @@
-package avenyrh.examples;
+package examples.src;
 
 import avenyrh.InputManager;
 import avenyrh.gameObject.GameObject;
@@ -30,7 +30,6 @@ class ControllableGameObject extends GameObject
     public override function update(dt : Float) 
     {
         super.update(dt);
-        //trace('${name} -> Update');
 
         if(InputManager.getKey("Right"))
             x += movementSpeed;

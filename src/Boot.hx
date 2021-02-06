@@ -1,6 +1,4 @@
-//package avenyrh.engine;
-
-import avenyrh.examples.*;
+import examples.src.*;
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
 

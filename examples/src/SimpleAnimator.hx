@@ -1,5 +1,6 @@
-package avenyrh.examples;
+package examples.src;
 
+import avenyrh.InputManager;
 import avenyrh.stateMachine.Transition;
 import avenyrh.animation.Animation;
 import avenyrh.animation.Animator;

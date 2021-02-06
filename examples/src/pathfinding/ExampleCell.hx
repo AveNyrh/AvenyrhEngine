@@ -1,4 +1,4 @@
-package avenyrh.examples.pathfinding;
+package examples.src.pathfinding;
 
 import avenyrh.Vector2;
 import h2d.Interactive;

@@ -1,6 +1,7 @@
-package avenyrh.examples;
+package examples.src;
 
-import avenyrh.examples.pathfinding.PFScene;
+import avenyrh.InputManager;
+import examples.src.pathfinding.PFScene;
 import avenyrh.engine.Engine;
 import avenyrh.ui.Dropdown;
 import avenyrh.ui.ScrollArea;
@@ -236,12 +237,6 @@ class UIScene extends Scene
 
         for(i in 0...10)
         {
-            //f = new Flow(dropdown);
-
-            // t = new Text(hxd.res.DefaultFont.get(), f);
-            // t.text = 'Item $i';
-            // t.scale(3);
-
             b = new Bitmap(Tile.fromColor(Std.int(Math.random() * Color.iBLACK), 140, 40), dropdown);
 
             dropdown.addItem(b);
