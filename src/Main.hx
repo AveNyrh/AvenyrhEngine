@@ -1,17 +1,18 @@
+import examples.src.GameObjectScene;
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
 
-class Boot extends hxd.App
+class Main extends hxd.App
 {
-    public static var instance (default, null) : Boot;
+    public static var instance (default, null) : Main;
     public static var avenyrhEngine (default, null) : Engine;
 
     /**
-     * Boot
+     * Main
      */
     static function main() 
     {
-        new Boot();
+        new Main();
     }
 
     /**
@@ -23,9 +24,9 @@ class Boot extends hxd.App
 
         instance = this;
 
-        avenyrhEngine = new Engine(s2d);
+        avenyrhEngine = new Engine(s2d, engine);
 
-        //avenyrhEngine.addScene(new GameObjectScene());
+        avenyrhEngine.addScene(new GameObjectScene());
         //avenyrhEngine.addScene(new UIScene());
         //avenyrhEngine.addScene(new PFScene());
     }
@@ -37,6 +38,13 @@ class Boot extends hxd.App
     override function update(dt : Float) 
     {
         super.update(dt);
-        Process.updateAll(dt);
+        @:privateAccess Process.updateAll(dt);
+    }
+
+    override function onResize() 
+    {
+        super.onResize();
+
+        Process.resizeAll();
     }
 }

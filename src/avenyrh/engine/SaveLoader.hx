@@ -9,6 +9,9 @@ class SaveLoader
 {
     public static var SAVEABLES : Array<ISaveable>;
 
+    //-------------------------------
+    //#region Public static API
+    //-------------------------------
     /**
      * Saves all ISaveable registered in SAVEABLES to the path
      */
@@ -65,4 +68,5 @@ class SaveLoader
     {
         Save.delete(path);
     }
+    //#endregion
 }

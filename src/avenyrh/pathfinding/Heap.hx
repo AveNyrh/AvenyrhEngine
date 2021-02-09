@@ -19,9 +19,9 @@ class Heap
         count = 0;  
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds the item to the Heap
      */
@@ -62,10 +62,11 @@ class Heap
     {
         return items[item.heapIndex] == item;
     }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * Sorts the item up in the Heap
      */
@@ -134,4 +135,5 @@ class Heap
         itemA.heapIndex = itemB.heapIndex;
         itemB.heapIndex = itemAIndex;
     }
+    //#endregion
 }

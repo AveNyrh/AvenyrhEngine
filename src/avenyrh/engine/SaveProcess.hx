@@ -7,6 +7,9 @@ class SaveProcess extends Process implements ISaveable
 {
     public var saveID : String;
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     override function init() 
     {
         super.init();
@@ -21,10 +24,11 @@ class SaveProcess extends Process implements ISaveable
 
         SaveLoader.SAVEABLES.remove(this);
     }
+    //#endregion
 
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Override this to save data from this process
      * @return SaveData Data you want to save
@@ -36,4 +40,5 @@ class SaveProcess extends Process implements ISaveable
       * @param saveData Saved data to restore
       */
     public function RestoreState(saveData : SaveData) { }
+    //#endregion
 }

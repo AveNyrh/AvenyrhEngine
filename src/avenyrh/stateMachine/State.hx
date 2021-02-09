@@ -45,6 +45,9 @@ class State implements IGarbageCollectable
         destroyed = false;
     }
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds a transition to this state
      * @param transition Transition going from this state
@@ -102,33 +105,64 @@ class State implements IGarbageCollectable
         }
         return null;
     }
+    //#endregion
 
-    //--------------------
-    //Overridable functions
-    //--------------------
-    public function onStateEnter(info : StateChangeInfo) 
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
+    /**
+     * Called when the state machine enters this state
+     */
+    public function onStateEnter(info : StateChangeInfo) { }
+
+    /**
+     * Called when the state machine update this state
+     */
+    public function onStateUpdate(dt : Float) { }
+
+    /**
+     * Called when the state machine exits this state
+     */
+    public function onStateExit(info : StateChangeInfo) { }
+
+    /**
+     * Called when beeing removed from the state machine
+     */
+    public function removed() { }
+    //#endregion
+
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
+    function _onStateEnter(info : StateChangeInfo) 
     {
         if(destroyed)
             return;
 
         isActive = true;
+
+        onStateEnter(info);
     }
 
-    public function onStateUpdate(dt : Float)
+    function _onStateUpdate(dt : Float)
     {
         if(destroyed && !isActive)
             return;
+
+        onStateUpdate(dt);
     }
 
-    public function onStateExit(info : StateChangeInfo) 
+    function _onStateExit(info : StateChangeInfo) 
     { 
         if(destroyed)
             return;
 
         isActive = false;
+
+        onStateExit(info);
     }
 
-    public function removed()
+    function _removed()
     {
         isActive = false;
         Engine.instance.gc.push(this);
@@ -143,4 +177,5 @@ class State implements IGarbageCollectable
         transitions = [];
         destroyed = true;
     }
+    //#endregion
 }

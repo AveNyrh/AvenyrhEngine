@@ -7,11 +7,12 @@ package avenyrh.pathfinding;
  */
 class Pathfinding 
 {
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Finds a path between two points
      */
     public function findPath(startPos : Vector2, targetPos : Vector2) { }
+    //#endregion
 }

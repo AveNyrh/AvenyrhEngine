@@ -44,7 +44,7 @@ class AMath
     }
     
     //--------------------
-    //Int
+    //#region Int
 	//--------------------
     /**
 	 * Returns min(x, y).
@@ -85,9 +85,10 @@ class AMath
 	{
 		return (x < min) ? min : (x > max) ? max : x;
     }
+	//#endregion
 
     //--------------------
-    //Float
+    //#region Float
     //--------------------
     /**
 	 * Returns min(x, y).
@@ -136,8 +137,7 @@ class AMath
     {
 		return (x > 0) ? 1 : (x < 0 ? -1 : 0);
     }
-
-    //------
+	//#endregion
 
     /**
 	 * Returns true if x is even

@@ -11,9 +11,9 @@ class SaveComponent extends Component
         saveID = '${gameObject.name}_${name}';
     }
 
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Override this to save data from this component
      * @return Dynamic Data you want to save
@@ -25,4 +25,5 @@ class SaveComponent extends Component
      * @param state Saved data to restore
      */
     public function RestroreState(state : Dynamic) { }
+    //#endregion
 }

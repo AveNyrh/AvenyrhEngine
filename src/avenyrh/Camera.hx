@@ -137,15 +137,15 @@ class Camera extends Process
         }
 
         //Scale
-        sx *= Const.SCALE;
-        sy *= Const.SCALE;
+        sx *= zoom;
+        sy *= zoom;
 
         //Round
         scene.scroller.x = AMath.round(sx);
         scene.scroller.y = AMath.round(sy);
 
         //Zoom
-        scene.scroller.setScale(zoom * Const.SCALE);
+        scene.scroller.setScale(zoom);
     }
 
     override function onDispose() 

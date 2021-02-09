@@ -1,6 +1,5 @@
 package avenyrh.engine;
 
-import h2d.Font;
 import h2d.Console;
 import avenyrh.InputManager;
 
@@ -17,16 +16,18 @@ class Engine extends Process
 
     public var currentScene (default, null) : Scene;
 
-    public function new(s : h2d.Scene, ?initScene : Scene) 
+    public function new(s : h2d.Scene, engine : h3d.Engine, ?initScene : Scene) 
     {
         super("Engine");
 
         instance = this;
 
-        Boot.instance.engine.backgroundColor = Color.iDARKBLUE;
+        engine.backgroundColor = Color.iDARKBLUE;
 
         //Engine settings
-        hxd.Timer.wantedFPS = Const.FPS;
+        hxd.Timer.wantedFPS = EngineConst.FPS;
+        @:privateAccess EngineConst.onFPSChanged = () -> hxd.Timer.wantedFPS = EngineConst.FPS;
+
         gc = [];
         createRoot(s);
         Process.S2D = s;
@@ -46,11 +47,13 @@ class Engine extends Process
         new Inspector();
 
         InputManager.init();
-        InputConfig.initInputs();
         new Tweeny("Tweeny", this);
         //Init options//
     }
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     public override function update(dt : Float)
     {
         super.update(dt);
@@ -89,7 +92,11 @@ class Engine extends Process
         removeChild(scene);
         scene.removed();
     }
+    //#endregion
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * Cleans all garbage
      */
@@ -103,4 +110,5 @@ class Engine extends Process
 
         gc = [];
     }
+    //#endregion
 }

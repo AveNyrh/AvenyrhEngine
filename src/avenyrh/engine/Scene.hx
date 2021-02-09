@@ -32,6 +32,9 @@ class Scene extends Process
         camera = new Camera("Camera", this, this);
     }
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * Called when added to the engine
      */
@@ -49,9 +52,18 @@ class Scene extends Process
         added();
     }
 
-    //--------------------
-    //Overridable functions
-    //--------------------
+    override function onResize() 
+    {
+        super.onResize();
+
+        for (go in allGO)
+            go.onResize();
+    }
+    //#endregion
+
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Override this to instantiate things when the scene is added to the engine
      */
@@ -103,10 +115,11 @@ class Scene extends Process
         ui.removeChildren();
         ui = null;
     }
+    //#endregion
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds a gameObject to the scene so that it can be updated
      * @param gameObject GameObject to add to the scene
@@ -163,12 +176,9 @@ class Scene extends Process
         return false;
     }
 
-    override function onResize() {
-        super.onResize();
-
-        for (go in allGO)
-            go.onResize();
+    public override function toString() : String 
+    { 
+        return "Scene " + name;
     }
-
-    public override function toString() : String { return "Scene " + name; }
+    //#endregion
 }

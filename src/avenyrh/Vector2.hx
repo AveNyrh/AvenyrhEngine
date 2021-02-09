@@ -8,16 +8,14 @@ private typedef Vector2Impl = {x : Float, y : Float}
 
     private var self (get, never) : Vector2;
 
-    private inline function get_self() : Vector2 
-    {
-		return (this : Vector2);
-	}
-
     public inline function new(x : Float, y : Float)
     {
         this = {x : x, y : y};
     }
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     public inline function set(x : Float, y : Float) : Vector2
     {
         this.x = x;
@@ -73,15 +71,25 @@ private typedef Vector2Impl = {x : Float, y : Float}
         var v : Vector2 = self * other;
         return v.x = v.y;
     }
+    //#endregion
     
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
+    private inline function get_self() : Vector2 
+    {
+		return (this : Vector2);
+	}
+
     private inline function get_magnitude() : Float 
     {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
+    //#endregion
 
-    //--------------------
-    //Operators
-    //--------------------
+    //-------------------------------
+    //#region Operators
+    //-------------------------------
     @:commutative @:op(A += B)
     public inline function addAssign(other : Vector2) : Vector2 
     {
@@ -216,10 +224,11 @@ private typedef Vector2Impl = {x : Float, y : Float}
     {
         return 'x : ${this.x}, y : ${this.y}';
     }
+    //#endregion
 
-    //--------------------
-    //Static variables
-    //--------------------
+    //-------------------------------
+    //#region Static variables
+    //-------------------------------
     /**
      * Easy way to get {0, 0}
      */
@@ -279,4 +288,5 @@ private typedef Vector2Impl = {x : Float, y : Float}
     {
         return new Vector2(-1, 0);
     }
+    //#endregion
 }

@@ -35,6 +35,12 @@ class Cell implements ICell
      */
     public var isWalkable : Bool = true; 
 
+    public function new(x : Int, y : Int)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
     public function compareTo(other : IHeapItem) : Int
     {
         var cell : ICell = cast other;

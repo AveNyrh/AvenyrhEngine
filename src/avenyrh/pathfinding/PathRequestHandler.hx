@@ -26,9 +26,9 @@ class PathRequestHandler extends Process
         pathRequestQueue = new Queue<PathRequest>();
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Put a path finding request in the queue
      */
@@ -38,10 +38,11 @@ class PathRequestHandler extends Process
         pathRequestQueue.enqueue(newRequest);
         tryProcessNext();
     }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     override function postUpdate(dt:Float) 
     {
         super.postUpdate(dt);
@@ -71,6 +72,7 @@ class PathRequestHandler extends Process
         currentPathRequest.callback(path, succes);
         isProcessingPath = false;
     }
+    //#endregion
 }
 
 typedef PathRequest = 

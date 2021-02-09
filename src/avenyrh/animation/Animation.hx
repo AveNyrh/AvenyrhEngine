@@ -51,6 +51,9 @@ class Animation extends State
         init();
     }
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     override function onStateEnter(info:StateChangeInfo) 
     {
         super.onStateEnter(info);
@@ -81,18 +84,20 @@ class Animation extends State
         if(currentTime > length && loop)
             currentTime = -0.0001;
     }
+    //#endregion
 
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Use this to init all events and/or transitions
      */
     function init() { }
+    //#endregion
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds a new key event
      * @param time time of the event
@@ -109,12 +114,14 @@ class Animation extends State
         events.push({time : time, event : event});
 
         //Sort events to have them in ascending order
-        events.sort(function(a, b) {
+        events.sort(function(a, b) 
+        {
             if(a.time < b.time) return -1;
             else if(a.time > b.time) return 1;
             else return 0;
         });
     }
+    //#endregion
 }
 
 typedef EventKey =

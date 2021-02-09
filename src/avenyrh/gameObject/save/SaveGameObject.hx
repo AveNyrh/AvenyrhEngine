@@ -14,16 +14,9 @@ class SaveGameObject extends GameObject implements ISaveable
         SaveLoader.SAVEABLES.push(this);
     }
 
-    override function onDestroy() 
-    {
-        super.onDestroy();
-
-        SaveLoader.SAVEABLES.remove(this);
-    }
-
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Override this to save data from this game object
      * @return SaveData Data you want to save
@@ -35,10 +28,11 @@ class SaveGameObject extends GameObject implements ISaveable
      * @param saveData Saved data to restore
      */
     public function RestoreState(saveData : SaveData) { }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //-------------------- 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * Gets all save data from every save component on this game object
      */
@@ -66,4 +60,12 @@ class SaveGameObject extends GameObject implements ISaveable
                c.RestroreState(stateMap[c.saveID]); 
         }
     }
+
+    override function onDestroy() 
+    {
+        super.onDestroy();
+
+        SaveLoader.SAVEABLES.remove(this);
+    }
+    //#endregion
 }

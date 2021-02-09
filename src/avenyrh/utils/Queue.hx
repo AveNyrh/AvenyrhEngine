@@ -14,6 +14,9 @@ class Queue<T>
         array = [];    
     }
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds an item to the end of the queue
      */
@@ -37,9 +40,14 @@ class Queue<T>
     {
         return array[array.length - 1];
     }
+    //#endregion
 
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     function get_length() : Int
     {
         return array.length;
     }
+    //#endregion
 }

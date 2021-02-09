@@ -66,42 +66,9 @@ class Button extends Interactive
         disable = new ButtonStateGraph(width, height, getDefaultColor(Disable));
     }
 
-    override private function draw(ctx : RenderContext)
-    {
-        if(!interactable)
-            state = Disable;
-        else
-        {
-            if (isOver())
-            {
-                state = pressed ? Press : Hover;
-            }
-            else 
-            {
-                state = pressed ? Hold : Idle;
-            }
-        }
-
-        emitTile(ctx, getGraph());
-    }
-
-    override public function handleEvent(e : Event)
-    {
-        if(!interactable)
-            return;
-
-        if (e.kind == EventKind.EPush)
-        {
-            pressed = true; 
-        }
-        else if (e.kind == EventKind.ERelease || e.kind == EventKind.EReleaseOutside)
-        {
-            pressed = false;
-        }
-
-        super.handleEvent(e);
-    }
-
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Sets the text inside the button
      */
@@ -127,6 +94,46 @@ class Button extends Interactive
             txt.color = c;
         else
             txt.color.setColor(color);
+    }
+
+    override public function handleEvent(e : Event)
+    {
+        if(!interactable)
+            return;
+
+        if (e.kind == EventKind.EPush)
+        {
+            pressed = true; 
+        }
+        else if (e.kind == EventKind.ERelease || e.kind == EventKind.EReleaseOutside)
+        {
+            pressed = false;
+        }
+
+        super.handleEvent(e);
+    }
+    //#endregion
+
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
+    override function draw(ctx : RenderContext)
+    {
+        if(!interactable)
+            state = Disable;
+        else
+        {
+            if (isOver())
+            {
+                state = pressed ? Press : Hover;
+            }
+            else 
+            {
+                state = pressed ? Hold : Idle;
+            }
+        }
+
+        emitTile(ctx, getGraph());
     }
 
     /**
@@ -174,6 +181,7 @@ class Button extends Interactive
 
         }
     }
+    //#endregion
 }
 
 class ButtonStateGraph

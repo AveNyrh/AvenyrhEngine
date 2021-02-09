@@ -41,6 +41,9 @@ class Timer implements IGarbageCollectable
         this.play = play;
     }
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Starts the timer
      */
@@ -101,12 +104,14 @@ class Timer implements IGarbageCollectable
     {
         destroyed = true;
     }
+    //#endregion
 
-    //--------------------
-    //Getters & Setters
-    //--------------------
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     inline function get_ratio() : Float
     {
         return currentTime / maxTime;    
     }
+    //#endregion
 }

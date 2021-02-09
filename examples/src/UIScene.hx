@@ -278,11 +278,11 @@ class UIScene extends Scene
     {
         super.update(dt);
 
-        if(InputManager.getKeyDown("RightArrow"))
+        if(hxd.Key.isPressed(hxd.Key.RIGHT))
         {
             Engine.instance.addScene(new PFScene());
         }
-        else if(InputManager.getKeyDown("LeftArrow"))
+        else if(hxd.Key.isPressed(hxd.Key.LEFT))
         {
             Engine.instance.addScene(new GameObjectScene());
         }

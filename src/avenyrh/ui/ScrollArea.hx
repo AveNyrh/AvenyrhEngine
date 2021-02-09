@@ -74,9 +74,9 @@ class ScrollArea extends Flow
         interactive.onWheel = onWheelUpdate;
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds something to the content view
      */
@@ -128,18 +128,20 @@ class ScrollArea extends Flow
         maskFlow.horizontalAlign = horizontal;
         maskFlow.verticalAlign = vertical;
     }
+    //#endregion
     
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Called when the wheel is used to move the scroll area
      */
     public dynamic function onWheel(e : hxd.Event) { }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     function onWheelUpdate(e : hxd.Event) 
     {
         var delta = e.wheelDelta * wheelSpeed;
@@ -373,10 +375,11 @@ class ScrollArea extends Flow
     {
         return maskFlow.getSize().height > mask.height;
     }
+    //#endregion
 
-    //--------------------
-    //Getters & Setters
-    //--------------------
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     function set_allowHorizontal(value : Bool) : Bool
     {
         allowHorizontal = value;
@@ -394,4 +397,5 @@ class ScrollArea extends Flow
 
         return allowVertical;
     }
+    //#endregion
 }

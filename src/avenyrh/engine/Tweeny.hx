@@ -13,9 +13,9 @@ class Tweeny extends Process
         tweens = [];
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds a tween to be updated
      */
@@ -33,10 +33,11 @@ class Tweeny extends Process
         if(tweens.contains(t))
             tweens.remove(t);    
     }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     override function update(dt:Float) 
     {
         super.update(dt);
@@ -54,4 +55,5 @@ class Tweeny extends Process
 
         tweens = [];
     }
+    //#endregion
 }

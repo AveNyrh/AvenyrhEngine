@@ -1,6 +1,5 @@
 package avenyrh.engine;
 
-import h2d.Font;
 import h2d.col.Point;
 import h2d.Bitmap;
 import h2d.Tile;
@@ -94,6 +93,9 @@ class Inspector extends Process
         close();
     }
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     override function update(dt:Float) 
     {
         super.update(dt);
@@ -212,10 +214,11 @@ class Inspector extends Process
         bg.width = flow.getSize().width;
         bg.height = flow.getSize().height;
     }
+    //#endregion
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     public function open()
     {
         enable = true;
@@ -229,4 +232,5 @@ class Inspector extends Process
         enable = false;
         flow.visible = false;
     }
+    //#endregion
 }

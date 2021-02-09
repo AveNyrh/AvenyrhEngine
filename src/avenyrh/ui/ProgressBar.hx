@@ -73,9 +73,9 @@ class ProgressBar extends Flow
         drawGraph();
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Eases the bar fill
      */
@@ -111,10 +111,11 @@ class ProgressBar extends Flow
         
         drawGraph();
     }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     function updateValue(value : Float) 
     {
         fillAmount = value;
@@ -137,18 +138,20 @@ class ProgressBar extends Flow
         if(t != null)
             Tweeny.unregister(t);
     }
+    //#endregion
 
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Override this to implement how to draw the graph
      */
     function drawGraph() { }
+    //#endregion
 
-    //--------------------
-    //Getters & Setters
-    //--------------------
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     function set_useTween(value : Bool) : Bool 
     {
         useTween = value;
@@ -158,4 +161,5 @@ class ProgressBar extends Flow
 
         return useTween;
     }
+    //#endregion
 }

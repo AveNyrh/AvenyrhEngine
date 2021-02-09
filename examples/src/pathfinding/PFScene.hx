@@ -97,18 +97,18 @@ class PFScene extends Scene
     {
         super.update(dt);
 
-        if(InputManager.getKeyDown("RightArrow"))
+        if(hxd.Key.isPressed(hxd.Key.RIGHT))
         {
             Engine.instance.addScene(new GameObjectScene());
             return;
         }
-        else if(InputManager.getKeyDown("LeftArrow"))
+        else if(hxd.Key.isPressed(hxd.Key.LEFT))
         {
             Engine.instance.addScene(new UIScene());
             return;
         }
 
-        if(InputManager.getKeyDown("R"))
+        if(hxd.Key.isPressed(hxd.Key.R))
         {
             for(x in 0 ... grid.width)
             {
@@ -121,7 +121,7 @@ class PFScene extends Scene
             }
         }
         
-        if(InputManager.getKeyDown("A"))
+        if(hxd.Key.isPressed(hxd.Key.A))
         {
             var x : Int = ExampleCell.currentHoverCell.x;
             var y : Int = ExampleCell.currentHoverCell.y;
@@ -153,13 +153,13 @@ class PFScene extends Scene
             startCell = ec;
         }
 
-        if(InputManager.getKeyDown("Space"))
+        if(hxd.Key.isPressed(hxd.Key.SPACE))
         {
             pf.simplify = !pf.simplify;
             text.text = 'simplify = ${pf.simplify}';
         }
 
-        if(InputManager.getKey("MouseLeft"))
+        if(hxd.Key.isDown(hxd.Key.MOUSE_LEFT))
         {
             var x : Int = ExampleCell.currentHoverCell.x;
             var y : Int = ExampleCell.currentHoverCell.y;
@@ -174,7 +174,7 @@ class PFScene extends Scene
             }                 
         }
 
-        if(InputManager.getKey("MouseRight"))
+        if(hxd.Key.isDown(hxd.Key.MOUSE_RIGHT))
         {
             var x : Int = ExampleCell.currentHoverCell.x;
             var y : Int = ExampleCell.currentHoverCell.y;

@@ -27,9 +27,9 @@ class Grid
         cells = [];
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Returns the cell in the grid at the coordinate [x, y]
      */
@@ -107,12 +107,14 @@ class Grid
 
         return neighbours;
     }
+    //#endregion
 
-    //--------------------
-    //Getters & Setters
-    //--------------------
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     inline function get_maxSize() : Int
     {
         return width * height;    
     }
+    //#endregion
 }

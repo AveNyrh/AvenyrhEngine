@@ -68,11 +68,28 @@ class Process implements IGarbageCollectable
         init();
     }
 
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
+    public function init() { }
+
+    public function update(dt : Float) { if(paused || destroyed) return; }
+    
+    public function postUpdate(dt : Float) { if(paused || destroyed) return; }
+    
+    public function onResize() { }
+    
+    private function onDispose() { destroyed = true; }
+    //#endregion
+
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * Creates the root for graphics
      * @param ctx Normally s2d
      */
-    public function createRoot(?ctx : h2d.Object, ?layer : Int = 0)
+    function createRoot(?ctx : h2d.Object, ?layer : Int = 0)
     {
         if(root != null)
 			throw '[Process ${name}] : root already created !';
@@ -90,35 +107,15 @@ class Process implements IGarbageCollectable
         time = 0;
     }
 
-    //--------------------
-    //Overridable functions
-    //--------------------
-    public function init() { }
-
-    public function update(dt : Float) { if(paused || destroyed) return; }
-    
-    public function postUpdate(dt : Float) { if(paused || destroyed) return; }
-    
-    public function onResize() { }
-    
-    private function onDispose() { destroyed = true; }
-
-    //--------------------
-    //Private API
-    //--------------------
     function getDefaultFrameRate() : Float 
     {
 		return hxd.Timer.wantedFPS;
 	}
+    //#endregion
     
-    //--------------------
-    //Public API
-    //--------------------
-    public function toString() : String
-    {
-        return name + " : " + uID;
-    }
-
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Puts the process in pause
      */
@@ -190,10 +187,29 @@ class Process implements IGarbageCollectable
 		for(p in children)
 			p.destroy();
     }
+
+    public function toString() : String
+    {
+        return name + " : " + uID;
+    }
+    //#endregion
     
-    //--------------------
-    //Public static API
-    //--------------------
+    //-------------------------------
+    //#region Public static API
+    //-------------------------------    
+    /**
+     * Resizes all process
+     */
+    public static function resizeAll() 
+    {
+		for (p in ROOTS)
+			_resize(p);
+    }
+    //#endregion
+    
+    //-------------------------------
+    //#region Private static API
+    //-------------------------------
     /**
      * Updates all process
      * @param dt Delta time
@@ -214,19 +230,7 @@ class Process implements IGarbageCollectable
         //Add time
         time += dt;
     }
-    
-    /**
-     * Resizes all process
-     */
-    public static function resizeAll() 
-    {
-		for (p in ROOTS)
-			_resize(p);
-    }
-    
-    //--------------------
-    //Private static API
-    //--------------------
+
     /**
      * Updates the process in parameter
      * @param p Process to update
@@ -330,10 +334,11 @@ class Process implements IGarbageCollectable
 				_resize(p);
 		}
     }
+    //#endregion
     
-    //--------------------
-    //Getters & Setters
-    //--------------------
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     inline function get_width() : Int
     {
         return hxd.Window.getInstance().width;    
@@ -343,4 +348,5 @@ class Process implements IGarbageCollectable
     {
         return hxd.Window.getInstance().height;    
     }
+    //#endregion
 }

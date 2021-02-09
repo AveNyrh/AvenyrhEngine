@@ -19,9 +19,9 @@ class AStarPathfinding extends Pathfinding
         this.grid = grid;
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     public override function findPath(startPos : Vector2, targetPos : Vector2)
     {
         //Sets the starting and the target cell
@@ -82,10 +82,11 @@ class AStarPathfinding extends Pathfinding
 
         @:privateAccess PathRequestHandler.finishedProcessingPath(waypoints, pathSucces);
     }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * Retrace the path from one Cell to another
      */
@@ -159,4 +160,5 @@ class AStarPathfinding extends Pathfinding
 
         return 14 * distX + 10 * (distY - distX);
     }
+    //#endregion
 }

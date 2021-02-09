@@ -30,9 +30,9 @@ class InputManager
         initialized = true;
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds a custom keyboard key to the list
      * @param name Name of the custom key
@@ -261,11 +261,12 @@ class InputManager
         }
 
         return nb;
-    } 
+    }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     private static function getPad(index : Int) : Null<Pad>
     {
         if(!pads.exists(index))
@@ -311,6 +312,7 @@ class InputManager
             i++;
         }
     }
+    //#endregion
 }
 
 class KeyBinding

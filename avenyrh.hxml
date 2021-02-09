@@ -6,5 +6,5 @@
 -D windowTitle=AveNyrhEngine
 -D windowSize=1280x720
 
--main Boot
+-main Main
 -hl avenyrh.hl

@@ -48,9 +48,9 @@ class Component implements IGarbageCollectable
         enable = true;
     }
 
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Use this to initialize components and else
      */
@@ -102,15 +102,16 @@ class Component implements IGarbageCollectable
 
         return s;
     }
+    //#endregion
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Gets a component that is on the same gameObject
      * @param componentType Class of the wanted component
      */
-    public function getComponent<T : Dynamic>(componentType : Class<T>) : T
+    public function getComponent<T : Component>(componentType : Class<T>) : T
     {
         return gameObject.getComponent(componentType);
     }
@@ -119,7 +120,7 @@ class Component implements IGarbageCollectable
      * Gets all components that are on the same gameObject
      * @param componentType Class of the wanted component
      */
-    public function getComponents<T : Dynamic>(componentType : Class<T>) : Array<T>
+    public function getComponents<T : Component>(componentType : Class<T>) : Array<T>
     {
         return gameObject.getComponents(componentType);
     }
@@ -146,10 +147,11 @@ class Component implements IGarbageCollectable
     {
         return name + " : " + uID;
     }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * GarbageCollectable implementation \
      * Destroys this component
@@ -160,10 +162,11 @@ class Component implements IGarbageCollectable
         destroyed = true;
         onDestroy();
     }
+    //#endregion
 
-    //--------------------
-    //Getters & Setters
-    //--------------------
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     private function set_enable(enable : Bool) : Bool
     {
         if(this.enable == enable)
@@ -175,4 +178,5 @@ class Component implements IGarbageCollectable
 
         return this.enable;
     }
+    //#endregion
 }

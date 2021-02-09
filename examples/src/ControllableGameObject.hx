@@ -31,18 +31,18 @@ class ControllableGameObject extends GameObject
     {
         super.update(dt);
 
-        if(InputManager.getKey("Right"))
+        if(hxd.Key.isDown(hxd.Key.D))
             x += movementSpeed;
-        if(InputManager.getKey("Left"))
+        if(hxd.Key.isDown(hxd.Key.Q))
             x -= movementSpeed;
-        if(InputManager.getKey("Up"))
+        if(hxd.Key.isDown(hxd.Key.Z))
             y -= movementSpeed;
-        if(InputManager.getKey("Down"))
+        if(hxd.Key.isDown(hxd.Key.S))
             y += movementSpeed;
 
-        if(InputManager.getKey("A"))
+        if(hxd.Key.isDown(hxd.Key.A))
             rotation -= 0.01 * rotationSpeed;
-        if(InputManager.getKey("E"))
+        if(hxd.Key.isDown(hxd.Key.E))
             rotation += 0.01 * rotationSpeed;
     }
 }

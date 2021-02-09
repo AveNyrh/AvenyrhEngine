@@ -89,9 +89,9 @@ class Dropdown extends Flow
         needReflow = true;
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds an item to the dropdown list \
      * The item can be different from other items in the list
@@ -110,10 +110,11 @@ class Dropdown extends Flow
 
         minWidth = AMath.imax(minWidth, Std.int(width-arrow.getSize().width));
     }
+    //#endregion
 
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
 	 * Called when the dropdown opens
 	 */
@@ -133,10 +134,11 @@ class Dropdown extends Flow
 	 * Called when the mouse goes away from an item in the dropdown list
 	 */
     public dynamic function onOutItem(item : Object) { }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     function onPush(e : hxd.Event)
     {
         if(e.button == 0 && enable)
@@ -236,10 +238,11 @@ class Dropdown extends Flow
         
 		itemsArea.remove();
 	}
+    //#endregion
     
-    //--------------------
-    //Getters & Setters
-    //--------------------
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     override function set_backgroundTile(t : Tile) : Tile 
     {
         super.set_backgroundTile(t);
@@ -285,6 +288,7 @@ class Dropdown extends Flow
 
         return selectedItem;    
     }
+    //#endregion
 }
 
 private class DisplayedItem extends Object

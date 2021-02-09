@@ -7,7 +7,9 @@ import hxd.Pad;
 class GamePad 
 {
     static var ALL : Array<GamePad> = [];
+
     var pad : Null<Pad>;
+    
     var lastValues : Array<Float>;
 
     static var mapping : Array<Int> = 
@@ -35,6 +37,7 @@ class GamePad
     ];
 
     public var deadZone : Float;
+
     public var axisAsButtonDeadZone : Float;
 
     public function new(?deadZone : Float)
@@ -53,9 +56,9 @@ class GamePad
         axisAsButtonDeadZone = 0.7;
     }
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Makes the gamePad rumble
      * @param strength Strength of the rumble
@@ -131,10 +134,11 @@ class GamePad
     {
         return false;
     }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     private inline function hasPad() : Bool 
     {
         if(pad == null)
@@ -171,6 +175,7 @@ class GamePad
         lastValues[0] = pad.values[mapping[GamePadKey.LT.getIndex()]];
         lastValues[1] = pad.values[mapping[GamePadKey.RT.getIndex()]];
     }
+    //#endregion
 }
 
 enum abstract GamePadKey(Int)

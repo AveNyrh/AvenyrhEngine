@@ -28,6 +28,9 @@ class TabGroup extends Flow
         defaultSelectedButton = null;
     }
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Opens the tab \
      * Opens the defaultSelectedButton tab if not null, else the last selected
@@ -78,7 +81,11 @@ class TabGroup extends Flow
         if(buttons.exists(button))
             buttons.remove(button);    
     }
+    //#endregion
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * Called by a button when it gets selected
      */
@@ -102,4 +109,5 @@ class TabGroup extends Flow
                 buttons[b].visible = false;
         }
     }
+    //#endregion
 }

@@ -37,8 +37,8 @@ class ExampleCell extends Cell
 
     public function new(x : Int, y : Int, size : Int, parent : Object, scene : PFScene)
     {
-        this.x = x;
-        this.y = y;
+        super(x, y);
+
         this.scene = scene;
 
         var tileSize : Int = Std.int(size * 0.9);

@@ -34,9 +34,9 @@ class Color
 		return (c.a << 24) | (c.r<<16 ) | (c.g<<8) | c.b;
 	}
 
-    //--------------------
-    //Colors
-	//--------------------
+    //-------------------------------
+    //#region Colors
+    //-------------------------------
 	//Ints
     public static inline var iWHITE : Int = 0xFFFFFFFF;
 	public static inline var iBLACK : Int = 0xFF000000;
@@ -72,6 +72,7 @@ class Color
 	public static var BEIGE (get, never) : Vector; static inline function get_BEIGE() return intToVector(iBEIGE);
 	public static var CARAMEL (get, never) : Vector; static inline function get_CARAMEL() return intToVector(iCARAMEL);
 	public static var DARKBLUE (get, never) : Vector; static inline function get_DARKBLUE() return intToVector(iDARKBLUE);
+	//#endregion
 }
 
 typedef Col = 

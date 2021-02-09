@@ -52,6 +52,9 @@ class StateMachine implements IGarbageCollectable
       anyState = new State("Any", this);
     }
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     public function start()
     {
       if(states.length == 0)
@@ -80,7 +83,7 @@ class StateMachine implements IGarbageCollectable
       if(t == null)
       {
         //No transition valid, just update
-        currentState.onStateUpdate(dt);
+        @:privateAccess currentState._onStateUpdate(dt);
       }
       else
       {
@@ -89,8 +92,8 @@ class StateMachine implements IGarbageCollectable
         var next = t.to;
         var info = new StateChangeInfo(previous, next, t);
 
-        currentState.onStateExit(info);
-        next.onStateEnter(info);
+        @:privateAccess currentState._onStateExit(info);
+        @:privateAccess next._onStateEnter(info);
         currentState = next;
       }
     }
@@ -131,8 +134,13 @@ class StateMachine implements IGarbageCollectable
     public function removed()
     {
       isActive = false;
+
+      for(s in states)
+        s.removed();
+
       Engine.instance.gc.push(this);
     }
+    //#endregion
     
     /**
      * GarbageCollectable implementation \

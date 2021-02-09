@@ -8,6 +8,9 @@ class Animator extends Component
     var variables : Map<String, Any>;
     var stateMachine : StateMachine;
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     override function init() 
     {
         super.init();
@@ -36,7 +39,11 @@ class Animator extends Component
         s += stateMachine.currentState.name + "\n";
         return s;
     }
+    //#endregion
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Adds an animation to the state machine
      * @param animation Animation to add
@@ -48,4 +55,5 @@ class Animator extends Component
 
         return animation;
     }
+    //#endregion
 }

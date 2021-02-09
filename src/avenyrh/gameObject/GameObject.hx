@@ -82,9 +82,9 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         enable = true;
     }
 
-    //--------------------
-    //Overridable functions
-    //--------------------
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
     /**
      * Use this to initialize components and else
      */
@@ -99,31 +99,34 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     /**
      * Main loop
      */
-    function update(dt : Float) 
-    {
-        if(!enable || destroyed)
-            return;
-
-        if(!started)
-        {
-            started = true;
-            start();
-        }
-    }
+    function update(dt : Float) { }
 
     /**
-     * Override this to post update
+     * Loop after the main loop
      */
-    function postUpdate(dt : Float) { if(!enable || destroyed) return; }
+    function postUpdate(dt : Float) { }
 
-    function onEnable() { }
+    function onEnable() 
+    {
+        for(child in children)
+        {
+            if(Std.isOfType(child, GameObject))
+            {
+                var go : GameObject = cast(child);
+                go.enable = true;
+            }
+        }
+    }
 
     function onDisable() 
     { 
         for(child in children)
         {
-            var go : GameObject = cast(child);
-            go.enable = false;
+            if(Std.isOfType(child, GameObject))
+            {
+                var go : GameObject = cast(child);
+                go.enable = false;
+            }
         }
     }
 
@@ -132,7 +135,8 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     override function removeChildren()
     {
         for(child in children)
-            scene.removeGameObject(cast(child, GameObject));
+            if(Std.isOfType(child, GameObject))
+                scene.removeGameObject(cast child);
 
         super.removeChildren();
     }
@@ -146,19 +150,20 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
      * Override this to put custom informations on the inspector window 
      */
     function getInfo() : String { return ""; }
+    //#endregion
 
-    //--------------------
-    //Public API
-    //--------------------
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
     /**
      * Gets the first component found on this gameObject
      * @param component Class of the wanted component
      */
-    public function getComponent<T : Dynamic>(componentType : Class<T>) : T
+    public function getComponent<T : Component>(componentType : Class<T>) : T
     {
         for(c in components)
         {
-            if(Std.is(c, componentType))
+            if(Std.isOfType(c, componentType))
             {
                 return cast c; 
             }
@@ -171,13 +176,13 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
      * Gets the all components found on this gameObject
      * @param componentType Class of the wanted components
      */
-    public function getComponents<T : Dynamic>(componentType : Class<T>) : Array<T>
+    public function getComponents<T : Component>(componentType : Class<T>) : Array<T>
     {
-        var cs : Array<T> = null;
+        var cs : Array<T> = [];
 
         for(c in components)
         {
-            if(Std.is(c, componentType))
+            if(Std.isOfType(c, componentType))
             {
                 cs.push(cast c);
             }
@@ -253,10 +258,13 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     
         for(c in children)
         {
-            var go : GameObject = cast(c);
+            if(Std.isOfType(c, GameObject))
+            {
+                var go : GameObject = cast c;
 
-            if(go.uID == child.uID)
-                return true;
+                if(go.uID == child.uID)
+                    return true;
+            }
         }
             
         return false;
@@ -277,10 +285,11 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     {
         return name + " : " + uID;
     }
+    //#endregion
 
-    //--------------------
-    //Private API
-    //--------------------
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     /**
      * Called by the scene to update
      */
@@ -319,8 +328,9 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         if(!enable || destroyed)
             return;
 
-        for (c in components) 
-            c.postUpdate(dt);
+        for (c in components)
+            if(c.enable)
+                c.postUpdate(dt);
     }
 
     /**
@@ -378,10 +388,9 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         //Children
         for(c in children)
         {
-            var go : Null<GameObject> = cast c;
-
-            if(go != null)
+            if(Std.isOfType(c, GameObject))
             {
+                var go : GameObject = cast c;
                 s += "\n ---------------------------- \n\n";
                 s += go.getInspectorInfo() + "\n";
             }
@@ -412,10 +421,11 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
             super.draw(ctx);
         }
     }
+    //#endregion
 
-    //--------------------
-    //Getters & Setters
-    //--------------------
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     function set_enable(enable : Bool) : Bool
     {
         if(this.enable == enable)
@@ -458,6 +468,7 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
 
         return debug;
     }
+    //#endregion
 }
 
 class Pivot
