@@ -11,7 +11,7 @@ As I worked moslty with Unity, the framework here is similar in some points.
 
 ## Examples
 
-In the examples folder, there are some examples on how to work with this framework
+In the examples folder, there are some examples on how to work with this framework :
 
 - GameObjectScene : GameObject (controllable & fixed), Animator/Animation, Camera
 
@@ -35,9 +35,20 @@ In the examples folder, there are some examples on how to work with this framewo
 
 ## Inspector
 
-You have an Inspector that can help you to debug the game. Press F4 to show the Inspector window and click on the GameObject you want to inspect
-It shows different informations about the object, its components and its children
-You can put you own debug informations by overriding the `getInfo()` method
+You have an Inspector that can help you to debug the game. Press F4 to show the Inspector window and click on the GameObject you want to inspect.
+It shows different informations about the object, its components and its children.
+You can put you own debug informations by overriding the `drawInspector` method.
+
+Here is an example :
+```haxe
+public function drawInspector(inspector : Inspector, fold : Fold)
+{
+    inspector.doubleField(fold, "left", () -> '${hxd.Math.fmt(value1)}', (v) -> value1 = Std.parseFloat(v), "right", () -> '${hxd.Math.fmt(value2)}', (v) -> value2 = Std.parseFloat(v)); //Two value field
+    inspector.field(fold, "value", () -> variable.toString(), (v) -> variable = v); //On value field
+	inspector.space(fold, 20); //Space
+	inspector.textLabel(fold, "Label", () -> name, (v) -> return); //Avoid modification
+}
+```
 
 
 ## UI
@@ -58,6 +69,8 @@ There are some UI components that can help with most of UI work :
 - ScrollArea : Content window that can be scrolled both horizontaly and verticaly if the content is bigger that the window
 
 - Tab : TabGroup handles TabButtons states and the corresponding content
+
+- NineSlice : Cut a tile in 9 with corners, borders and a center container
 
 You can Tween elements by addind tween to you objects.
 
