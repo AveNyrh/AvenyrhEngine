@@ -18,7 +18,7 @@ class ScrollArea extends Flow
     /**
      * Flow for the content
      */
-    var maskFlow : Flow;
+    public var maskFlow : Flow;
     /**
      * Horizontal bar containter
      */
@@ -83,6 +83,27 @@ class ScrollArea extends Flow
     public function addToContent(object : Object) 
     {
         maskFlow.addChild(object);
+
+        updateHandles();
+    }
+
+    /**
+     * Removes something from the content view
+     */
+    public function removeFromContent(object : Object) 
+    {
+        if(maskFlow.children.contains(object))
+            maskFlow.removeChild(object);
+
+        updateHandles();
+    }
+
+    /**
+     * Clears the content view
+     */
+    public function clearContent() 
+    {
+        maskFlow.removeChildren();
 
         updateHandles();
     }

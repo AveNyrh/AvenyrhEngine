@@ -1,4 +1,5 @@
 import examples.src.GameObjectScene;
+import examples.src.UIScene;
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
 

@@ -39,6 +39,8 @@ class GameObjectScene extends Scene
     {
         super.update(dt);
 
+        return;
+
         if(hxd.Key.isPressed(hxd.Key.RIGHT))
         {
             Engine.instance.addScene(new UIScene());

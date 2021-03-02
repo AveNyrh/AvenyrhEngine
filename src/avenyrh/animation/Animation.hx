@@ -34,9 +34,9 @@ class Animation extends State
      */
     public var loop (default, null) : Bool;
 
-    public function new(name : String, sm : StateMachine, animator : Animator, loop : Bool = true) 
+    public function new(name : String, animator : Animator, loop : Bool = true) 
     {
-        super(name, sm);
+        super(name, animator.stateMachine);
 
         this.animator = animator;
         

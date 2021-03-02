@@ -12,9 +12,9 @@ interface IInspectable
     var debugColor : Int;
 
     /**
-     * Returns all info that should appear on the Inspector window
+     * Draws the Inspector windows
      */
-    function getInspectorInfo() : String;
+    function drawInspector(inspector : Inspector) : Void;
 
     /**
      * Are the x and y inside the bounds of the object ?

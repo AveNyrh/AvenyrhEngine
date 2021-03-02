@@ -1,12 +1,14 @@
 package avenyrh.animation;
 
+import avenyrh.engine.Inspector;
+import avenyrh.ui.Fold;
 import avenyrh.gameObject.Component;
 import avenyrh.stateMachine.*;
 
 class Animator extends Component
 {
     var variables : Map<String, Any>;
-    var stateMachine : StateMachine;
+    public var stateMachine : StateMachine;
 
     //-------------------------------
     //#region Private API
@@ -33,11 +35,11 @@ class Animator extends Component
         stateMachine.update(dt);
     }
 
-    override function getInfo() : String 
+    override function drawInfo(inspector:Inspector, fold:Fold) 
     {
-        var s : String = super.getInfo();
-        s += stateMachine.currentState.name + "\n";
-        return s;
+        super.drawInfo(inspector, fold);
+
+        inspector.textLabel(fold, "Animation", () -> stateMachine.currentState.name, (v) -> return);
     }
     //#endregion
 
@@ -54,6 +56,22 @@ class Animator extends Component
         stateMachine.addState(animation, isDefault);
 
         return animation;
+    }
+
+    public function addVariable(name : String, value : Any)
+    {
+        if(variables.exists(name))
+            return;
+
+        variables.set(name, value);
+    }
+
+    public function updateVariable(name : String, value : Any) 
+    {
+        if(!variables.exists(name))
+            return;
+        
+        variables.set(name, value);
     }
     //#endregion
 }

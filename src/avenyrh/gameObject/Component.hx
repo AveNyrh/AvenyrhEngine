@@ -1,5 +1,7 @@
 package avenyrh.gameObject;
 
+import avenyrh.ui.Fold;
+import avenyrh.engine.Inspector;
 import avenyrh.engine.IGarbageCollectable;
 import avenyrh.engine.Engine;
 
@@ -92,15 +94,15 @@ class Component implements IGarbageCollectable
     function onDestroy() { }
 
     /**
-     * Override this to put custom informations on the inspector window\
+     * Override this to draw custom informations on the inspector window 
      * Call super and append to it
      */
-    public function getInfo() : String
+    function drawInfo(inspector : Inspector, fold : Fold) 
     {
-        var s : String = "- " + name + " -\n\n";
-        s += 'enable = $enable' + "\n";
+        inspector.space(fold, 20);
 
-        return s;
+        var n : Array<String> = Type.getClassName(Type.getClass(this)).split(".");
+        inspector.textLabel(fold, '- ${n[n.length - 1]}', () -> name, (v) -> return, 32);
     }
     //#endregion
 

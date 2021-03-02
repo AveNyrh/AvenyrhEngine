@@ -1,6 +1,6 @@
 package examples.src;
 
-import avenyrh.InputManager;
+import avenyrh.ui.Fold;
 import examples.src.pathfinding.PFScene;
 import avenyrh.engine.Engine;
 import avenyrh.ui.Dropdown;
@@ -44,6 +44,8 @@ class UIScene extends Scene
 
     var dropdown : Dropdown;
 
+    var fold : Fold;
+
     public override function new() 
     {
         super("TestScene");
@@ -66,7 +68,18 @@ class UIScene extends Scene
         // spawnScrollArea(ui);
         // spawnDropdown(ui);
 
-        fullExample();
+        // fullExample();
+
+        spawnFold();
+    }
+
+    function spawnFold()
+    {
+        fold = new Fold(ui, "Fold", hxd.res.DefaultFont.get(), 300, 30, Color.iDARKGREY);
+        fold.setPosition(100, 100);
+        fold.label.textColor = Color.iWHITE;
+        
+        var bitmap : Bitmap = new Bitmap(Tile.fromColor(Color.iCYAN, 300, 300, 0.1), fold.container);
     }
 
     function spawnButton() 

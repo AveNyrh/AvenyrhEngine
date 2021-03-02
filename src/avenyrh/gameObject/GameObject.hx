@@ -1,5 +1,7 @@
 package avenyrh.gameObject;
 
+import avenyrh.ui.Fold;
+import avenyrh.engine.Inspector;
 import h2d.col.Point;
 import avenyrh.engine.IInspectable;
 import h2d.col.Bounds;
@@ -145,6 +147,11 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
      * Called when the screen is resized
      */
     function onResize() { }
+
+    /**
+     * Override this to draw custom informations on the inspector window 
+     */
+    function drawInfo(inspector : Inspector, fold : Fold) { }
 
     /**
      * Override this to put custom informations on the inspector window 
@@ -365,38 +372,29 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     }
 
     @:noCompletion
-    public function getInspectorInfo() : String
+    public function drawInspector(inspector : Inspector)
     {
-        var s : String = "-- " + name + " --\n\n";
-        s += 'enable = $enable' + "\n";
-        s += 'x = $x      y = $y' + "\n";
-        s += 'rot = ${Std.int(AMath.toDeg(rotation) % 360)}' + "\n";
-        s += 'sx = $scaleX      sy = $scaleY' + "\n";
+        var fold : Fold = inspector.fold(name);
+        
+        inspector.doubleField(fold, "x", () -> '${hxd.Math.fmt(x)}', (v) -> x = Std.parseFloat(v), "y", () -> '${hxd.Math.fmt(y)}', (v) -> y = Std.parseFloat(v));
+        inspector.field(fold, "rotation", () -> '${Std.int(AMath.toDeg(rotation) % 360)}', (v) -> rotation = AMath.toRad(Std.parseFloat(v)));
+        inspector.doubleField(fold, "sx", () -> '${hxd.Math.fmt(scaleX)}', (v) -> scaleX = Std.parseFloat(v), "sy", () -> '${hxd.Math.fmt(scaleY)}', (v) -> scaleY = Std.parseFloat(v));
 
-        //Custom infos
-        var info : String = getInfo();
-        if(info != "")
-            s += info + "\n";
+        drawInfo(inspector, fold);
 
         //Components
         for(c in components)
-        {
-            s += "\n ---------------------------- \n\n";
-            s += c.getInfo();
-        }
+            c.drawInfo(inspector, fold);
 
         //Children
         for(c in children)
         {
-            if(Std.isOfType(c, GameObject))
+            if(Std.isOfType(c, IInspectable))
             {
-                var go : GameObject = cast c;
-                s += "\n ---------------------------- \n\n";
-                s += go.getInspectorInfo() + "\n";
+                var inspec : IInspectable = cast c;
+                inspec.drawInspector(inspector);
             }
         }
-
-        return s;
     }
 
     @:noCompletion
@@ -410,6 +408,8 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     {
         if(enable)
         {
+            super.draw(ctx);
+
             if(debug)
             {
                 debugGraphics.lineStyle(1, debugColor);
@@ -417,8 +417,6 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
                 getBoundsRec(this, bds, true);
                 debugGraphics.drawRect(bds.xMin, bds.yMin, bds.width, bds.height);
             }
-
-            super.draw(ctx);
         }
     }
     //#endregion
