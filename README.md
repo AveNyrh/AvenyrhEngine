@@ -43,12 +43,20 @@ Here is an example :
 ```haxe
 public function drawInspector(inspector : Inspector, fold : Fold)
 {
-    inspector.doubleField(fold, "left", () -> '${hxd.Math.fmt(value1)}', (v) -> value1 = Std.parseFloat(v), "right", () -> '${hxd.Math.fmt(value2)}', (v) -> value2 = Std.parseFloat(v)); //Two value field
-    inspector.field(fold, "value", () -> variable.toString(), (v) -> variable = v); //On value field
-	inspector.space(fold, 20); //Space
-	inspector.textLabel(fold, "Label", () -> name, (v) -> return); //Avoid modification
+	//Two value field
+    inspector.doubleField(fold, "left", () -> '${hxd.Math.fmt(value1)}', (v) -> value1 = Std.parseFloat(v), "right", () -> '${hxd.Math.fmt(value2)}', (v) -> value2 = Std.parseFloat(v));
+	//On value field
+    inspector.field(fold, "value", () -> variable.toString(), (v) -> variable = v);
+	//Space
+	inspector.space(fold, 20);
+	//Text label
+	inspector.textLabel(fold, "Label");
 }
 ```
+
+You have two buttons :
+- Debug the bounds of all gameObjects
+- Lock on the current gameObject
 
 
 ## UI

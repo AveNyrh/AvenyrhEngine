@@ -329,19 +329,20 @@ class Inspector extends Process
         return fold;
     }
 
-    public function field(parent : Fold, label : String, get : Void -> String, set : String -> Void, slider : Bool = false, min : Float = 0, max : Float = 1) : Field
+    public function field(parent : Fold, label : String, get : Void -> String, set : String -> Void, slider : Bool = false, min : Float = 0, max : Float = 1, canEdit : Bool = true) : Field
     {
         var f : Flow = cast parent.container.getChildAt(0);
 
         var field : Field = new Field(label, f, EngineConst.INSPECTOR_FIELD_WIDTH, EngineConst.INSPECTOR_FIELD_HEIGHT, get, set);
         f.getProperties(field).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
-        
+        field.ti.canEdit = canEdit;
+
         fields.push(field);
 
         return field;
     }
 
-    public function doubleField(parent : Fold, labelLeft : String, getLeft : Void -> String, setLeft : String -> Void, labelRight : String, getRight : Void -> String, setRight : String -> Void, slider : Bool = false, min : Float = 0, max : Float = 1)
+    public function doubleField(parent : Fold, labelLeft : String, getLeft : Void -> String, setLeft : String -> Void, labelRight : String, getRight : Void -> String, setRight : String -> Void, slider : Bool = false, min : Float = 0, max : Float = 1, canEdit : Bool = true)
     {
         var f : Flow = cast parent.container.getChildAt(0);
         var flow : Flow = new Flow(f);
@@ -349,21 +350,20 @@ class Inspector extends Process
         f.getProperties(flow).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
 
         var field : Field = new Field(labelLeft, flow, Std.int(EngineConst.INSPECTOR_FIELD_WIDTH / 2), EngineConst.INSPECTOR_FIELD_HEIGHT, getLeft, setLeft);
+        field.ti.canEdit = canEdit;
         fields.push(field);
 
         field = new Field(labelRight, flow, Std.int(EngineConst.INSPECTOR_FIELD_WIDTH / 2), EngineConst.INSPECTOR_FIELD_HEIGHT, getRight, setRight);
+        field.ti.canEdit = canEdit;
         fields.push(field);
     }
 
-    public function textLabel(parent : Fold, label : String, get : Void -> String, set : String -> Void, offsetX : Int = 0)
+    public function textLabel(parent : Fold, label : String)
     {
         var f : Flow = cast parent.container.getChildAt(0);
 
-        var field : Field = new Field(label, f, EngineConst.INSPECTOR_FIELD_WIDTH, EngineConst.INSPECTOR_FIELD_HEIGHT, get, set, offsetX);
-        f.getProperties(field).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
-        field.ti.canEdit = false;
-
-        fields.push(field);
+        var label : Label = new Label(label, f, EngineConst.INSPECTOR_FIELD_WIDTH, EngineConst.INSPECTOR_FIELD_HEIGHT);
+        f.getProperties(label).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
     }
 
     public function space(parent : Fold, size : Int)
@@ -417,6 +417,28 @@ class Field extends Flow
     public function updateText()
     {
         ti.text = get();
+    }
+}
+
+class Label extends Flow
+{
+    override public function new(label : String, parent : Object, width : Int, height : Int) 
+    {
+        super(parent);
+
+        layout = Stack;
+
+        minWidth = maxWidth = width;
+        minHeight = maxHeight = height;
+
+        backgroundTile = Tile.fromColor(EngineConst.INSPECTOR_FIELD_COLOR, width, height);
+
+        var text : Text = new Text(hxd.res.DefaultFont.get(), this);
+        text.text = label;
+        text.textColor = EngineConst.INSPECTOR_TEXT_COLOR;
+        getProperties(text).align(Top, Left);
+        getProperties(text).offsetX = 10;
+        getProperties(text).offsetY = Std.int((height - text.textHeight) / 2);
     }
 }
 

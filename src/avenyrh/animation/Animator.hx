@@ -39,7 +39,7 @@ class Animator extends Component
     {
         super.drawInfo(inspector, fold);
 
-        inspector.textLabel(fold, "Animation", () -> stateMachine.currentState.name, (v) -> return);
+        inspector.field(fold, "Animation", () -> stateMachine.currentState.name, (v) -> return, false);
     }
     //#endregion
 

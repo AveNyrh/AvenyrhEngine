@@ -99,10 +99,10 @@ class Component implements IGarbageCollectable
      */
     function drawInfo(inspector : Inspector, fold : Fold) 
     {
-        inspector.space(fold, 20);
+        inspector.space(fold, 10);
 
         var n : Array<String> = Type.getClassName(Type.getClass(this)).split(".");
-        inspector.textLabel(fold, '- ${n[n.length - 1]}', () -> name, (v) -> return, 32);
+        inspector.textLabel(fold, '-- ${n[n.length - 1]} - $name --');
     }
     //#endregion
 

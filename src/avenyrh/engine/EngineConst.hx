@@ -14,8 +14,8 @@ class EngineConst
 
   public static var INSPECTOR_FOLD_WIDTH (default, null) : Int = 280;
   public static var INSPECTOR_FOLD_HEIGHT (default, null) : Int = 30;
-  public static var INSPECTOR_FIELD_WIDTH (default, null) : Int = 240;
-  public static var INSPECTOR_FIELD_HEIGHT (default, null) : Int = 30;
+  public static var INSPECTOR_FIELD_WIDTH (default, null) : Int = 260;
+  public static var INSPECTOR_FIELD_HEIGHT (default, null) : Int = 20;
 
   public static var INSPECTOR_BG_COLOR (default, null) : Int = 0xFF1c1f24;
   public static var INSPECTOR_FOLD_COLOR (default, null) : Int = 0xFF282c34;
