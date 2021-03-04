@@ -74,9 +74,6 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         else
             this.pivot = pivot;
 
-        if(parent == null)
-            this.parent =  scene.scroller;
-
         scene.addGameObject(this, layer);
         
         init();
@@ -218,9 +215,11 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
      * Adds a component to this gameObject
      * @param component Component to add
      */
-    public function addComponent(component : Component)
+    public function addComponent(component : Component) : Component
     {
         components.push(component);
+
+        return component;
     }
 
     /**

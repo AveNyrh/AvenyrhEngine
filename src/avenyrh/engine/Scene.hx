@@ -127,7 +127,9 @@ class Scene extends Process
     public function addGameObject(gameObject : GameObject, layer : Int) 
     {
         allGO.push(gameObject);
-        scroller.add(gameObject, layer);
+
+        if(gameObject.parent == scroller)
+            scroller.add(gameObject, layer);
     }
 
     /**
