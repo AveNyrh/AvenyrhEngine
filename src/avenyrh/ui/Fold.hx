@@ -41,7 +41,7 @@ class Fold extends Flow
         getProperties(label).offsetY = Std.int((labelHeight - label.textHeight) / 2);
 
         var icons : Array<Tile> = hxd.res.Embed.getResource("avenyrh/engine/icons.png").toTile().split(4);
-        var t : Tile = icons[4];
+        var t : Tile = icons[3];
         t.scaleToSize(labelHeight * 0.4, labelHeight * 0.4);
         t.dx = -t.width / 2;
         t.dy = -t.height / 2;
