@@ -90,7 +90,7 @@ class Inspector extends Process
         f.getProperties(title).align(Top, Middle);
 
         //Buttons
-        var icons : Array<Tile> = hxd.Res.Icons.toTile().split(3);
+        var icons : Array<Tile> = hxd.res.Embed.getResource("avenyrh/engine/icons.png").toTile().split(4);
         var b : InspectorButton = new InspectorButton(f, icons[0], icons[1], EngineConst.INSPECTOR_ICON_ON_COLOR, EngineConst.INSPECTOR_ICON_OFF_COLOR, (v) -> lock = v);
         b.scale(0.3);
         f.getProperties(b).align(Top, Right);
@@ -158,7 +158,7 @@ class Inspector extends Process
         if(!enable)
             return;
 
-        e.propagate = true;
+        e.propagate = false;
 
         //Click on the inspector
         if(e.kind == EPush && !scroll.isScrolling)

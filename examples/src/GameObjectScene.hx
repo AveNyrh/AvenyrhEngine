@@ -26,7 +26,7 @@ class GameObjectScene extends Scene
     function spawnGameObject()
     {
         go = new ControllableGameObject("Controllable GameObject");
-
+        
         go2 = new FixedGameObject("Fixed Game Object");
         go2.setPosition(200, 200);
         go2.scale(2);

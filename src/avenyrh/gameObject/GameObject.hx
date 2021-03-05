@@ -459,6 +459,9 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
             debugGraphics = new Graphics(this);
         else
         {
+            if(debugGraphics == null)
+                return debug;
+            
             debugGraphics.clear();
             debugGraphics = null;
         }
