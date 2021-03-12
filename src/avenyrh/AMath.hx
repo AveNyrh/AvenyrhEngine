@@ -216,7 +216,7 @@ class AMath
     }
 
     /**
-	 * Returns a pseudo random integer in the interval [0, max]
+	 * Returns a pseudo random integer in the interval [0, max[
 	 */
 	inline public static function irand(?max : Float = 1) : Int
 	{
@@ -242,7 +242,7 @@ class AMath
     }
 
     /**
-	 * Returns a pseudo random float in the interval [0, max]
+	 * Returns a pseudo random float in the interval [min, max]
 	 */
 	inline public static function frandRange(min : Float, max : Float) : Float
 	{

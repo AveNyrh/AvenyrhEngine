@@ -5,7 +5,7 @@ package avenyrh.utils;
  */
 class Queue<T> 
 {
-    var array : Array<T>;
+    public var array (default, null) : Array<T>;
 
     public var length (get, null) : Int;
     

@@ -213,7 +213,7 @@ class PFScene extends Scene
             for(c in p)
                 c.resetCell(false);
 
-            PathRequestHandler.requestPath(startCell.toVector2(), c.toVector2(), callback);
+            pfRequest.requestPath(startCell.toVector2(), c.toVector2(), callback);
         }
 
         endCell = c;

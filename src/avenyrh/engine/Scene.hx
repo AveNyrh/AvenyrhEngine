@@ -43,6 +43,8 @@ class Scene extends Process
     {
         ui = new Flow();
         root.add(ui, 1);
+        ui.minWidth = ui.maxWidth = width;
+        ui.minHeight = ui.maxHeight = height;
 
         scroller = new h2d.Layers();
         root.add(scroller, 0);

@@ -80,7 +80,7 @@ class AStarPathfinding extends Pathfinding
         if(pathSucces)
             waypoints = retracePath(startCell, targetCell);
 
-        @:privateAccess PathRequestHandler.finishedProcessingPath(waypoints, pathSucces);
+        @:privateAccess pathRequestHandler.finishedProcessingPath(waypoints, pathSucces);
     }
     //#endregion
 

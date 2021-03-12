@@ -9,19 +9,20 @@ import avenyrh.Vector2;
  */
 class PathRequestHandler extends Process
 {
-    static var pathfinding : Pathfinding;
+    var pathfinding : Pathfinding;
 
-    static var isProcessingPath : Bool;
+    var isProcessingPath : Bool;
 
-    static var pathRequestQueue : Queue<PathRequest>;
+    var pathRequestQueue : Queue<PathRequest>;
 
-    static var currentPathRequest : Null<PathRequest>;
+    var currentPathRequest : Null<PathRequest>;
 
     public function new(name : String, ?parent : Process, pf : Pathfinding)
     {
         super(name, parent);
 
         pathfinding = pf;
+        @:privateAccess pathfinding.pathRequestHandler = this;
         isProcessingPath = false;
         pathRequestQueue = new Queue<PathRequest>();
     }
@@ -32,7 +33,7 @@ class PathRequestHandler extends Process
     /**
      * Put a path finding request in the queue
      */
-    public static function requestPath(pathStart : Vector2, pathEnd : Vector2, callback : (Array<Vector2>, Bool) -> Void)
+    public function requestPath(pathStart : Vector2, pathEnd : Vector2, callback : (Array<Vector2>, Bool) -> Void)
     {
         var newRequest : PathRequest = {pathStart : pathStart, pathEnd : pathEnd, callback : callback};
         pathRequestQueue.enqueue(newRequest);
@@ -54,7 +55,7 @@ class PathRequestHandler extends Process
     /**
      * Process the next path finding request if possible
      */
-    static function tryProcessNext() 
+    function tryProcessNext() 
     {
         if(!isProcessingPath && pathRequestQueue.length > 0)
         {
@@ -67,7 +68,7 @@ class PathRequestHandler extends Process
     /**
      * Called when a path finding request has finished processing
      */
-    static function finishedProcessingPath(path : Array<Vector2>, succes : Bool) 
+    function finishedProcessingPath(path : Array<Vector2>, succes : Bool) 
     {
         currentPathRequest.callback(path, succes);
         isProcessingPath = false;

@@ -7,6 +7,8 @@ package avenyrh.pathfinding;
  */
 class Pathfinding 
 {
+    var pathRequestHandler : PathRequestHandler;
+
     //-------------------------------
     //#region Public API
     //-------------------------------

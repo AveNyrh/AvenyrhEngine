@@ -36,6 +36,10 @@ class Camera extends Process
      * Smoothing of the target tracking
      */
     public var smooth : Float = 1;
+    /**
+     * Snaping to the target, ignoring deadzone & smoothing
+     */
+    public var snap : Bool = false;
 
     var dx : Float;
 
@@ -93,17 +97,25 @@ class Camera extends Process
             var tx = target.x + targetOffset.x;
             var ty = target.y + targetOffset.y;
 
-            //Distance
-            var d = AMath.dist(x, y, tx, ty);
-
-            if(d >= deadzone)
+            if(!snap)
             {
-                //Angle
-                var a = Math.atan2(ty - y, tx - x);
+                //Distance
+                var d = AMath.dist(x, y, tx, ty);
 
-                //Go toward target
-                dx = Math.cos(a) * (d - deadzone) * smooth * dt;
-                dy = Math.sin(a) * (d - deadzone) * smooth * dt;
+                if(d >= deadzone)
+                {
+                    //Angle
+                    var a = Math.atan2(ty - y, tx - x);
+
+                    //Go toward target
+                    dx = Math.cos(a) * (d - deadzone) * smooth * dt;
+                    dy = Math.sin(a) * (d - deadzone) * smooth * dt;
+                }
+            }
+            else 
+            {
+                dx = tx - x;
+                dy = ty - y;
             }
         }
 
@@ -137,8 +149,8 @@ class Camera extends Process
         }
 
         //Scale
-        sx *= zoom;
-        sy *= zoom;
+        // sx *= zoom;
+        // sy *= zoom;
 
         //Round
         scene.scroller.x = AMath.round(sx);
