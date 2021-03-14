@@ -27,7 +27,7 @@ class Checkbox extends Flow
     /**
      * Current value of the checkbox
      */
-    public var value (default, null) : Bool;
+    public var value (default, set) : Bool;
     /**
      * Callback when the value is changed
      */
@@ -122,10 +122,17 @@ class Checkbox extends Flow
         if(enable)
         {
             value = !value;
-            check.visible = value;
             
             if(onValueChange != null)
                 onValueChange(value);
         }
+    }
+
+    function set_value(v : Bool) : Bool
+    {
+        value = v;
+        check.visible = value;
+
+        return value;
     }
 }
