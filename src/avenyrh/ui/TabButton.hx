@@ -9,7 +9,7 @@ class TabButton extends Button
 
     public function new(width : Float, height : Float, tabGroup : TabGroup, ?shape : Collider) 
     {
-        super(tabGroup, width, height, shape);
+        super(tabGroup.buttonsFlow, width, height, shape);
 
         this.tabGroup = tabGroup;
     }

@@ -15,7 +15,7 @@ class Dropdown extends Flow
 
     var highlight : Bitmap;
 
-    var itemsArea : ScrollArea;
+    public var itemsArea : ScrollArea;
     
     public var tileOverItem (default, set) : Tile;
 
@@ -29,12 +29,15 @@ class Dropdown extends Flow
 
     public var enable : Bool;
 
-    public function new(parent : Object, width : Int, height : Int)
+    public var isOpen (default, null) : Bool;
+
+    public function new(parent : Object, width : Int, height : Int, scrollHeight : Int)
     {
         super(parent);
 
         items = [];
         enable = true;
+        isOpen = false;
 
         var pad = 5;
         layout = Stack;
@@ -47,7 +50,7 @@ class Dropdown extends Flow
         getProperties(display).offsetX = pad;
 
         //Scroll list
-        itemsArea = new ScrollArea(this, width + 2 * pad, height * 4);
+        itemsArea = new ScrollArea(this, width + 2 * pad, scrollHeight);
         getProperties(itemsArea).align(Bottom, Left);
         getProperties(itemsArea).offsetY = height;
         itemsArea.setContentLayout(Vertical);
@@ -74,7 +77,6 @@ class Dropdown extends Flow
         enableInteractive = true;
         interactive.onPush = onPush;
         interactive.onClick = onClick;
-        //interactive.onFocusLost = onFocusLost;
         interactive.propagateEvents = true;
         itemsArea.enableInteractive = true;
         itemsArea.interactive.onClick = onClickItemArea;
@@ -186,7 +188,8 @@ class Dropdown extends Flow
             var bds = item.getBounds();
 
             //If mouse over that item
-            if(mousePos.y >= bds.yMin && mousePos.y < bds.yMax && mousePos.x < itemsArea.getSize().width - @:privateAccess itemsArea.vBar.getSize().width + bds.xMin)
+            var barSize : Float = @:privateAccess itemsArea.vBar == null ? 0 : @:privateAccess itemsArea.vBar.getSize().width;
+            if(mousePos.y >= bds.yMin && mousePos.y < bds.yMax && mousePos.x < itemsArea.getSize().width - barSize + bds.xMin)
             {
                 //Mouse over a new item
                 if(highlightedItem != i)
@@ -222,6 +225,7 @@ class Dropdown extends Flow
     {
         itemsArea.visible = true;
         arrow.tile = arrowOpen;
+        isOpen = true;
         onOpen();
     }
 
@@ -229,6 +233,7 @@ class Dropdown extends Flow
     {
         itemsArea.visible = false;
         arrow.tile = arrowClose;
+        isOpen = false;
         onClose();
     }
 

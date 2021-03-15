@@ -242,7 +242,7 @@ class UIScene extends Scene
 
     function spawnDropdown(flowParent : Flow)
     {
-       dropdown = new Dropdown(flowParent, 200, 60);
+       dropdown = new Dropdown(flowParent, 200, 60, 240);
         
         var f : Flow;
         var t : Text;

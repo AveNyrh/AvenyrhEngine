@@ -10,6 +10,10 @@ class TabGroup extends Flow
      */
     var buttons : Map<TabButton, Object>;
     /**
+     * Container for the buttons
+     */
+    public var buttonsFlow : Flow;
+    /**
      * The current selected button
      */
     public var selectedButton (default, null) : TabButton;
@@ -26,6 +30,8 @@ class TabGroup extends Flow
         buttons = new Map<TabButton, Object>();
         selectedButton = null;
         defaultSelectedButton = null;
+
+        buttonsFlow = new Flow(this);
     }
 
     //-------------------------------
