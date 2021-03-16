@@ -44,12 +44,14 @@ class TabGroup extends Flow
     public function openTab() 
     {
         visible = true;
+
+        resetTabs();
         
         if(defaultSelectedButton != null)
             selectedButton = defaultSelectedButton;
 
-        resetTabs();
-        buttons[selectedButton].visible = true;
+        defaultSelectedButton.visible = true;
+        @:privateAccess defaultSelectedButton.isSelected = true;
     }
 
     /**
@@ -97,11 +99,15 @@ class TabGroup extends Flow
      */
     function onTabSelected(button : TabButton) 
     {
+        if(selectedButton != null)
+            @:privateAccess selectedButton.isSelected = false;
+
         selectedButton = button;
 
         resetTabs();
 
         buttons[button].visible = true;
+        @:privateAccess button.isSelected = true;
     }
 
     /**
@@ -109,6 +115,9 @@ class TabGroup extends Flow
      */
     function resetTabs() 
     {
+        if(selectedButton != null)
+            @:privateAccess selectedButton.isSelected = false;
+
         for (b in buttons.keys())
         {
             if(b != selectedButton)
