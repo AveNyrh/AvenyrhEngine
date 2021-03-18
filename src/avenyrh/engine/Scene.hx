@@ -109,13 +109,8 @@ class Scene extends Process
 
         allGO = [];
 
-        //Dispose children
-        scroller.removeChildren();
-        scroller = null;
-
-        //Dispose UI
-        ui.removeChildren();
-        ui = null;
+        //Remove root graph
+        root.remove();
     }
     //#endregion
 
