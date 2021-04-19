@@ -25,9 +25,9 @@ class GameObjectScene extends Scene
 
     function spawnGameObject()
     {
-        go = new ControllableGameObject("Controllable GameObject");
+        go = new ControllableGameObject("Controllable GameObject", scroller);
         
-        go2 = new FixedGameObject("Fixed Game Object");
+        go2 = new FixedGameObject("Fixed Game Object", scroller);
         go2.setPosition(200, 200);
         go2.scale(2);
         go2.changeTile(hxd.Res.CarreVert.toTile());

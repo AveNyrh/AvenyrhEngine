@@ -366,6 +366,14 @@ class Inspector extends Process
         f.getProperties(label).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
     }
 
+    public function button(parent : Fold, label : String, cb : Void -> Void)
+    {
+        var f : Flow = cast parent.container.getChildAt(0);
+
+        var b : ButtonField = new ButtonField(label, f, EngineConst.INSPECTOR_FIELD_WIDTH, EngineConst.INSPECTOR_FIELD_HEIGHT, cb);
+        f.getProperties(b).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
+    }
+
     public function space(parent : Fold, size : Int)
     {
         var f : Flow = cast parent.container.getChildAt(0);
@@ -439,6 +447,48 @@ class Label extends Flow
         getProperties(text).align(Top, Left);
         getProperties(text).offsetX = 10;
         getProperties(text).offsetY = Std.int((height - text.textHeight) / 2);
+    }
+}
+
+class ButtonField extends Flow
+{
+    var cb : Void -> Void;
+
+    var inter : Interactive;
+
+    override public function new(label : String, parent : Object, width : Int, height : Int, cb : Void -> Void, offsetX : Int = 0) 
+    {
+        super(parent);
+
+        this.cb = cb;
+
+        layout = Stack;
+        minWidth = maxWidth = width;
+        minHeight = maxHeight = height;
+
+        backgroundTile = Tile.fromColor(EngineConst.INSPECTOR_FIELD_COLOR, width, height);
+
+        var text : Text = new Text(hxd.res.DefaultFont.get(), this);
+        text.text = label;
+        text.textColor = EngineConst.INSPECTOR_TEXT_COLOR;
+        getProperties(text).align(Top, Left);
+        getProperties(text).offsetX = 10;
+        getProperties(text).offsetY = Std.int((height - text.textHeight) / 2);
+
+        inter = new Interactive(width * 0.6, height * 0.8, this);
+        inter.backgroundColor = Color.iGREY;
+        getProperties(inter).align(Top, Left);
+        getProperties(inter).offsetX = 90 + offsetX;
+        getProperties(inter).offsetY = Std.int((height - inter.height) / 2);
+
+        inter.onPush = (e) -> 
+        {
+            inter.backgroundColor = Color.iDARKGREY;
+            cb();
+        }
+
+        inter.onRelease = (e) -> inter.backgroundColor = Color.iGREY;
+        inter.onReleaseOutside = (e) -> inter.backgroundColor = Color.iGREY;
     }
 }
 
