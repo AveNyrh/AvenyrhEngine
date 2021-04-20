@@ -10,7 +10,7 @@ class EngineConst
   //#region Inspector
   public static var INSPECTOR_MAX_HEIGHT (default, null) : Int = 600;
   public static var INSPECTOR_DEFAULT_WIDTH (default, null) : Int = 300;
-  public static var INSPECTOR_DEFAULT_HEIGHT (default, null) : Int = 500;
+  public static var INSPECTOR_DEFAULT_HEIGHT (default, null) : Int = 900;
 
   public static var INSPECTOR_FOLD_WIDTH (default, null) : Int = 280;
   public static var INSPECTOR_FOLD_HEIGHT (default, null) : Int = 30;

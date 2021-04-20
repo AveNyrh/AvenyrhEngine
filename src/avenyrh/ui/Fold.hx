@@ -1,7 +1,7 @@
 package avenyrh.ui;
 
+import avenyrh.engine.EngineConst;
 import h2d.col.Bounds;
-import h2d.Interactive;
 import h2d.Tile;
 import h2d.Flow;
 import h2d.Font;
@@ -40,7 +40,7 @@ class Fold extends Flow
         getProperties(label).offsetX = 10;
         getProperties(label).offsetY = Std.int((labelHeight - label.textHeight) / 2);
 
-        var icons : Array<Tile> = hxd.res.Embed.getResource("avenyrh/engine/icons.png").toTile().split(4);
+        var icons : Array<Tile> = hxd.res.Embed.getResource("avenyrh/engine/icons.png").toTile().split(6);
         var t : Tile = icons[3];
         t.scaleToSize(labelHeight * 0.4, labelHeight * 0.4);
         t.dx = -t.width / 2;

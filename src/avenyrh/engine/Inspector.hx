@@ -1,5 +1,6 @@
 package avenyrh.engine;
 
+import avenyrh.ui.Dropdown;
 import h2d.Interactive;
 import h2d.TextInput;
 import avenyrh.ui.Fold;
@@ -47,9 +48,11 @@ class Inspector extends Process
 
     var dragOffset : Vector2;
 
-    var fields : Array<Field>;
+    var fields : Array<IField>;
 
     var lock : Bool = false;
+
+    var icons : Array<Tile>;
 
     override public function new() 
     {
@@ -90,7 +93,7 @@ class Inspector extends Process
         f.getProperties(title).align(Top, Middle);
 
         //Buttons
-        var icons : Array<Tile> = hxd.res.Embed.getResource("avenyrh/engine/icons.png").toTile().split(4);
+        icons = hxd.res.Embed.getResource("avenyrh/engine/icons.png").toTile().split(6);
         var b : InspectorButton = new InspectorButton(f, icons[0], icons[1], EngineConst.INSPECTOR_ICON_ON_COLOR, EngineConst.INSPECTOR_ICON_OFF_COLOR, (v) -> lock = v);
         b.scale(0.3);
         f.getProperties(b).align(Top, Right);
@@ -143,7 +146,7 @@ class Inspector extends Process
         if(currentInspectable != null)
         {
             for(f in fields)
-                f.updateText();
+                f.updateDisplay();
         }
 
         //Dragging
@@ -374,6 +377,26 @@ class Inspector extends Process
         f.getProperties(b).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
     }
 
+    public function boolField(parent : Fold, label : String, get : Void -> Bool, set : Bool -> Void) 
+    {
+        var f : Flow = cast parent.container.getChildAt(0);
+
+        var b : BoolField = new BoolField(label, f, EngineConst.INSPECTOR_FIELD_WIDTH, EngineConst.INSPECTOR_FIELD_HEIGHT, get, set, icons);
+        f.getProperties(b).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
+
+        fields.push(b);
+    }
+
+    public function enumField<T>(parent : Fold, label : String, get : Void -> Int, set : Int -> Void, e : Enum<T>) 
+    {
+        var f : Flow = cast parent.container.getChildAt(0);
+
+        var ef : EnumField<T> = new EnumField(label, f, EngineConst.INSPECTOR_FIELD_WIDTH, EngineConst.INSPECTOR_FIELD_HEIGHT, get, set, e, icons);
+        f.getProperties(ef).offsetX = EngineConst.INSPECTOR_FOLD_WIDTH - EngineConst.INSPECTOR_FIELD_WIDTH;
+
+        fields.push(ef);
+    }
+
     public function space(parent : Fold, size : Int)
     {
         var f : Flow = cast parent.container.getChildAt(0);
@@ -384,13 +407,15 @@ class Inspector extends Process
     //#endregion
 }
 
-class Field extends Flow
+class Field extends Flow implements IField
 {
     public var get : Void -> String;
 
     public var set : String -> Void;
 
     public var ti : TextInput;
+
+    var isChanging : Bool = false;
 
     override public function new(label : String, parent : Object, width : Int, height : Int, get : Void -> String, set : String -> Void, offsetX : Int = 0) 
     {
@@ -419,12 +444,18 @@ class Field extends Flow
         getProperties(ti).offsetX = 90 + offsetX;
         getProperties(ti).offsetY = Std.int((height - ti.textHeight) / 2);
         ti.text = get();
-        ti.onChange = () -> set(ti.text);
+        ti.onChange = () ->
+        {
+            set(ti.text);
+            isChanging = true;
+        }
+        ti.onFocusLost = (e) -> isChanging = false;
     }
 
-    public function updateText()
+    public function updateDisplay()
     {
-        ti.text = get();
+        if(!isChanging)
+            ti.text = get();
     }
 }
 
@@ -492,6 +523,159 @@ class ButtonField extends Flow
     }
 }
 
+class BoolField extends Flow implements IField
+{
+    var get : Void -> Bool;
+
+    var set : Bool -> Void;
+
+    var inter : Interactive;
+
+    var bitmap : Bitmap;
+
+    var onTile : Tile;
+
+    var offTile : Tile;
+
+    var value : Bool;
+
+    override public function new(label : String, parent : Object, width : Int, height : Int, get : Void -> Bool, set : Bool -> Void, offsetX : Int = 0, icons : Array<Tile>) 
+    {
+        super(parent);
+
+        this.get = get;
+        this.set = set;
+
+        layout = Stack;
+        minWidth = maxWidth = width;
+        minHeight = maxHeight = height;
+
+        backgroundTile = Tile.fromColor(EngineConst.INSPECTOR_FIELD_COLOR, width, height);
+
+        var text : Text = new Text(hxd.res.DefaultFont.get(), this);
+        text.text = label;
+        text.textColor = EngineConst.INSPECTOR_TEXT_COLOR;
+        getProperties(text).align(Top, Left);
+        getProperties(text).offsetX = 10;
+        getProperties(text).offsetY = Std.int((height - text.textHeight) / 2);
+
+        onTile = icons[4];
+        onTile.scaleToSize(height * 0.8, height * 0.8);
+        offTile = icons[5];
+        offTile.scaleToSize(height * 0.8, height * 0.8);
+        bitmap = new Bitmap(onTile, this);
+        getProperties(bitmap).offsetX = 90 + offsetX;
+
+        inter = new Interactive(width * 0.4, height * 0.8, this);
+        inter.backgroundColor = Color.iGREY;
+        getProperties(inter).align(Top, Left);
+        getProperties(inter).offsetX = 120 + offsetX;
+        getProperties(inter).offsetY = Std.int((height - inter.height) / 2);
+
+        inter.onPush = (e) -> 
+        {
+            inter.backgroundColor = Color.iDARKGREY;
+            value = !value;
+            set(value);
+
+            bitmap.tile = value ? onTile : offTile;
+        }
+
+        inter.onRelease = (e) -> inter.backgroundColor = Color.iGREY;
+        inter.onReleaseOutside = (e) -> inter.backgroundColor = Color.iGREY;
+    }
+
+    public function updateDisplay()
+    {
+        value = get();
+        bitmap.tile = value ? onTile : offTile;
+    }
+}
+
+class EnumField<T> extends Flow implements IField
+{
+    var get : Void -> Int;
+
+    var set : Int -> Void;
+
+    var dd : Dropdown;
+
+    var index : Int;
+
+    override public function new(label : String, parent : Object, width : Int, height : Int, get : Void -> Int, set : Int -> Void, e : Enum<T>, icons : Array<Tile>) 
+    {
+        super(parent);
+
+        this.get = get;
+        this.set = set;
+
+        layout = Stack;
+
+        minWidth = maxWidth = width;
+        minHeight = maxHeight = height;
+
+        backgroundTile = Tile.fromColor(EngineConst.INSPECTOR_FIELD_COLOR, width, height);
+
+        var text : Text = new Text(hxd.res.DefaultFont.get(), this);
+        text.text = label;
+        text.textColor = EngineConst.INSPECTOR_TEXT_COLOR;
+        getProperties(text).align(Top, Left);
+        getProperties(text).offsetX = 10;
+        getProperties(text).offsetY = Std.int((height - text.textHeight) / 2);
+
+        var h : Int = Std.int(height * 0.8);
+        var enumArray : Array<T> = haxe.EnumTools.createAll(e);
+        dd = new Dropdown(this, Std.int(width * 0.6), h, Std.int(h * (enumArray.length + 1)));
+        getProperties(dd).align(Top, Left);
+        getProperties(dd).offsetX = 90;
+        
+        for(value in enumArray)
+        {
+            var t : Text = new Text(hxd.res.DefaultFont.get(), dd);
+            t.scale(1.01);
+            t.textColor = EngineConst.INSPECTOR_TEXT_COLOR;
+            t.text = Std.string(value);
+            dd.addItem(t);
+        }
+
+        dd.arrowClose = icons[3];
+        dd.arrowOpen = icons[3];
+
+        dd.onOpen = () ->
+        {
+            @:privateAccess dd.arrow.rotation = -AMath.PI / 2;
+            dd.getProperties(@:privateAccess dd.arrow).offsetY = 16;
+        }
+
+        dd.onClose = () ->
+        {
+            index = dd.selectedItem;
+            set(index);
+
+            @:privateAccess dd.arrow.rotation = 0;
+            dd.getProperties(@:privateAccess dd.arrow).offsetY = 0;
+        }
+    }
+
+    public function updateDisplay()
+    {
+        index = get();
+        dd.selectedItem = index;
+    }
+}
+
+class DdItem extends Bitmap
+{
+    override public function new(label : String, parent : Object, width : Int, height : Int) 
+    {
+        super(Tile.fromColor(EngineConst.INSPECTOR_FOLD_COLOR, width, height), parent);
+
+        var text : Text = new Text(hxd.res.DefaultFont.get(), this);
+        text.text = label;
+        text.textColor = EngineConst.INSPECTOR_TEXT_COLOR;
+    }
+}
+
 class InspectorButton extends Bitmap
 {
     public var interactive : Interactive;
@@ -535,4 +719,9 @@ class InspectorButton extends Bitmap
 
         return value;
     }
+}
+
+interface IField 
+{
+    function updateDisplay() : Void;
 }
