@@ -12,6 +12,8 @@ class ParticleComponent extends Component
 
     var group : ParticleGroup;
 
+    public var loop (default, set) : Bool = true;
+
     override public function new(gameObject : GameObject, name : String, texture : h3d.mat.Texture, frameCount : Int = 1) 
     {
         super(gameObject, name);
@@ -24,6 +26,17 @@ class ParticleComponent extends Component
         group.frameCount = frameCount;
         
         loadParticle();
+    }
+
+    public function play()
+    {
+        group.enable = true;
+        group.rebuild();
+    }
+
+    public function stop() 
+    {
+        group.enable = false;
     }
 
     public function saveParticle()
@@ -113,7 +126,7 @@ class ParticleComponent extends Component
         //dx, dy : Int
         inspector.doubleField(fold, "Dx", () -> '${group.dx}', (v) -> group.dx = Std.parseInt(v), "Dy", () -> '${group.dy}', (v) -> group.dy = Std.parseInt(v));
         //loop : Bool
-        inspector.boolField(fold, "Loop", () -> group.emitLoop, (v) -> group.emitLoop = v);
+        inspector.boolField(fold, "Loop", () -> group.emitLoop, (v) -> {group.emitLoop = v; loop = v; group.enable = true; group.rebuild();});
         //size : Float
         inspector.field(fold, "Size", () -> '${group.size}', (v) -> group.size = Std.parseFloat(v));
         //sizeRand : Float
@@ -158,6 +171,18 @@ class ParticleComponent extends Component
         inspector.field(fold, "Fade power", () -> '${group.fadePower}', (v) -> group.fadePower = Std.parseFloat(v));
         //isRelative : Bool
         inspector.boolField(fold, "Is relative", () -> group.isRelative, (v) -> group.isRelative = v);
+    }
+
+    function set_loop(v : Bool) : Bool
+    {
+        loop = v;
+
+        if(loop)
+            particles.onEnd = () -> return;
+        else
+            particles.onEnd = stop;
+
+        return loop;
     }
 }
 
