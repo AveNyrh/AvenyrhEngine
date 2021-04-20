@@ -65,8 +65,10 @@ class ParticleComponent extends Component
         po.speedIncr = group.speedIncr;
         po.emitMode = group.emitMode;
         po.emitDist = group.emitDist;
+        po.emitDistY = group.emitDistY;
         po.emitAngle = group.emitAngle;
         po.emitDelay = group.emitDelay;
+        po.emitSync = group.emitSync;
         po.fadeIn = group.fadeIn;
         po.fadeOut = group.fadeOut;
         po.fadePower = group.fadePower;
@@ -107,8 +109,10 @@ class ParticleComponent extends Component
         group.speedIncr = po.speedIncr;
         group.emitMode = po.emitMode;
         group.emitDist = po.emitDist;
+        group.emitDistY = po.emitDistY;
         group.emitAngle = po.emitAngle;
         group.emitDelay = po.emitDelay;
+        group.emitSync = po.emitSync;
         group.fadeIn = po.fadeIn;
         group.fadeOut = po.fadeOut;
         group.fadePower = po.fadePower;
@@ -159,10 +163,14 @@ class ParticleComponent extends Component
         inspector.enumField(fold, "Emit mode", () -> group.emitMode.getIndex(), (v) -> group.emitMode = haxe.EnumTools.createByIndex(PartEmitMode, v), PartEmitMode);
 		//emitDist : Float
         inspector.field(fold, "Emit dist", () -> '${group.emitDist}', (v) -> group.emitDist = Std.parseFloat(v));
+        //emitDistY : Float
+        inspector.field(fold, "Emit dist y", () -> '${group.emitDistY}', (v) -> group.emitDistY = Std.parseFloat(v));
 		//emitAngle : Float
         inspector.field(fold, "Emit angle", () -> '${group.emitAngle}', (v) -> group.emitAngle = Std.parseFloat(v));
         //emitDelay : Float
         inspector.field(fold, "Emit delay", () -> '${group.emitDelay}', (v) -> group.emitDelay = Std.parseFloat(v));
+        //emitSync : Float
+        inspector.field(fold, "Emit sync", () -> '${group.emitSync}', (v) -> group.emitSync = Std.parseFloat(v));
         //fadeIn : Float
         inspector.field(fold, "Fade in", () -> '${group.fadeIn}', (v) -> group.fadeIn = Std.parseFloat(v));
 		//fadeOut : Float
@@ -208,8 +216,10 @@ class ParticleOptions
     public var speedIncr : Float;
     public var emitMode : PartEmitMode;
     public var emitDist : Float;
+    public var emitDistY : Float;
     public var emitAngle : Float;
     public var emitDelay : Float;
+    public var emitSync : Float;
     public var fadeIn : Float;
     public var fadeOut : Float;
     public var fadePower : Float;
