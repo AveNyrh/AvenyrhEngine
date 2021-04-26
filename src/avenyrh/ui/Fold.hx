@@ -84,10 +84,14 @@ class Fold extends Flow
             interactive.height = minHeight;
     }
 
-    override function getSize(?out : Bounds) : Bounds 
+    override function getBoundsRec(relativeTo : Object, out : Bounds, forSize : Bool)
     {
-        var bds : Bounds = super.getSize(out);
-        bds.height += isOpen ? minHeight : 0;
-        return bds;
+        super.getBoundsRec(relativeTo, out, forSize);
+
+        if(forSize)
+        {
+            var bds : Bounds = out;
+            bds.height += isOpen ? minHeight : 0;
+        }
     }
 }

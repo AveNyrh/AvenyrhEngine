@@ -288,13 +288,13 @@ class ScrollArea extends Flow
         {
             var oPos : Float = e.relX;
 
-            hHandle.startDrag(function (ev : Event) 
+            hHandle.startCapture(function (ev : Event) 
             {
                 //Stop grabbing when released
                 if(ev.kind == ERelease) 
                 {
                     isScrolling = false;
-                    hHandle.stopDrag();
+                    hHandle.stopCapture();
 					return;
                 }
 
@@ -346,13 +346,13 @@ class ScrollArea extends Flow
         {
             var oPos : Float = e.relY;
 
-            vHandle.startDrag(function (ev : Event) 
+            vHandle.startCapture(function (ev : Event) 
             {
                 //Stop grabbing when released
                 if(ev.kind == ERelease) 
                 {
                     isScrolling = false;
-                    vHandle.stopDrag();
+                    vHandle.stopCapture();
 					return;
                 }
 

@@ -32,9 +32,4 @@ class FixedGameObject extends GameObject
         if(hxd.Key.isDown(hxd.Key.J))
             part.stop();
     }
-
-    override function drawInfo(inspector : Inspector, fold : Fold) 
-    {
-        super.drawInfo(inspector, fold);
-    }
 }

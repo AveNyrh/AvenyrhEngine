@@ -1,6 +1,6 @@
 package avenyrh.engine;
 
-class Process implements IGarbageCollectable
+class Process implements IGarbageCollectable implements IInspectable
 {
     /**
      * All process at the root
@@ -80,6 +80,11 @@ class Process implements IGarbageCollectable
     public function onResize() { }
     
     private function onDispose() { destroyed = true; }
+
+    /**
+     * Override this to draw custom informations on the inspector window 
+     */
+    private function drawInfo() { }
     //#endregion
 
     //-------------------------------
@@ -186,6 +191,12 @@ class Process implements IGarbageCollectable
     {
 		for(p in children)
 			p.destroy();
+    }
+
+    @:noCompletion
+    public function drawInspector()
+    {
+        drawInfo();
     }
 
     public function toString() : String

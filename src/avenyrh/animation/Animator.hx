@@ -1,5 +1,6 @@
 package avenyrh.animation;
 
+import avenyrh.imgui.ImGui;
 import avenyrh.engine.Inspector;
 import avenyrh.ui.Fold;
 import avenyrh.gameObject.Component;
@@ -35,11 +36,11 @@ class Animator extends Component
         stateMachine.update(dt);
     }
 
-    override function drawInfo(inspector:Inspector, fold:Fold) 
+    override function drawInfo() 
     {
-        super.drawInfo(inspector, fold);
+        super.drawInfo();
 
-        inspector.field(fold, "Animation", () -> stateMachine.currentState.name, (v) -> return, false);
+        Inspector.labelText("Animation", uID, stateMachine.currentState.name);
     }
     //#endregion
 

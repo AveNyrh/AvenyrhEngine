@@ -1,7 +1,6 @@
 package avenyrh.gameObject;
 
-import avenyrh.ui.Fold;
-import avenyrh.engine.Inspector;
+import avenyrh.imgui.ImGui;
 import avenyrh.engine.IGarbageCollectable;
 import avenyrh.engine.Engine;
 
@@ -95,15 +94,8 @@ class Component implements IGarbageCollectable
 
     /**
      * Override this to draw custom informations on the inspector window 
-     * Call super and append to it
      */
-    function drawInfo(inspector : Inspector, fold : Fold) 
-    {
-        inspector.space(fold, 10);
-
-        //var n : Array<String> = Type.getClassName(Type.getClass(this)).split(".");
-        inspector.textLabel(fold, '-- $name --');
-    }
+    function drawInfo() {}    
     //#endregion
 
     //-------------------------------
@@ -163,6 +155,16 @@ class Component implements IGarbageCollectable
         gameObject = null;
         destroyed = true;
         onDestroy();
+    }
+
+    function drawInspector() 
+    {
+        ImGui.spacing();
+
+        if(ImGui.collapsingHeader('$name###$name$uID', DefaultOpen))
+        {
+            drawInfo();
+        }
     }
     //#endregion
 

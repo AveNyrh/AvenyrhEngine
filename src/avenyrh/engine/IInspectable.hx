@@ -3,21 +3,17 @@ package avenyrh.engine;
 interface IInspectable 
 {
     /**
-     * See debug lines
+     * Unique identifier
      */
-    var debug (default, set) : Bool;
+    var uID (default, null) : Int;
+
     /**
-     * Color of the debug lines
+     * Name that will appear in the header
      */
-    var debugColor : Int;
+    var name (default, null) : String;
 
     /**
      * Draws the Inspector windows
      */
-    function drawInspector(inspector : Inspector) : Void;
-
-    /**
-     * Are the x and y inside the bounds of the object ?
-     */
-    function isInBounds(x : Float, y : Float) : Bool;
+    function drawInspector() : Void;
 }

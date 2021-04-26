@@ -1,9 +1,9 @@
 package avenyrh.gameObject;
 
+import avenyrh.imgui.ImGui;
 import haxe.ds.StringMap;
 import avenyrh.engine.SaveLoader;
 import avenyrh.engine.Inspector;
-import avenyrh.ui.Fold;
 import h2d.Particles;
 
 class ParticleComponent extends Component
@@ -119,66 +119,155 @@ class ParticleComponent extends Component
         group.isRelative = po.isRelative;
     }
 
-    override function drawInfo(inspector : Inspector, fold : Fold) 
+    override function drawInfo() 
     {
-        super.drawInfo(inspector, fold);
+        super.drawInfo();
 
-        inspector.button(fold, "Save", () -> saveParticle());
+        if(Inspector.button("Save", uID))
+            saveParticle();
 
         //maxNumber : Int
-        inspector.field(fold, "Max number", () -> '${group.nparts}', (v) -> group.nparts = Std.parseInt(v));
+        var nb : Array<Int> = [group.nparts];
+        if(Inspector.dragFields("Max Number", uID, nb))
+            group.nparts = nb[0];
+
         //dx, dy : Int
-        inspector.doubleField(fold, "Dx", () -> '${group.dx}', (v) -> group.dx = Std.parseInt(v), "Dy", () -> '${group.dy}', (v) -> group.dy = Std.parseInt(v));
+        var pos : Array<Int> = [group.dx, group.dy];
+        if(Inspector.dragFields("Part pos", uID, pos))
+        {
+            group.dx = pos[0];
+            group.dy = pos[1];
+        }
+        
         //loop : Bool
-        inspector.boolField(fold, "Loop", () -> group.emitLoop, (v) -> {group.emitLoop = v; loop = v; group.enable = true; group.rebuild();});
+        var l : Bool = Inspector.checkbox("Loop", uID, group.emitLoop);
+        if(group.emitLoop != l)
+        {
+            group.emitLoop = l;
+            loop = l;
+            group.enable = true;
+            group.rebuild();
+        }
+
         //size : Float
-        inspector.field(fold, "Size", () -> '${group.size}', (v) -> group.size = Std.parseFloat(v));
+        var s : Array<Float> = [group.size];
+        if(Inspector.dragFields("Size", uID, s))
+            group.size = s[0];
+
         //sizeRand : Float
-        inspector.field(fold, "Size rand", () -> '${group.sizeRand}', (v) -> group.sizeRand = Std.parseFloat(v));
+        var sr : Array<Float> = [group.sizeRand];
+        if(Inspector.dragFields("Size rand", uID, sr))
+            group.sizeRand = sr[0];
+
         //sizeIncr : Float
-        inspector.field(fold, "Size incr", () -> '${group.sizeIncr}', (v) -> group.sizeIncr = Std.parseFloat(v));
+        var si : Array<Float> = [group.sizeIncr];
+        if(Inspector.dragFields("Size incr", uID, si))
+            group.sizeIncr = si[0];
+
         //rotationInit : Float
-        inspector.field(fold, "Rotation init", () -> '${group.rotInit}', (v) -> group.rotInit = Std.parseFloat(v));
+        var ri : Array<Float> = [group.rotInit];
+        if(Inspector.dragFields("Rot init", uID, ri))
+            group.rotInit = ri[0];
+
         //rotationSpeed : Float
-        inspector.field(fold, "Rot speed", () -> '${group.rotSpeed}', (v) -> group.rotSpeed = Std.parseFloat(v));
+        var rs : Array<Float> = [group.rotSpeed];
+        if(Inspector.dragFields("Rot speed", uID, rs))
+            group.rotSpeed = rs[0];
+
         //rotationSpeedRand : Float
-        inspector.field(fold, "Rot spd rnd", () -> '${group.rotSpeedRand}', (v) -> group.rotSpeedRand = Std.parseFloat(v));
+        var rsr : Array<Float> = [group.rotSpeedRand];
+        if(Inspector.dragFields("Rot spd rnd", uID, rsr))
+            group.rotSpeedRand = rsr[0];
+
         //rotationAuto : Bool
-        inspector.boolField(fold, "Rot auto", () -> group.rotAuto, (v) -> group.rotAuto = v);
+        var ra : Bool = Inspector.checkbox("Rot auto", uID, group.rotAuto);
+        if(group.rotAuto != ra)
+            group.rotAuto = ra;
+
 		//gravity : Float
-        inspector.field(fold, "Gravity", () -> '${group.gravity}', (v) -> group.gravity = Std.parseFloat(v));
+        var g : Array<Float> = [group.gravity];
+        if(Inspector.dragFields("Gravity", uID, g))
+            group.gravity = g[0];
+
         //gravity angle : Float
-        inspector.field(fold, "Gravity angle", () -> '${group.gravityAngle}', (v) -> group.gravityAngle = Std.parseFloat(v));
+        var ga : Array<Float> = [group.gravityAngle];
+        if(Inspector.dragFields("Gravity angle", uID, ga))
+            group.gravityAngle = ga[0];
+
 		//life : Float
-        inspector.field(fold, "Life", () -> '${group.life}', (v) -> group.life = Std.parseFloat(v));
+        var li : Array<Float> = [group.life];
+        if(Inspector.dragFields("Life", uID, li))
+            group.life = li[0];
+
         //lifeRand : Float
-        inspector.field(fold, "Life rand", () -> '${group.lifeRand}', (v) -> group.lifeRand = Std.parseFloat(v));
+        var lir : Array<Float> = [group.lifeRand];
+        if(Inspector.dragFields("Life rand", uID, lir))
+            group.lifeRand = lir[0];
+
 		//speed : Float
-        inspector.field(fold, "Speed", () -> '${group.speed}', (v) -> group.speed = Std.parseFloat(v));
+        var sp : Array<Float> = [group.speed];
+        if(Inspector.dragFields("Speed", uID, sp))
+            group.speed = sp[0];
+
 		//speedRand : Float
-        inspector.field(fold, "Speed rand", () -> '${group.speedRand}', (v) -> group.speedRand = Std.parseFloat(v));
+        var spr : Array<Float> = [group.speedRand];
+        if(Inspector.dragFields("Speed rand", uID, spr))
+            group.speedRand = spr[0];
+
         //speedIncr : Float
-        inspector.field(fold, "Speed incr", () -> '${group.speedIncr}', (v) -> group.speedIncr = Std.parseFloat(v));
+        var spi : Array<Float> = [group.speedIncr];
+        if(Inspector.dragFields("Speed incr", uID, spi))
+            group.speedIncr = spi[0];
+
 	    //emitMode : PartEmitMode
-        inspector.enumField(fold, "Emit mode", () -> group.emitMode.getIndex(), (v) -> group.emitMode = haxe.EnumTools.createByIndex(PartEmitMode, v), PartEmitMode);
-		//emitDist : Float
-        inspector.field(fold, "Emit dist", () -> '${group.emitDist}', (v) -> group.emitDist = Std.parseFloat(v));
+        var i = Inspector.enumDropdown("EmitMode", uID, PartEmitMode, group.emitMode.getIndex());
+        if(i != group.emitMode.getIndex())
+            group.emitMode = haxe.EnumTools.createByIndex(PartEmitMode, i);
+
+        //emitDist : Float
+        var ed : Array<Float> = [group.emitDist];
+        if(Inspector.dragFields("Emit dist", uID, ed))
+            group.emitDist = ed[0];
+
         //emitDistY : Float
-        inspector.field(fold, "Emit dist y", () -> '${group.emitDistY}', (v) -> group.emitDistY = Std.parseFloat(v));
+        var edy : Array<Float> = [group.emitDistY];
+        if(Inspector.dragFields("Emit dist y", uID, edy))
+            group.emitDistY = edy[0];
+
 		//emitAngle : Float
-        inspector.field(fold, "Emit angle", () -> '${group.emitAngle}', (v) -> group.emitAngle = Std.parseFloat(v));
+        var ea : Array<Float> = [group.emitAngle];
+        if(Inspector.dragFields("Emit angle", uID, ea))
+            group.emitAngle = ea[0];
+
         //emitDelay : Float
-        inspector.field(fold, "Emit delay", () -> '${group.emitDelay}', (v) -> group.emitDelay = Std.parseFloat(v));
+        var ede : Array<Float> = [group.emitDelay];
+        if(Inspector.dragFields("Emit delay", uID, ede))
+            group.emitDelay = ede[0];
+
         //emitSync : Float
-        inspector.field(fold, "Emit sync", () -> '${group.emitSync}', (v) -> group.emitSync = Std.parseFloat(v));
+        var es : Array<Float> = [group.emitSync];
+        if(Inspector.dragFields("Emit sync", uID, es))
+            group.emitSync = es[0];
+
         //fadeIn : Float
-        inspector.field(fold, "Fade in", () -> '${group.fadeIn}', (v) -> group.fadeIn = Std.parseFloat(v));
+        var fi : Array<Float> = [group.fadeIn];
+        if(Inspector.dragFields("Fade in", uID, fi))
+            group.fadeIn = fi[0];
+
 		//fadeOut : Float
-        inspector.field(fold, "Fade out", () -> '${group.fadeOut}', (v) -> group.fadeOut = Std.parseFloat(v));
+        var fo : Array<Float> = [group.fadeOut];
+        if(Inspector.dragFields("Fade out", uID, fo))
+            group.fadeOut = fo[0];
+
         //fadePower : Float
-        inspector.field(fold, "Fade power", () -> '${group.fadePower}', (v) -> group.fadePower = Std.parseFloat(v));
+        var fp : Array<Float> = [group.fadePower];
+        if(Inspector.dragFields("Fade power", uID, fp))
+            group.fadePower = fp[0];
+
         //isRelative : Bool
-        inspector.boolField(fold, "Is relative", () -> group.isRelative, (v) -> group.isRelative = v);
+        var ir : Bool = Inspector.checkbox("Is relative", uID, group.isRelative);
+        if(ir != group.isRelative)
+            group.isRelative = ir;
     }
 
     function set_loop(v : Bool) : Bool

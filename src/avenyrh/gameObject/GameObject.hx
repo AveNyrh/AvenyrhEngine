@@ -1,5 +1,6 @@
 package avenyrh.gameObject;
 
+import avenyrh.imgui.ImGui;
 import avenyrh.ui.Fold;
 import avenyrh.engine.Inspector;
 import h2d.col.Point;
@@ -48,7 +49,7 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     /**
      * Color of the debug lines
      */
-    public var debugColor : Int = Color.iRED;
+    var debugColor : Int = Color.iRED;
 
     var debugGraphics : Null<Graphics>;
 
@@ -148,12 +149,7 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     /**
      * Override this to draw custom informations on the inspector window 
      */
-    function drawInfo(inspector : Inspector, fold : Fold) { }
-
-    /**
-     * Override this to put custom informations on the inspector window 
-     */
-    function getInfo() : String { return ""; }
+    function drawInfo() { }
     //#endregion
 
     //-------------------------------
@@ -371,36 +367,29 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     }
 
     @:noCompletion
-    public function drawInspector(inspector : Inspector)
+    public function drawInspector()
     {
-        var fold : Fold = inspector.fold(name);
-        
-        inspector.doubleField(fold, "x", () -> '${hxd.Math.fmt(x)}', (v) -> x = Std.parseFloat(v), "y", () -> '${hxd.Math.fmt(y)}', (v) -> y = Std.parseFloat(v));
-        inspector.field(fold, "rotation", () -> '${Std.int(AMath.toDeg(rotation) % 360)}', (v) -> rotation = AMath.toRad(Std.parseFloat(v)));
-        inspector.doubleField(fold, "sx", () -> '${hxd.Math.fmt(scaleX)}', (v) -> scaleX = Std.parseFloat(v), "sy", () -> '${hxd.Math.fmt(scaleY)}', (v) -> scaleY = Std.parseFloat(v));
+        //Position
+        var pos : Array<Float> = [x, y];
+        Inspector.dragFields("Position", uID, pos, 0.1);
+        x = pos[0];
+        y = pos[1];
+    
+        //Rotation
+        var rot : Array<Float> = [AMath.toDeg(rotation)];
+        Inspector.dragFields("Rotation", uID, rot, 0.1);
+        rotation = AMath.toRad(rot[0]);
 
-        drawInfo(inspector, fold);
+        //Scale
+        var scale : Array<Float> = [scaleX, scaleY];
+        Inspector.dragFields("Scale", uID, scale, 0.1);
+        scaleX = scale[0];
+        scaleY = scale[1];
 
-        //Components
+        drawInfo();
+
         for(c in components)
-            c.drawInfo(inspector, fold);
-
-        //Children
-        for(c in children)
-        {
-            if(Std.isOfType(c, IInspectable))
-            {
-                var inspec : IInspectable = cast c;
-                inspec.drawInspector(inspector);
-            }
-        }
-    }
-
-    @:noCompletion
-    public function isInBounds(x : Float, y : Float) : Bool
-    {
-        var p : Point = new Point(x, y);
-        return getBounds().contains(p);
+            c.drawInspector();
     }
 
     override function draw(ctx : RenderContext) 
