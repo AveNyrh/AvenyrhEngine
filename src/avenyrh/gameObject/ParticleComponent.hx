@@ -19,6 +19,7 @@ class ParticleComponent extends Component
         super(gameObject, name);
 
         particles = new Particles(gameObject);
+        particles.name = 'Particle-${gameObject.name}';
 		group = new ParticleGroup(particles);
         particles.addGroup(group);
 

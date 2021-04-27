@@ -407,6 +407,30 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
             }
         }
     }
+
+    @:noCompletion
+    public function drawHierarchy() : Null<IInspectable>
+    {
+        var inspec : IInspectable = null;
+        var i : IInspectable = null;
+
+        if(ImGui.selectable('$name###$name$uID', this == Inspector.currentInspectable))
+            inspec = this;
+
+        for(c in children)
+        {
+            if(Std.isOfType(c, IInspectable))
+            {
+                var ci : IInspectable = cast c;
+                i = ci.drawHierarchy();
+            }
+        }
+
+        if(i != null)
+            inspec = i;
+
+        return inspec;
+    }
     //#endregion
 
     //-------------------------------

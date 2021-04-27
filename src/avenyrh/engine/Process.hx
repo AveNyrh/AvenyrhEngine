@@ -1,5 +1,7 @@
 package avenyrh.engine;
 
+import avenyrh.imgui.ImGui;
+
 class Process implements IGarbageCollectable implements IInspectable
 {
     /**
@@ -197,6 +199,30 @@ class Process implements IGarbageCollectable implements IInspectable
     public function drawInspector()
     {
         drawInfo();
+    }
+
+    @:noCompletion
+    public function drawHierarchy() : Null<IInspectable>
+    {
+        var inspec : IInspectable = null;
+        var i : IInspectable = null;
+
+        if(ImGui.selectable('$name###$name$uID', this == Inspector.currentInspectable))
+            inspec = this;
+
+        for(c in children)
+        {
+            if(Std.isOfType(c, IInspectable))
+            {
+                var ci : IInspectable = cast c;
+                i = ci.drawHierarchy();
+            }
+        }
+
+        if(i != null)
+            inspec = i;
+
+        return inspec;
     }
 
     public function toString() : String

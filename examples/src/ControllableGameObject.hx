@@ -22,9 +22,13 @@ class ControllableGameObject extends GameObject
 
         addComponent(new SimpleAnimator(this, "Simple Animator"));
 
-        // var go = new FixedGameObject("Children Game Object", this);
-        // go.setPosition(10, 10);
-        // addChild(go);
+        var go = new FixedGameObject("Child of controlable go", this);
+        go.setPosition(10, 10);
+        addChild(go);
+
+        var go2 : FixedGameObject = new FixedGameObject("Child of controlable go 2", this);
+        go2.setPosition(-10, 10);
+        addChild(go2);
     }
 
     public override function update(dt : Float) 

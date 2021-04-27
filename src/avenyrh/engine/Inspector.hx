@@ -1,8 +1,5 @@
 package avenyrh.engine;
 
-import h2d.Layers;
-import h2d.Flow;
-import h2d.Object;
 import avenyrh.imgui.ImGui;
 import avenyrh.imgui.ImGuiDrawable;
 import h2d.Tile;
@@ -17,7 +14,7 @@ class Inspector extends Process
     /**
      * Current object being inspected
      */
-    var currentInspectable : Null<IInspectable>;
+    public static var currentInspectable : Null<IInspectable>;
 
     var lock : Bool = false;
 
@@ -67,33 +64,63 @@ class Inspector extends Process
         ImGui.begin("Hierarchy");
 
         var scene : Scene = Engine.instance.currentScene;
-        var flags : ImGuiTreeNodeFlags = NoTreePushOnOpen | Bullet;
+        var flags : ImGuiTreeNodeFlags = DefaultOpen;
 
-        ImGui.text("------ Process ------");
-        for(p in scene.children)
+        ImGui.separator();
+        if(ImGui.treeNodeEx("Process", flags))
         {
-            if(ImGui.selectable('${p.name}###${p.name}${p.uID}', p == currentInspectable))
-                currentInspectable = p;
+            for(p in scene.children)
+            {
+                var i : IInspectable = p.drawHierarchy();
+
+                if(i != null)
+                {
+                    ImGui.spacing();
+                    currentInspectable = i;
+                    ImGui.spacing();
+                }
+            }
+            ImGui.treePop();
         }
 
-        ImGui.text("------ UI ------");
-        for(i in 0 ... scene.ui.numChildren)
+        ImGui.separator();
+        if(ImGui.treeNodeEx("UI", flags))
         {
-            var inspec : IInspectable = cast scene.ui.getChildAt(i);
+            for(i in 0 ... scene.ui.numChildren)
+            {
+                if(Std.isOfType(scene.ui.getChildAt(i), IInspectable))
+                {
+                    ImGui.spacing();
+                    var inspec : IInspectable = cast scene.ui.getChildAt(i);
+                    var insp : IInspectable = inspec.drawHierarchy();
 
-            if(inspec != null)
-                if(ImGui.selectable('${inspec.name}###${inspec.name}${inspec.uID}', inspec == currentInspectable))
-                    currentInspectable = inspec;
+                    if(insp != null)
+                        currentInspectable = insp;
+
+                    ImGui.spacing();
+                }
+            }
+            ImGui.treePop();
         }
 
-        ImGui.text("------ Game ------");
-        for(i in 0 ... scene.scroller.numChildren)
+        ImGui.separator();
+        if(ImGui.treeNodeEx("Game", flags))
         {
-            var inspec : IInspectable = cast scene.scroller.getChildAt(i);
+            for(i in 0 ... scene.scroller.numChildren)
+            {
+                if(Std.isOfType(scene.scroller.getChildAt(i), IInspectable))
+                {
+                    ImGui.spacing();
+                    var inspec : IInspectable = cast scene.scroller.getChildAt(i);
+                    var insp : IInspectable = inspec.drawHierarchy();
 
-            if(inspec != null)
-                if(ImGui.selectable('${inspec.name}###${inspec.name}${inspec.uID}', inspec == currentInspectable))
-                    currentInspectable = inspec;
+                    if(insp != null)
+                        currentInspectable = insp;
+
+                    ImGui.spacing();
+                }
+            }
+            ImGui.treePop();
         }
 
         ImGui.end();
@@ -149,7 +176,7 @@ class Inspector extends Process
         for(i in 0 ... data.length)
             na[i] = data[i];
 
-        if(ImGui.dragFloat(label + '###$label$id', na, step, format))
+        if(ImGui.dragFloat('$label###$label$id', na, step, format))
         {
             changed = true;
             for(i in 0 ... data.length)
@@ -171,7 +198,7 @@ class Inspector extends Process
         for(i in 0 ... ea.length)
             na[i] = Std.string(ea[i]);
 
-        if(ImGui.beginCombo(label + '###$label$id', na[index]))
+        if(ImGui.beginCombo('$label###$label$id', na[index]))
         {
             for(i in 0 ... na.length)
             {
