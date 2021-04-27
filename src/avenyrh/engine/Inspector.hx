@@ -26,7 +26,8 @@ class Inspector extends Process
     {
         super("Inspector");
 
-        drawable = new ImGuiDrawable(Process.S2D);
+        createRoot(Process.S2D, 10);
+        drawable = new ImGuiDrawable(root);
 
         close();
     }
