@@ -19,6 +19,8 @@ class Scene extends Process
      */
     public var camera : Camera;
 
+    public var miscInspectable : Array<IInspectable>;
+
     var allGO : Array<GameObject> = [];
     var goToRemove : Array<GameObject> = [];
 
@@ -29,6 +31,7 @@ class Scene extends Process
 
         createRoot(Process.S2D);
 
+        miscInspectable = [];
         camera = new Camera("Camera", this, this);
     }
 

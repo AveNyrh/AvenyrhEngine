@@ -29,6 +29,8 @@ class Inspector extends Process
         createRoot(Process.S2D, 10);
         drawable = new ImGuiDrawable(root);
 
+        ImGui.loadIniSettingsFromDisk("default.ini");
+
         close();
     }
 
@@ -120,6 +122,23 @@ class Inspector extends Process
 
                     ImGui.spacing();
                 }
+            }
+            ImGui.treePop();
+        }
+
+        ImGui.separator();
+        if(ImGui.treeNodeEx("Misc", flags))
+        {
+            for(i in scene.miscInspectable)
+            {
+                ImGui.spacing();
+
+                var insp : IInspectable = i.drawHierarchy();
+
+                if(insp != null)
+                    currentInspectable = insp;
+
+                ImGui.spacing();
             }
             ImGui.treePop();
         }
