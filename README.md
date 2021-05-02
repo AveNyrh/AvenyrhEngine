@@ -35,28 +35,42 @@ In the examples folder, there are some examples on how to work with this framewo
 
 ## Inspector
 
-You have an Inspector that can help you to debug the game. Press F4 to show the Inspector window and click on the GameObject you want to inspect.
-It shows different informations about the object, its components and its children.
-You can put you own debug informations by overriding the `drawInspector` method.
+You have an Inspector that can help you to debug the game. Press F4 to display the Hierarchy & Inspector window.
+It shows different informations about the object and its components.
+You can put you own debug informations by overriding the `drawInfo` method.
 
 Here is an example :
 ```haxe
-public function drawInspector(inspector : Inspector, fold : Fold)
+public function drawInfo()
 {
-	//Two value field
-    inspector.doubleField(fold, "left", () -> '${hxd.Math.fmt(value1)}', (v) -> value1 = Std.parseFloat(v), "right", () -> '${hxd.Math.fmt(value2)}', (v) -> value2 = Std.parseFloat(v));
-	//On value field
-    inspector.field(fold, "value", () -> variable.toString(), (v) -> variable = v);
-	//Space
-	inspector.space(fold, 20);
-	//Text label
-	inspector.textLabel(fold, "Label");
+    //Two floats/ints on the same line
+    var array : Array<Float> = [x, y];
+    Inspector.dragFields("Array", uID, array, 0.1);
+    x = array[0];
+    y = array[1];
+    
+    //One float/int
+    var v : Array<Int> = [value];
+    Inspector.dragFields("Value", uID, v);
+    value = v[0];
+
+	//Enum fiel
+    var i = Inspector.enumDropdown("Enum", uID, EnumName, currentEnumIndex);
+    currentEnumIndex = haxe.EnumTools.createByIndex(EnumName, i);
+
+	//Button
+	if(Inspector.button("Foo", uID))
+        foo();
+
+	//Checkbox
+	value = Inspector.checkbox("Value", uID, value);
+
+	//Text
+    Inspector.labelText("Text", uID, "Some text");
 }
 ```
 
-You have two buttons :
-- Debug the bounds of all gameObjects
-- Lock on the current gameObject
+There will be more wrapper in the future and I plan on making it simpler to use.
 
 
 ## UI
