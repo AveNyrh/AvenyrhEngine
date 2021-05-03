@@ -204,8 +204,8 @@ class Process implements IGarbageCollectable implements IInspectable
     @:noCompletion
     public function drawHierarchy() : Null<IInspectable>
     {
-        var inspec : IInspectable = null;
-        var i : IInspectable = null;
+        var inspec : Null<IInspectable> = null;
+        var i : Null<IInspectable> = null;
 
         if(ImGui.selectable('$name###$name$uID', this == Inspector.currentInspectable))
             inspec = this;
@@ -215,11 +215,14 @@ class Process implements IGarbageCollectable implements IInspectable
             if(Std.isOfType(c, IInspectable))
             {
                 var ci : IInspectable = cast c;
-                i = ci.drawHierarchy();
+                var cii : IInspectable = ci.drawHierarchy();
+
+                if(cii != null && i == null)
+                    i = cii;
             }
         }
 
-        if(i != null)
+        if(i != null && inspec == null)
             inspec = i;
 
         return inspec;
