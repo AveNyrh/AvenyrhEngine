@@ -2,6 +2,8 @@
 -lib heaps
 -lib hlsdl
 
+-D inspector
+
 -D resourcesPath=examples/res
 -D windowTitle=AveNyrhEngine
 -D windowSize=1280x720

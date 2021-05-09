@@ -44,7 +44,9 @@ class Engine extends Process
         console.shortKeyChar = "²".code;
 
         //Inspector
+        #if inspector
         new Inspector();
+        #end
 
         InputManager.init();
         new Tweeny("Tweeny", this);

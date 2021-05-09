@@ -369,6 +369,11 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     @:noCompletion
     public function drawInspector()
     {
+        //Enable
+        var e : Bool = Inspector.checkbox("Enable", uID, enable);
+        enable = e;
+        visible = e;
+
         //Position
         var pos : Array<Float> = [x, y];
         Inspector.dragFields("Position", uID, pos, 0.1);
