@@ -4,6 +4,14 @@ import avenyrh.imgui.ImGui;
 import avenyrh.imgui.ImGuiDrawable;
 import h2d.Tile;
 
+/**
+ * To compile ImGui
+ * cd where/you/cloned/hlimgui/
+ * cd extension
+ * mkdir build
+ * cl /I%HASHLINK%\include /I. /Iimgui *.cpp imgui\*.cpp /Fobuild\ /Fe"hlimgui.hdll" /link /DLL /libpath:%HASHLINK% libhl.lib
+ */
+
 class Inspector extends Process
 {
     /**
@@ -72,17 +80,9 @@ class Inspector extends Process
         ImGui.separator();
         if(ImGui.treeNodeEx("Process", flags))
         {
-            for(p in scene.children)
-            {
-                var i : IInspectable = p.drawHierarchy();
-
-                if(i != null)
-                {
-                    ImGui.spacing();
-                    currentInspectable = i;
-                    ImGui.spacing();
-                }
-            }
+            var i : IInspectable = scene.drawHierarchy();
+            if(i != null)
+                currentInspectable = i;
             ImGui.treePop();
         }
 

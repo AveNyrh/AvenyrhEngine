@@ -12,6 +12,8 @@ class ParticleComponent extends Component
 
     var group : ParticleGroup;
 
+    public var isPlaying (default, null) : Bool = true;
+
     public var loop (default, set) : Bool = true;
 
     override public function new(gameObject : GameObject, name : String, texture : h3d.mat.Texture, frameCount : Int = 1) 
@@ -33,16 +35,19 @@ class ParticleComponent extends Component
     {
         group.enable = true;
         group.rebuild();
+        isPlaying = true;
     }
 
     public function stop() 
     {
         group.enable = false;
+        isPlaying = false;
     }
 
     public function saveParticle()
     {
         var data : StringMap<ParticleOptions> = new StringMap();
+        data = SaveLoader.loadData("particles", data);
 
         var po : ParticleOptions = new ParticleOptions();
 
@@ -152,32 +157,32 @@ class ParticleComponent extends Component
 
         //size : Float
         var s : Array<Float> = [group.size];
-        if(Inspector.dragFields("Size", uID, s))
+        if(Inspector.dragFields("Size", uID, s, 0.1))
             group.size = s[0];
 
         //sizeRand : Float
         var sr : Array<Float> = [group.sizeRand];
-        if(Inspector.dragFields("Size rand", uID, sr))
+        if(Inspector.dragFields("Size rand", uID, sr, 0.1))
             group.sizeRand = sr[0];
 
         //sizeIncr : Float
         var si : Array<Float> = [group.sizeIncr];
-        if(Inspector.dragFields("Size incr", uID, si))
+        if(Inspector.dragFields("Size incr", uID, si, 0.1))
             group.sizeIncr = si[0];
 
         //rotationInit : Float
         var ri : Array<Float> = [group.rotInit];
-        if(Inspector.dragFields("Rot init", uID, ri))
+        if(Inspector.dragFields("Rot init", uID, ri, 0.1))
             group.rotInit = ri[0];
 
         //rotationSpeed : Float
         var rs : Array<Float> = [group.rotSpeed];
-        if(Inspector.dragFields("Rot speed", uID, rs))
+        if(Inspector.dragFields("Rot speed", uID, rs, 0.1))
             group.rotSpeed = rs[0];
 
         //rotationSpeedRand : Float
         var rsr : Array<Float> = [group.rotSpeedRand];
-        if(Inspector.dragFields("Rot spd rnd", uID, rsr))
+        if(Inspector.dragFields("Rot spd rnd", uID, rsr, 0.1))
             group.rotSpeedRand = rsr[0];
 
         //rotationAuto : Bool
@@ -187,37 +192,37 @@ class ParticleComponent extends Component
 
 		//gravity : Float
         var g : Array<Float> = [group.gravity];
-        if(Inspector.dragFields("Gravity", uID, g))
+        if(Inspector.dragFields("Gravity", uID, g, 0.1))
             group.gravity = g[0];
 
         //gravity angle : Float
         var ga : Array<Float> = [group.gravityAngle];
-        if(Inspector.dragFields("Gravity angle", uID, ga))
+        if(Inspector.dragFields("Gravity angle", uID, ga, 0.1))
             group.gravityAngle = ga[0];
 
 		//life : Float
         var li : Array<Float> = [group.life];
-        if(Inspector.dragFields("Life", uID, li))
+        if(Inspector.dragFields("Life", uID, li, 0.1))
             group.life = li[0];
 
         //lifeRand : Float
         var lir : Array<Float> = [group.lifeRand];
-        if(Inspector.dragFields("Life rand", uID, lir))
+        if(Inspector.dragFields("Life rand", uID, lir, 0.1))
             group.lifeRand = lir[0];
 
 		//speed : Float
         var sp : Array<Float> = [group.speed];
-        if(Inspector.dragFields("Speed", uID, sp))
+        if(Inspector.dragFields("Speed", uID, sp, 0.1))
             group.speed = sp[0];
 
 		//speedRand : Float
         var spr : Array<Float> = [group.speedRand];
-        if(Inspector.dragFields("Speed rand", uID, spr))
+        if(Inspector.dragFields("Speed rand", uID, spr, 0.1))
             group.speedRand = spr[0];
 
         //speedIncr : Float
         var spi : Array<Float> = [group.speedIncr];
-        if(Inspector.dragFields("Speed incr", uID, spi))
+        if(Inspector.dragFields("Speed incr", uID, spi, 0.1))
             group.speedIncr = spi[0];
 
 	    //emitMode : PartEmitMode
@@ -227,42 +232,42 @@ class ParticleComponent extends Component
 
         //emitDist : Float
         var ed : Array<Float> = [group.emitDist];
-        if(Inspector.dragFields("Emit dist", uID, ed))
+        if(Inspector.dragFields("Emit dist", uID, ed, 0.1))
             group.emitDist = ed[0];
 
         //emitDistY : Float
         var edy : Array<Float> = [group.emitDistY];
-        if(Inspector.dragFields("Emit dist y", uID, edy))
+        if(Inspector.dragFields("Emit dist y", uID, edy, 0.1))
             group.emitDistY = edy[0];
 
 		//emitAngle : Float
         var ea : Array<Float> = [group.emitAngle];
-        if(Inspector.dragFields("Emit angle", uID, ea))
+        if(Inspector.dragFields("Emit angle", uID, ea, 0.1))
             group.emitAngle = ea[0];
 
         //emitDelay : Float
         var ede : Array<Float> = [group.emitDelay];
-        if(Inspector.dragFields("Emit delay", uID, ede))
+        if(Inspector.dragFields("Emit delay", uID, ede, 0.1))
             group.emitDelay = ede[0];
 
         //emitSync : Float
         var es : Array<Float> = [group.emitSync];
-        if(Inspector.dragFields("Emit sync", uID, es))
+        if(Inspector.dragFields("Emit sync", uID, es, 0.1))
             group.emitSync = es[0];
 
         //fadeIn : Float
         var fi : Array<Float> = [group.fadeIn];
-        if(Inspector.dragFields("Fade in", uID, fi))
+        if(Inspector.dragFields("Fade in", uID, fi, 0.1))
             group.fadeIn = fi[0];
 
 		//fadeOut : Float
         var fo : Array<Float> = [group.fadeOut];
-        if(Inspector.dragFields("Fade out", uID, fo))
+        if(Inspector.dragFields("Fade out", uID, fo, 0.1))
             group.fadeOut = fo[0];
 
         //fadePower : Float
         var fp : Array<Float> = [group.fadePower];
-        if(Inspector.dragFields("Fade power", uID, fp))
+        if(Inspector.dragFields("Fade power", uID, fp, 0.1))
             group.fadePower = fp[0];
 
         //isRelative : Bool

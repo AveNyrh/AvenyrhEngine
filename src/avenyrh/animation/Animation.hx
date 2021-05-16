@@ -54,14 +54,14 @@ class Animation extends State
     //-------------------------------
     //#region Private API
     //-------------------------------
-    override function onStateEnter(info:StateChangeInfo) 
+    override function onStateEnter(info : StateChangeInfo) 
     {
         super.onStateEnter(info);
 
         currentTime = -0.0001;
     }
 
-    override function onStateUpdate(dt:Float) 
+    override function onStateUpdate(dt : Float) 
     {
         super.onStateUpdate(dt);
 
@@ -120,6 +120,33 @@ class Animation extends State
             else if(a.time > b.time) return 1;
             else return 0;
         });
+    }
+
+    @:noCompletion
+    public function setCurrentTime(t : Float)
+    {
+        oldTime = currentTime;
+        currentTime = t;
+
+        var i : Int = 0;
+        for (e in events)
+        {
+            //Check going forward
+            if(e.time > oldTime && e.time <= currentTime)
+            {
+                e.event();
+                break;
+            }
+            
+            //Check going backward
+            if(e.time <= oldTime && e.time > currentTime)
+            {
+                events[i - 1].event();
+                break;
+            }
+
+            i++;
+        }
     }
     //#endregion
 }
