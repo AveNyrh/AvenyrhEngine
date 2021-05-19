@@ -1,6 +1,6 @@
 package avenyrh.gameObject;
 
-import avenyrh.imgui.ImGui;
+import haxe.Unserializer;
 import haxe.ds.StringMap;
 import avenyrh.engine.SaveLoader;
 import avenyrh.engine.Inspector;
@@ -8,6 +8,8 @@ import h2d.Particles;
 
 class ParticleComponent extends Component
 {
+    static var data : StringMap<ParticleOptions>;
+
     var particles : Particles;
 
     var group : ParticleGroup;
@@ -31,6 +33,12 @@ class ParticleComponent extends Component
         loadParticle();
     }
 
+    //-------------------------------
+    //#region Public API
+    //-------------------------------
+    /**
+     * Start the particles
+     */
     public function play()
     {
         group.enable = true;
@@ -38,17 +46,20 @@ class ParticleComponent extends Component
         isPlaying = true;
     }
 
+    /**
+     * Stops all the particles
+     */
     public function stop() 
     {
         group.enable = false;
         isPlaying = false;
     }
 
+    /**
+     * Saves particles in the res/sav/particles.sav file
+     */
     public function saveParticle()
     {
-        var data : StringMap<ParticleOptions> = new StringMap();
-        data = SaveLoader.loadData("particles", data);
-
         var po : ParticleOptions = new ParticleOptions();
 
         po.maxNumber = group.nparts;
@@ -81,19 +92,18 @@ class ParticleComponent extends Component
         po.isRelative = group.isRelative;
 
         data.set(name, po);
-
-        SaveLoader.saveData("particles", data);
+        saveData();
     }
 
+    /**
+     * Loads particles options
+     */
     public function loadParticle()
     {
-        var data : StringMap<ParticleOptions> = new StringMap();
-        data = SaveLoader.loadData("particles", data);
-
         if(!data.exists(name))
             return;
 
-        var po : ParticleOptions = cast data.get(name);
+        var po : ParticleOptions = data.get(name);
 
         group.nparts = po.maxNumber;
         group.dx = po.dx;
@@ -124,7 +134,11 @@ class ParticleComponent extends Component
         group.fadePower = po.fadePower;
         group.isRelative = po.isRelative;
     }
+    //#endregion
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     override function drawInfo() 
     {
         super.drawInfo();
@@ -275,7 +289,27 @@ class ParticleComponent extends Component
         if(ir != group.isRelative)
             group.isRelative = ir;
     }
+    //#endregion
 
+    //-------------------------------
+    //#region Static API
+    //-------------------------------
+    static function initData()
+    {
+        data = new StringMap<ParticleOptions>();
+        var obj : Dynamic = Unserializer.run(hxd.Res.sav.particles.entry.getBytes().toString());
+        data = cast obj;
+    }
+
+    static function saveData()
+    {
+        SaveLoader.saveData("particles", data);
+    }
+    //#endregion
+
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
     function set_loop(v : Bool) : Bool
     {
         loop = v;
@@ -287,6 +321,7 @@ class ParticleComponent extends Component
 
         return loop;
     }
+    //#endregion
 }
 
 class ParticleOptions 

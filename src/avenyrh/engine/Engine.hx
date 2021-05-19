@@ -1,5 +1,7 @@
 package avenyrh.engine;
 
+import avenyrh.gameObject.ColliderComponent;
+import avenyrh.gameObject.ParticleComponent;
 import h2d.Console;
 import avenyrh.InputManager;
 
@@ -48,9 +50,11 @@ class Engine extends Process
         new Inspector();
         #end
 
+        //Init options
         InputManager.init();
         new Tweeny("Tweeny", this);
-        //Init options//
+        @:privateAccess ParticleComponent.initData();
+        @:privateAccess ColliderComponent.initData();
     }
 
     //-------------------------------
