@@ -30,7 +30,7 @@ class Main extends hxd.App
         //avenyrhEngine.addScene(new GameObjectScene());
         //avenyrhEngine.addScene(new UIScene());
         //avenyrhEngine.addScene(new PFScene());
-        avenyrhEngine.addScene(new PhysicScene());
+        avenyrhEngine.addScene(new PhysicExampleScene());
     }
 
     /**
