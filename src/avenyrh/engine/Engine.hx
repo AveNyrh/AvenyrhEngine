@@ -1,6 +1,6 @@
 package avenyrh.engine;
 
-import avenyrh.gameObject.ColliderComponent;
+import avenyrh.gameObject.PhysicGameObject;
 import avenyrh.gameObject.ParticleComponent;
 import h2d.Console;
 import avenyrh.InputManager;
@@ -54,7 +54,7 @@ class Engine extends Process
         InputManager.init();
         new Tweeny("Tweeny", this);
         @:privateAccess ParticleComponent.initData();
-        @:privateAccess ColliderComponent.initData();
+        @:privateAccess PhysicGameObject.initData();
     }
 
     //-------------------------------

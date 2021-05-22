@@ -1,5 +1,5 @@
-import examples.src.GameObjectScene;
-import examples.src.UIScene;
+import examples.src.*;
+import examples.src.pathfinding.PFScene;
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
 
@@ -27,9 +27,10 @@ class Main extends hxd.App
 
         avenyrhEngine = new Engine(s2d, engine);
 
-        avenyrhEngine.addScene(new GameObjectScene());
+        //avenyrhEngine.addScene(new GameObjectScene());
         //avenyrhEngine.addScene(new UIScene());
         //avenyrhEngine.addScene(new PFScene());
+        avenyrhEngine.addScene(new PhysicScene());
     }
 
     /**

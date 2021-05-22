@@ -374,6 +374,9 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         enable = e;
         visible = e;
 
+        var d : Bool = Inspector.checkbox("Debug", uID, debug);
+        debug = d;
+
         //Position
         var pos : Array<Float> = [x, y];
         Inspector.dragFields("Position", uID, pos, 0.1);

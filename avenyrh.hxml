@@ -1,6 +1,7 @@
 -cp src
 -lib heaps
 -lib hlsdl
+-lib echo
 
 -D inspector
 
