@@ -1,6 +1,6 @@
 package examples.src;
 
-import avenyrh.engine.PhysicScene;
+import avenyrh.physic.PhysicScene;
 
 class PhysicExampleScene extends PhysicScene
 {

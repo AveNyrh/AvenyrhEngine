@@ -1,6 +1,6 @@
 package examples.src;
 
-import avenyrh.gameObject.PhysicGameObject;
+import avenyrh.physic.PhysicGameObject;
 import avenyrh.Color;
 import h2d.Tile;
 import echo.World;

@@ -1,5 +1,6 @@
-package avenyrh.gameObject;
+package avenyrh.physic;
 
+import avenyrh.gameObject.GameObject;
 import avenyrh.imgui.ImGui;
 import avenyrh.engine.Inspector;
 import avenyrh.engine.SaveLoader;
