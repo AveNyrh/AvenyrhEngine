@@ -1,6 +1,6 @@
 package avenyrh.engine;
 
-import avenyrh.gameObject.PhysicGameObject;
+import avenyrh.physic.PhysicGameObject;
 import avenyrh.gameObject.ParticleComponent;
 import h2d.Console;
 import avenyrh.InputManager;

@@ -30,6 +30,8 @@ class Inspector extends Process
 
     var drawable : ImGuiDrawable;
 
+    static var textures : Map<h3d.mat.Texture, Int> = [];
+
     override public function new() 
     {
         super("Inspector");
@@ -255,6 +257,17 @@ class Inspector extends Process
     public static function labelText(label : String, id : Int, text : String) 
     {
         ImGui.labelText('$label###$label$id', text);
+    }
+
+    public static function image(tile : Tile) @:privateAccess
+    {
+        var tex = tile.getTexture();
+        var id = textures[tex];
+
+        if (id == null)
+            textures[tex] = id = avenyrh.imgui.ImGuiDrawable.ImGuiDrawableBuffers.instance.registerTexture(tex);
+
+        ImGui.image(id, {x : tile.width, y : tile.height}, {x : tile.u, y : tile.v}, {x : tile.u2, y : tile.v2});
     }
     //#endregion
 }

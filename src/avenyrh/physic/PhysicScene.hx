@@ -15,11 +15,6 @@ class PhysicScene extends Scene
 
     var drawDebug : Bool = true;
 
-    public override function new() 
-    {
-        super("PhysicScene");
-    }
-
     override function added() 
     {
         super.added();

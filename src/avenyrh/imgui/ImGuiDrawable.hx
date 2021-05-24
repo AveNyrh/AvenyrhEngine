@@ -4,7 +4,7 @@ import h3d.mat.Texture;
 import avenyrh.imgui.ImGui;
 import hxd.Key;
 
-private class ImGuiDrawableBuffers {
+class ImGuiDrawableBuffers {
 
 	public static final instance = new ImGuiDrawableBuffers();
 
