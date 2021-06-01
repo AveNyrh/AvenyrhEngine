@@ -2,49 +2,54 @@ package avenyrh.engine;
 
 import avenyrh.imgui.ImGui;
 
-class Process implements IGarbageCollectable implements IInspectable
+@:rtti
+class Process extends Uniq implements IInspectable
 {
     /**
      * All process at the root
      */
     static var ROOTS : Array<Process> = [];
+
     /**
      * Scene s2d
      */
     public static var S2D : h2d.Scene;
-    /**
-     * Unique ID used to set each process uID
-     */
-    static var UNIQ_ID = 0;
 
     /**
      * Name of the process
      */
-     public var name (default, null) : String;
-    /**
-     * Unique ID
-     */
-    public var uID (default, null) : Int;
+    @hideInInspector
+    public var name (default, null) : String;
+
     /**
      * Is the process in pause
      */
+    @hideInInspector
     public var paused (default, null) : Bool;
+
     /**
      * Is the process destroyed
      */
+    @hideInInspector
     public var destroyed (default, null) : Bool;
+
     /**
      * Root of the graphic layer
      */
     public var root : Null<h2d.Layers>;
+
     /**
      * Width of the Window
      */
+    @hideInInspector
     public var width (get, never) : Int;
+
     /**
      * Height of the Window
      */
+    @hideInInspector
     public var height (get, never) : Int;
+
     /**
      * Time elapsed since the start of the Engine
      */
@@ -57,7 +62,7 @@ class Process implements IGarbageCollectable implements IInspectable
     public function new(name : String, ?parent : Process) 
     {
         this.name = name;
-        uID = UNIQ_ID++;
+        uID = Uniq.UNIQ_ID++;
         paused = false;
         destroyed = false;
         children = [];
@@ -75,9 +80,11 @@ class Process implements IGarbageCollectable implements IInspectable
     //-------------------------------
     public function init() { }
 
-    public function update(dt : Float) { if(paused || destroyed) return; }
+    public function update(dt : Float) { }
     
-    public function postUpdate(dt : Float) { if(paused || destroyed) return; }
+    public function postUpdate(dt : Float) { }
+
+    public function fixedUpdate(dt : Float) { }
     
     public function onResize() { }
     
@@ -86,7 +93,10 @@ class Process implements IGarbageCollectable implements IInspectable
     /**
      * Override this to draw custom informations on the inspector window 
      */
-    private function drawInfo() { }
+    private function drawInfo() 
+    { 
+        Inspector.drawInInspector(this);
+    }
     //#endregion
 
     //-------------------------------
@@ -212,14 +222,10 @@ class Process implements IGarbageCollectable implements IInspectable
 
         for(c in children)
         {
-            if(Std.isOfType(c, IInspectable))
-            {
-                var ci : IInspectable = cast c;
-                var cii : IInspectable = ci.drawHierarchy();
+            var ci : IInspectable = c.drawHierarchy();
 
-                if(cii != null && i == null)
-                    i = cii;
-            }
+            if(ci != null && i == null)
+                i = ci;
         }
 
         if(i != null && inspec == null)
@@ -236,26 +242,13 @@ class Process implements IGarbageCollectable implements IInspectable
     
     //-------------------------------
     //#region Public static API
-    //-------------------------------    
-    /**
-     * Resizes all process
-     */
-    public static function resizeAll() 
-    {
-		for (p in ROOTS)
-			_resize(p);
-    }
-    //#endregion
-    
-    //-------------------------------
-    //#region Private static API
     //-------------------------------
     /**
      * Updates all process
      * @param dt Delta time
      */
-    @:allow(Boot)
-    private static function updateAll(dt : Float) 
+    @:noCompletion
+    public static function updateAll(dt : Float) 
     {
         //Update all
 		for (p in ROOTS)
@@ -271,6 +264,19 @@ class Process implements IGarbageCollectable implements IInspectable
         time += dt;
     }
 
+    /**
+     * Resizes all process
+     */
+    public static function resizeAll() 
+    {
+		for (p in ROOTS)
+			_resize(p);
+    }
+    //#endregion
+    
+    //-------------------------------
+    //#region Private static API
+    //-------------------------------
     /**
      * Updates the process in parameter
      * @param p Process to update
@@ -308,6 +314,25 @@ class Process implements IGarbageCollectable implements IInspectable
 		if( !p.destroyed )
 			for (c in p.children)
 				_postUpdate(c, dt);
+    }
+
+    /**
+     * Called at a fixed interval
+     * @param p Process to fixed update
+     */
+    static function _fixedUpdate(p : Process, dt : Float) 
+    {
+        //Don't update if paused or destroyed
+		if( p.paused || p.destroyed )
+			return;
+
+        //Fixed update
+		p.fixedUpdate(dt);
+
+        //Post update children
+		if( !p.destroyed )
+			for (c in p.children)
+				_fixedUpdate(c, dt);
     }
     
     /**

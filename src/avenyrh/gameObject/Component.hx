@@ -1,33 +1,28 @@
 package avenyrh.gameObject;
 
+import avenyrh.engine.Inspector;
+import avenyrh.engine.Uniq;
 import avenyrh.imgui.ImGui;
-import avenyrh.engine.IGarbageCollectable;
-import avenyrh.engine.Engine;
 
+@:rtti
 @:allow(avenyrh.gameObject.GameObject)
-class Component implements IGarbageCollectable
+class Component extends Uniq
 {
-    /**
-     * Unique ID used to set each component uID
-     */
-    static var UNIQ_ID = 0;
-
     /**
      * Name of the component
      */
     public var name (default, null) : String;
+
     /**
      * Is the component enable or not
      */
     public var enable (default, set) : Bool = false;
-    /**
-     * Unique ID of the component
-     */
-    public var uID (default, null) : Int;
+
     /**
      * GameObject this component is attached to
      */
     public var gameObject (default, null) : GameObject;
+
     /**
      * Is the component destroyed
      */
@@ -35,18 +30,17 @@ class Component implements IGarbageCollectable
 
     private var started : Bool;
 
-    public function new(gameObject : GameObject, name : String) 
+    public function new(name : String, gameObject : GameObject) 
     {
         destroyed = false;
-        uID = UNIQ_ID++;
+        uID = Uniq.UNIQ_ID++;
         this.name = name;
         this.gameObject = gameObject;
+        gameObject.addComponent(this);
         started = false;
+        enable = true;
 
         init();
-
-        this.gameObject = gameObject;
-        enable = true;
     }
 
     //-------------------------------
@@ -68,9 +62,6 @@ class Component implements IGarbageCollectable
      */
     function update(dt : Float) 
     {
-        if(!enable || destroyed)
-            return;
-
         if(!started)
         {
             started = true;
@@ -78,13 +69,9 @@ class Component implements IGarbageCollectable
         }
     }
 
-    function postUpdate(dt : Float) { if(!enable || destroyed) return; }
-        
-    function removed()
-    {
-        enable = false;
-        Engine.instance.gc.push(this);
-    }
+    function postUpdate(dt : Float) { }
+
+    function fixedUpdate(dt : Float) { }
 
     function onEnable() { }
 
@@ -95,7 +82,10 @@ class Component implements IGarbageCollectable
     /**
      * Override this to draw custom informations on the inspector window 
      */
-    function drawInfo() {}    
+    function drawInfo() 
+    {
+        Inspector.drawInInspector(this);
+    }    
     //#endregion
 
     //-------------------------------
@@ -146,12 +136,9 @@ class Component implements IGarbageCollectable
     //-------------------------------
     //#region Private API
     //-------------------------------
-    /**
-     * GarbageCollectable implementation \
-     * Destroys this component
-     */
-     private function onDispose() 
+    function removed()
     {
+        enable = false;
         gameObject = null;
         destroyed = true;
         onDestroy();
@@ -159,8 +146,6 @@ class Component implements IGarbageCollectable
 
     function drawInspector() 
     {
-        ImGui.spacing();
-
         if(ImGui.collapsingHeader('$name###$name$uID', DefaultOpen))
         {
             drawInfo();

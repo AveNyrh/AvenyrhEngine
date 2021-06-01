@@ -1,67 +1,86 @@
 package avenyrh.gameObject;
 
+using Lambda;
+import avenyrh.engine.Uniq;
 import avenyrh.imgui.ImGui;
-import avenyrh.ui.Fold;
 import avenyrh.engine.Inspector;
-import h2d.col.Point;
 import avenyrh.engine.IInspectable;
-import h2d.col.Bounds;
-import h2d.Graphics;
-import h2d.RenderContext;
-import h2d.Tile;
-import h2d.Bitmap;
 import avenyrh.engine.Scene;
-import avenyrh.engine.IGarbageCollectable;
 import avenyrh.engine.Engine;
-import avenyrh.Vector2;
 
+@:rtti
 @:allow(avenyrh.engine.Scene, avenyrh.gameObject.Transform)
-class GameObject extends Bitmap implements IGarbageCollectable implements IInspectable
+class GameObject extends Uniq implements IInspectable
 {
-    /**
-     * Unique ID used to set each game object uID
-     */
-    static var UNIQ_ID = 0;
     /**
      * Scene the gameObject is on
      */
+    @hideInInspector
     public var scene : Scene;
-    /**
-     * Is the gameObject enable or not
-     */
-    public var enable (default, set) : Bool;
-    /**
-     * Unique ID of the gameObject
-     */
-    public var uID (default, null) : Int;
-    /**
-     * Simplified way to set the pivot
-     */
-    public var pivot (default, set) : Vector2;
+
     /**
      * Is the gameObject destroyed
      */
+    @hideInInspector
     public var destroyed (default, null) : Bool;
-    /**
-     * See debug lines
-     */
-    public var debug (default, set) : Bool;
-    /**
-     * Color of the debug lines
-     */
-    var debugColor : Int = Color.iRED;
 
-    var debugGraphics : Null<Graphics>;
+    /**
+     * Is the gameObject enable or not
+     */
+    @hideInInspector
+    public var enable (default, set) : Bool;
 
-    var started : Bool;
+    /**
+     * Name of the GameObject
+     */
+    @hideInInspector
+    public var name (default, null) : String;
+
+    /**
+     * X position
+     */
+    @hideInInspector
+    public var x (default, set) : Float = 0;
+
+    /**
+     * Y position
+     */
+    @hideInInspector
+    public var y (default, set) : Float = 0;
+
+    /**
+     * Current rotation
+     */
+    @hideInInspector
+    public var rotation (default, set) : Float = 0;
+
+    /**
+     * Scale along the x axis
+     */
+    @hideInInspector
+    public var scaleX (default, set) : Float = 1;
+
+    /**
+     * Scale along the y axis
+     */
+    @hideInInspector
+    public var scaleY (default, set) : Float = 1;
+
+    @hideInInspector
+    public var parent (default, set) : Null<GameObject>;
+
+    @hideInInspector
+    public var children (default, null) : Array<GameObject>;
+
+    var started : Bool = false;
+
+    var transformChanged : Bool = false;
 
     var components : Array<Component>;
 
-    public function new(name : String = "", parent : h2d.Object = null, ?pivot : Vector2, ?layer : Int = 2) 
+    public function new(name : String = "", parent : GameObject = null) 
     {
-        super(parent);
-
-        uID = UNIQ_ID++;
+        uID = Uniq.UNIQ_ID++;
         scene = Engine.instance.currentScene;
         
         destroyed = false;
@@ -69,17 +88,12 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         children = [];
 
         this.name = name;
+        this.parent = parent;
+        enable = true;
 
-        if(pivot == null)
-            this.pivot = Pivot.CENTER;
-        else
-            this.pivot = pivot;
-
-        scene.addGameObject(this, layer);
+        scene.addGameObject(this);
         
         init();
-
-        enable = true;
     }
 
     //-------------------------------
@@ -106,15 +120,16 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
      */
     function postUpdate(dt : Float) { }
 
+    /**
+     * Called at a fixed interval
+     */
+    function fixedUpdate(dt : Float) { }
+
     function onEnable() 
     {
         for(child in children)
         {
-            if(Std.isOfType(child, GameObject))
-            {
-                var go : GameObject = cast(child);
-                go.enable = true;
-            }
+            child.enable = true;
         }
     }
 
@@ -122,24 +137,11 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     { 
         for(child in children)
         {
-            if(Std.isOfType(child, GameObject))
-            {
-                var go : GameObject = cast(child);
-                go.enable = false;
-            }
+            child.enable = false;
         }
     }
 
     function onDestroy() { }
-
-    override function removeChildren()
-    {
-        for(child in children)
-            if(Std.isOfType(child, GameObject))
-                scene.removeGameObject(cast child);
-
-        super.removeChildren();
-    }
 
     /**
      * Called when the screen is resized
@@ -147,14 +149,98 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     function onResize() { }
 
     /**
-     * Override this to draw custom informations on the inspector window 
+     * Override this to draw custom informations on the inspector window \
+     * Remove super call to disable automatic fields display
      */
-    function drawInfo() { }
+    function drawInfo() 
+    { 
+        //Enable
+        var e : Bool = Inspector.checkbox("Enable", uID, enable);
+        enable = e;
+
+        //Position
+        var pos : Array<Float> = [x, y];
+        Inspector.dragFloats("Position", uID, pos, 0.1);
+        x = pos[0];
+        y = pos[1];
+    
+        //Rotation
+        var rot : Array<Float> = [AMath.toDeg(rotation)];
+        Inspector.dragFloats("Rotation", uID, rot, 0.1);
+        rotation = AMath.toRad(rot[0]);
+
+        //Scale
+        var scale : Array<Float> = [scaleX, scaleY];
+        Inspector.dragFloats("Scale", uID, scale, 0.1);
+        scaleX = scale[0];
+        scaleY = scale[1];
+
+        ImGui.separator();
+
+        Inspector.drawInInspector(this);
+    }
     //#endregion
 
     //-------------------------------
     //#region Public API
     //-------------------------------
+    //#region Transform
+    /**
+     * Sets the current position relative to its parent
+     */
+    public inline function setPosition(x : Float, y : Float)
+    {
+        this.x = x;
+        this.y = y;
+
+        transformChanged = true;
+    }
+
+    /**
+     * Moves by the specified amount, takes in count the rotation
+     */
+    public function move(dx : Float, dy : Float)
+    {
+        x += dx * Math.cos(rotation);
+		y += dy * Math.sin(rotation);
+
+        transformChanged = true;
+    }
+
+    /**
+     * Rotates by the specified angle
+     */
+    public inline function rotate(a : Float) 
+    {
+		rotation += a;
+
+        transformChanged = true;
+	}
+
+    /**
+     * Scales on both X and Y by the specified value
+     */
+    public inline function scale(s : Float) 
+    {
+		scaleX *= s;
+		scaleY *= s;
+
+        transformChanged = true;
+	}
+
+    /**
+     * Sets the scale on both X and Y to the specified value
+     */
+    public inline function setScale(s : Float) 
+    {
+		scaleX = s;
+		scaleY = s;
+
+        transformChanged = true;
+	}
+    //#endregion
+    
+    //#region Components
     /**
      * Gets the first component found on this gameObject
      * @param component Class of the wanted component
@@ -247,6 +333,25 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         
         return false;
     }
+    //#endregion
+
+    //#region Children
+    public function addChild(go : GameObject)
+    {
+        children.push(go);
+        go.parent = this;
+    }
+
+    /**
+     * Removes all children
+     */
+    public function removeChildren()
+    {
+        for(c in children)
+            c.removed();
+
+        children = [];
+    }
 
     /**
      * Returns true if this gameObject has the child in its children
@@ -271,21 +376,11 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
             
         return false;
     }
+    //#endregion
 
-    /**
-     * Changes the tile and keep the same pivot
-     * @param tile 
-     */
-    public function changeTile(t : Tile) 
+    public function toString() : String 
     {
-        tile = t;
-        
-        set_pivot(pivot);
-    }
-
-    public override function toString() : String 
-    {
-        return name + " : " + uID;
+        return '[$uID]$name';
     }
     //#endregion
 
@@ -312,8 +407,9 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         if(!enable || destroyed)
             return;
 
-        for (c in components) 
-            c.update(dt);
+        for (c in components)
+            if(c.enable || !c.destroyed)
+                c.update(dt);
     }
 
     /**
@@ -331,8 +427,29 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
             return;
 
         for (c in components)
-            if(c.enable)
+            if(c.enable || !c.destroyed)
                 c.postUpdate(dt);
+
+        transformChanged = false;
+    }
+
+    /**
+     * Called by the scene at a fixed interval
+     */
+    @:noCompletion
+    private function _fixedUpdate(dt : Float)
+    {
+        if(!enable || destroyed)
+            return;
+
+        fixedUpdate(dt);
+
+        if(!enable || destroyed)
+            return;
+
+        for (c in components)
+            if(c.enable || !c.destroyed)
+                c.fixedUpdate(dt);
     }
 
     /**
@@ -347,21 +464,6 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         removeChildren();
 
         enable = false;
-
-        Engine.instance.gc.push(this);
-    }
-
-    /**
-     * GarbageCollectable implementation \
-     * Destroys this gameObject and its components
-     */
-    @:noCompletion
-    private function onDispose()
-    {
-        for(c in components)
-            if(!c.destroyed)
-                removeComponent(c);
-
         destroyed = true;
         onDestroy();
     }
@@ -369,50 +471,12 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
     @:noCompletion
     public function drawInspector()
     {
-        //Enable
-        var e : Bool = Inspector.checkbox("Enable", uID, enable);
-        enable = e;
-        visible = e;
-
-        var d : Bool = Inspector.checkbox("Debug", uID, debug);
-        debug = d;
-
-        //Position
-        var pos : Array<Float> = [x, y];
-        Inspector.dragFields("Position", uID, pos, 0.1);
-        x = pos[0];
-        y = pos[1];
-    
-        //Rotation
-        var rot : Array<Float> = [AMath.toDeg(rotation)];
-        Inspector.dragFields("Rotation", uID, rot, 0.1);
-        rotation = AMath.toRad(rot[0]);
-
-        //Scale
-        var scale : Array<Float> = [scaleX, scaleY];
-        Inspector.dragFields("Scale", uID, scale, 0.1);
-        scaleX = scale[0];
-        scaleY = scale[1];
-
         drawInfo();
 
         for(c in components)
-            c.drawInspector();
-    }
-
-    override function draw(ctx : RenderContext) 
-    {
-        if(enable)
         {
-            super.draw(ctx);
-
-            if(debug)
-            {
-                debugGraphics.lineStyle(1, debugColor);
-                var bds : Bounds = new Bounds();
-                getBoundsRec(this, bds, true);
-                debugGraphics.drawRect(bds.xMin, bds.yMin, bds.width, bds.height);
-            }
+            ImGui.spacing();
+            c.drawInspector();
         }
     }
 
@@ -427,14 +491,10 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
 
         for(c in children)
         {
-            if(Std.isOfType(c, IInspectable))
-            {
-                var ci : IInspectable = cast c;
-                var cii : IInspectable = ci.drawHierarchy();
+            var ci : IInspectable = c.drawHierarchy();
 
-                if(cii != null && i == null)
-                    i = cii;
-            }
+            if(ci != null && i == null)
+                i = ci;
         }
 
         if(i != null && inspec == null)
@@ -462,128 +522,62 @@ class GameObject extends Bitmap implements IGarbageCollectable implements IInspe
         return this.enable;
     }
 
-    function set_pivot(p : Vector2) : Vector2
+    function set_x(x : Float) : Float
     {
-        pivot = p;
+        this.x = x;
 
-        if(tile != null)
-        {
-            tile.dx = pivot.x * tile.width;
-            tile.dy = pivot.y * tile.width;
-        }
+        transformChanged = true;
 
-        return pivot;
+        return x;
     }
 
-    function set_debug(value : Bool) : Bool
+    function set_y(y : Float) : Float
     {
-        debug = value;
+        this.y = y;
 
-        if(debug)
-            debugGraphics = new Graphics(this);
-        else
+        transformChanged = true;
+
+        return y;
+    }
+
+    function set_rotation(r : Float) : Float
+    {
+        rotation = r;
+
+        transformChanged = true;
+
+        return rotation;
+    }
+
+    function set_scaleX(s : Float) : Float
+    {
+        scaleX = s;
+
+        transformChanged = true;
+
+        return scaleX;
+    }
+
+    function set_scaleY(s : Float) : Float
+    {
+        scaleY = s;
+
+        transformChanged = true;
+
+        return scaleY;
+    }
+
+    function set_parent(p : Null<GameObject>) : Null<GameObject>
+    {
+        if(p != null)
         {
-            if(debugGraphics == null)
-                return debug;
-            
-            debugGraphics.clear();
-            debugGraphics = null;
+            parent = p;
+            parent.children.push(this);
         }
+        else
+            parent = null;
 
-        return debug;
+        return parent;
     }
     //#endregion
-}
-
-class Pivot
-{
-    /**
-     * Sets the pivot to the center of the tile
-     */
-    public static var CENTER (get, never) : Vector2;
-
-    private static function get_CENTER() : Vector2 
-    {
-        return Vector2.ONE / -2;
-    }
-
-    /**
-     * Sets the pivot to the up left of the tile
-     */
-    public static var UP_LEFT (get, never) : Vector2;
-
-    private static function get_UP_LEFT() : Vector2 
-    {
-        return Vector2.ZERO;
-    }
-
-    /**
-     * Sets the pivot to the up right of the tile
-     */
-    public static var UP_RIGHT (get, never) : Vector2;
-
-    private static function get_UP_RIGHT() : Vector2 
-    {
-        return Vector2.LEFT;
-    }
-
-    /**
-     * Sets the pivot to the down left of the tile
-     */
-    public static var DOWN_LEFT (get, never) : Vector2;
-
-    private static function get_DOWN_LEFT() : Vector2 
-    {
-        return Vector2.DOWN;
-    }
-
-    /**
-     * Sets the pivot to the down right of the tile
-     */
-    public static var DOWN_RIGHT (get, never) : Vector2;
-
-    private static function get_DOWN_RIGHT() : Vector2 
-    {
-        return -1 * Vector2.ONE;
-    }
-
-    /**
-     * Sets the pivot to the up center of the tile
-     */
-    public static var UP (get, never) : Vector2;
-
-    private static function get_UP() : Vector2 
-    {
-        return Vector2.LEFT / 2;
-    }
-
-    /**
-     * Sets the pivot to the down center of the tile
-     */
-    public static var DOWN (get, never) : Vector2;
-
-    private static function get_DOWN() : Vector2 
-    {
-        return Vector2.DOWN + Vector2.LEFT / 2;
-    }
-
-    /**
-     * Sets the pivot to the left center of the tile
-     */
-    public static var LEFT (get, never) : Vector2;
-
-    private static function get_LEFT() : Vector2 
-    {
-        return Vector2.DOWN / 2;
-    }
-
-    /**
-     * Sets the pivot to the right center of the tile
-     */
-    public static var RIGHT (get, never) : Vector2;
-
-    private static function get_RIGHT() : Vector2 
-    {
-        return Vector2.LEFT + Vector2.DOWN / 2;
-    }
 }

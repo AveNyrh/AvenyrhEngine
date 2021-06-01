@@ -6,6 +6,7 @@ import avenyrh.engine.Process;
 class Main extends hxd.App
 {
     public static var instance (default, null) : Main;
+    
     public static var avenyrhEngine (default, null) : Engine;
 
     /**
@@ -27,10 +28,10 @@ class Main extends hxd.App
 
         avenyrhEngine = new Engine(s2d, engine);
 
-        //avenyrhEngine.addScene(new GameObjectScene());
+        avenyrhEngine.addScene(new GameObjectScene());
         //avenyrhEngine.addScene(new UIScene());
         //avenyrhEngine.addScene(new PFScene());
-        avenyrhEngine.addScene(new PhysicExampleScene());
+        //avenyrhEngine.addScene(new PhysicExampleScene());
     }
 
     /**
@@ -40,7 +41,7 @@ class Main extends hxd.App
     override function update(dt : Float) 
     {
         super.update(dt);
-        @:privateAccess Process.updateAll(dt);
+        Process.updateAll(dt);
     }
 
     override function onResize() 

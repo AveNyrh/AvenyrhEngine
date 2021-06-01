@@ -1,5 +1,6 @@
 package avenyrh.animation;
 
+import avenyrh.gameObject.SpriteComponent;
 import avenyrh.gameObject.GameObject;
 import avenyrh.stateMachine.*;
 
@@ -8,27 +9,35 @@ class Animation extends State
     /**
      * GameObject on which this animation will change parameters
      */
-    var gameObject(get, never): GameObject; inline function get_gameObject() return animator.gameObject;
+    var gameObject (get, never): GameObject;
+
+    var sprite (get, null) : Null<SpriteComponent>;
+
     /**
      * Animator that has this animation
      */
     var animator : Animator;
+
     /**
      * List of all events
      */
     var events : Array<EventKey>;
+
     /**
      * Current time of the animation
      */
     public var currentTime (default, null) : Float;
+
     /**
      * Time at the last frame
      */
     var oldTime : Float;
+
     /**
      * Time max of the animation
      */
-    public var length (get, null) : Float; inline function get_length() return events[events.length - 1].time;
+    public var length (get, null) : Float;
+
     /**
      * Is the animation looping on itslef
      */
@@ -147,6 +156,28 @@ class Animation extends State
 
             i++;
         }
+    }
+    //#endregion
+
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
+    inline function get_gameObject() : GameObject
+    {
+        return animator.gameObject;
+    }
+
+    inline function get_sprite() : Null<SpriteComponent>
+    {
+        if(sprite == null)
+            sprite = gameObject.getComponent(SpriteComponent);
+
+        return sprite;
+    }
+
+    inline function get_length() : Float
+    {
+        return events[events.length - 1].time;
     }
     //#endregion
 }

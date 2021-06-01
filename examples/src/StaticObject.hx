@@ -1,5 +1,6 @@
 package examples.src;
 
+import avenyrh.gameObject.GameObject;
 import avenyrh.physic.PhysicGameObject;
 import avenyrh.Color;
 import h2d.Tile;
@@ -9,11 +10,11 @@ import h2d.Object;
 class StaticObject extends PhysicGameObject
 {
 
-    override public function new(name : String, parent : Object, world : World, colType : ColliderType) 
+    override public function new(name : String, parent : GameObject, world : World, colType : ColliderType) 
     {
         super(name, parent, world, colType);
         
-        changeTile(Tile.fromColor(Color.iBROWN, 10, 10));
+        //changeTile(Tile.fromColor(Color.iBROWN, 10, 10));
 
         body.mass = 0;
     }

@@ -1,12 +1,13 @@
 package avenyrh.gameObject;
 
+import h2d.Object;
 import haxe.Unserializer;
 import haxe.ds.StringMap;
 import avenyrh.engine.SaveLoader;
 import avenyrh.engine.Inspector;
 import h2d.Particles;
 
-class ParticleComponent extends Component
+class ParticleComponent extends GraphicComponent
 {
     static var data : StringMap<ParticleOptions>;
 
@@ -14,23 +15,58 @@ class ParticleComponent extends Component
 
     var group : ParticleGroup;
 
+    @hideInInspector
     public var isPlaying (default, null) : Bool = true;
 
+    @hideInInspector
     public var loop (default, set) : Bool = true;
 
-    override public function new(gameObject : GameObject, name : String, texture : h3d.mat.Texture, frameCount : Int = 1) 
+    override public function new(name : String, gameObject : GameObject, texture : h3d.mat.Texture, frameCount : Int = 1, ?layer : Int = 0) 
     {
-        super(gameObject, name);
+        super(name, gameObject);
 
-        particles = new Particles(gameObject);
+        particles = new Particles();
         particles.name = 'Particle-${gameObject.name}';
 		group = new ParticleGroup(particles);
         particles.addGroup(group);
 
         group.texture = texture;
         group.frameCount = frameCount;
+
+        var p : GameObject = gameObject;
+        var graph : Null<GraphicComponent>;
+        var added : Bool = false;
+        while(p != null)
+        {
+            p = p.parent;
+
+            if(p == null)
+                break;
+
+            graph = p.getComponent(GraphicComponent);
+
+            if(graph != null)
+            {
+                graph.getObject().addChild(particles);
+                added = true;
+                break;
+            }
+        }
+
+        if(!added)
+            gameObject.scene.scroller.addChildAt(particles, layer);
         
         loadParticle();
+    }
+
+    override function postUpdate(dt : Float) 
+    {
+        super.postUpdate(dt);
+    
+        if(@:privateAccess gameObject.transformChanged)
+        {
+            particles.setPosition(gameObject.x, gameObject.y);
+        }
     }
 
     //-------------------------------
@@ -148,12 +184,12 @@ class ParticleComponent extends Component
 
         //maxNumber : Int
         var nb : Array<Int> = [group.nparts];
-        if(Inspector.dragFields("Max Number", uID, nb))
+        if(Inspector.dragInts("Max Number", uID, nb))
             group.nparts = nb[0];
 
         //dx, dy : Int
         var pos : Array<Int> = [group.dx, group.dy];
-        if(Inspector.dragFields("Part pos", uID, pos))
+        if(Inspector.dragInts("Part pos", uID, pos))
         {
             group.dx = pos[0];
             group.dy = pos[1];
@@ -171,32 +207,32 @@ class ParticleComponent extends Component
 
         //size : Float
         var s : Array<Float> = [group.size];
-        if(Inspector.dragFields("Size", uID, s, 0.1))
+        if(Inspector.dragFloats("Size", uID, s, 0.1))
             group.size = s[0];
 
         //sizeRand : Float
         var sr : Array<Float> = [group.sizeRand];
-        if(Inspector.dragFields("Size rand", uID, sr, 0.1))
+        if(Inspector.dragFloats("Size rand", uID, sr, 0.1))
             group.sizeRand = sr[0];
 
         //sizeIncr : Float
         var si : Array<Float> = [group.sizeIncr];
-        if(Inspector.dragFields("Size incr", uID, si, 0.1))
+        if(Inspector.dragFloats("Size incr", uID, si, 0.1))
             group.sizeIncr = si[0];
 
         //rotationInit : Float
         var ri : Array<Float> = [group.rotInit];
-        if(Inspector.dragFields("Rot init", uID, ri, 0.1))
+        if(Inspector.dragFloats("Rot init", uID, ri, 0.1))
             group.rotInit = ri[0];
 
         //rotationSpeed : Float
         var rs : Array<Float> = [group.rotSpeed];
-        if(Inspector.dragFields("Rot speed", uID, rs, 0.1))
+        if(Inspector.dragFloats("Rot speed", uID, rs, 0.1))
             group.rotSpeed = rs[0];
 
         //rotationSpeedRand : Float
         var rsr : Array<Float> = [group.rotSpeedRand];
-        if(Inspector.dragFields("Rot spd rnd", uID, rsr, 0.1))
+        if(Inspector.dragFloats("Rot spd rnd", uID, rsr, 0.1))
             group.rotSpeedRand = rsr[0];
 
         //rotationAuto : Bool
@@ -206,37 +242,37 @@ class ParticleComponent extends Component
 
 		//gravity : Float
         var g : Array<Float> = [group.gravity];
-        if(Inspector.dragFields("Gravity", uID, g, 0.1))
+        if(Inspector.dragFloats("Gravity", uID, g, 0.1))
             group.gravity = g[0];
 
         //gravity angle : Float
         var ga : Array<Float> = [group.gravityAngle];
-        if(Inspector.dragFields("Gravity angle", uID, ga, 0.1))
+        if(Inspector.dragFloats("Gravity angle", uID, ga, 0.1))
             group.gravityAngle = ga[0];
 
 		//life : Float
         var li : Array<Float> = [group.life];
-        if(Inspector.dragFields("Life", uID, li, 0.1))
+        if(Inspector.dragFloats("Life", uID, li, 0.1))
             group.life = li[0];
 
         //lifeRand : Float
         var lir : Array<Float> = [group.lifeRand];
-        if(Inspector.dragFields("Life rand", uID, lir, 0.1))
+        if(Inspector.dragFloats("Life rand", uID, lir, 0.1))
             group.lifeRand = lir[0];
 
 		//speed : Float
         var sp : Array<Float> = [group.speed];
-        if(Inspector.dragFields("Speed", uID, sp, 0.1))
+        if(Inspector.dragFloats("Speed", uID, sp, 0.1))
             group.speed = sp[0];
 
 		//speedRand : Float
         var spr : Array<Float> = [group.speedRand];
-        if(Inspector.dragFields("Speed rand", uID, spr, 0.1))
+        if(Inspector.dragFloats("Speed rand", uID, spr, 0.1))
             group.speedRand = spr[0];
 
         //speedIncr : Float
         var spi : Array<Float> = [group.speedIncr];
-        if(Inspector.dragFields("Speed incr", uID, spi, 0.1))
+        if(Inspector.dragFloats("Speed incr", uID, spi, 0.1))
             group.speedIncr = spi[0];
 
 	    //emitMode : PartEmitMode
@@ -246,42 +282,42 @@ class ParticleComponent extends Component
 
         //emitDist : Float
         var ed : Array<Float> = [group.emitDist];
-        if(Inspector.dragFields("Emit dist", uID, ed, 0.1))
+        if(Inspector.dragFloats("Emit dist", uID, ed, 0.1))
             group.emitDist = ed[0];
 
         //emitDistY : Float
         var edy : Array<Float> = [group.emitDistY];
-        if(Inspector.dragFields("Emit dist y", uID, edy, 0.1))
+        if(Inspector.dragFloats("Emit dist y", uID, edy, 0.1))
             group.emitDistY = edy[0];
 
 		//emitAngle : Float
         var ea : Array<Float> = [group.emitAngle];
-        if(Inspector.dragFields("Emit angle", uID, ea, 0.1))
+        if(Inspector.dragFloats("Emit angle", uID, ea, 0.1))
             group.emitAngle = ea[0];
 
         //emitDelay : Float
         var ede : Array<Float> = [group.emitDelay];
-        if(Inspector.dragFields("Emit delay", uID, ede, 0.1))
+        if(Inspector.dragFloats("Emit delay", uID, ede, 0.1))
             group.emitDelay = ede[0];
 
         //emitSync : Float
         var es : Array<Float> = [group.emitSync];
-        if(Inspector.dragFields("Emit sync", uID, es, 0.1))
+        if(Inspector.dragFloats("Emit sync", uID, es, 0.1))
             group.emitSync = es[0];
 
         //fadeIn : Float
         var fi : Array<Float> = [group.fadeIn];
-        if(Inspector.dragFields("Fade in", uID, fi, 0.1))
+        if(Inspector.dragFloats("Fade in", uID, fi, 0.1))
             group.fadeIn = fi[0];
 
 		//fadeOut : Float
         var fo : Array<Float> = [group.fadeOut];
-        if(Inspector.dragFields("Fade out", uID, fo, 0.1))
+        if(Inspector.dragFloats("Fade out", uID, fo, 0.1))
             group.fadeOut = fo[0];
 
         //fadePower : Float
         var fp : Array<Float> = [group.fadePower];
-        if(Inspector.dragFields("Fade power", uID, fp, 0.1))
+        if(Inspector.dragFloats("Fade power", uID, fp, 0.1))
             group.fadePower = fp[0];
 
         //isRelative : Bool
@@ -321,6 +357,8 @@ class ParticleComponent extends Component
 
         return loop;
     }
+
+    public function getObject() : Object { return particles; }
     //#endregion
 }
 

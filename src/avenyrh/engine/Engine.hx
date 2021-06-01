@@ -11,12 +11,11 @@ class Engine extends Process
 
     public static var console (default, null) : Console;
 
-    /**
-     * Garbage collector
-     */
-    public var gc (default, null) : Array<IGarbageCollectable>;
-
     public var currentScene (default, null) : Scene;
+
+    public var fixedFPS : Int = 30;
+
+    var currentTime : Float = 0;
 
     public function new(s : h2d.Scene, engine : h3d.Engine, ?initScene : Scene) 
     {
@@ -30,7 +29,6 @@ class Engine extends Process
         hxd.Timer.wantedFPS = EngineConst.FPS;
         @:privateAccess EngineConst.onFPSChanged = () -> hxd.Timer.wantedFPS = EngineConst.FPS;
 
-        gc = [];
         createRoot(s);
         Process.S2D = s;
 
@@ -66,7 +64,12 @@ class Engine extends Process
 
         GamePad.lateUpdateAll();
 
-        cleanGC();
+        currentTime += dt;
+        if(currentTime >= 1 / fixedFPS)
+        {
+            Process._fixedUpdate(this, currentTime);
+            currentTime = 0;
+        }
     }
 
     /**
@@ -103,18 +106,5 @@ class Engine extends Process
     //-------------------------------
     //#region Private API
     //-------------------------------
-    /**
-     * Cleans all garbage
-     */
-    function cleanGC() 
-    {
-        if(gc == null || gc.length == 0)
-            return;
-
-        for(c in gc)
-            c.onDispose();
-
-        gc = [];
-    }
     //#endregion
 }

@@ -22,6 +22,9 @@ class Scene extends Process
     public var miscInspectable : Array<IInspectable>;
 
     var allGO : Array<GameObject> = [];
+
+    var rootGO : GameObject;
+
     var goToRemove : Array<GameObject> = [];
 
     override public function new(name : String) 
@@ -51,6 +54,8 @@ class Scene extends Process
 
         scroller = new h2d.Layers();
         root.add(scroller, 0);
+
+        rootGO = new GameObject("Root");
         
         paused = false;
 
@@ -76,7 +81,7 @@ class Scene extends Process
 
     public function removed()
     {
-        Engine.instance.gc.push(this);
+        Process._dispose(this);
     }
 
     public override function update(dt : Float) 
@@ -97,6 +102,14 @@ class Scene extends Process
             go._postUpdate(dt);
 
         cleanGameObjects();
+    }
+
+    public override function fixedUpdate(dt : Float) 
+    {
+        super.fixedUpdate(dt);
+
+        for(go in allGO)
+            go._fixedUpdate(dt);
     }
 
     /**
@@ -124,12 +137,15 @@ class Scene extends Process
      * Adds a gameObject to the scene so that it can be updated
      * @param gameObject GameObject to add to the scene
      */
-    public function addGameObject(gameObject : GameObject, layer : Int) 
+    public function addGameObject(gameObject : GameObject) 
     {
-        allGO.push(gameObject);
+        if(rootGO == null)
+            return;
 
-        if(gameObject.parent == scroller)
-            scroller.add(gameObject, layer);
+        allGO.push(gameObject);
+        
+        if(gameObject.parent == null)
+            gameObject.parent = rootGO;
     }
 
     /**

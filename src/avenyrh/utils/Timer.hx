@@ -1,9 +1,6 @@
 package avenyrh.utils;
 
-import avenyrh.engine.Engine;
-import avenyrh.engine.IGarbageCollectable;
-
-class Timer implements IGarbageCollectable
+class Timer
 {
     /**
      * Callback function called at the end of the timer
@@ -94,14 +91,6 @@ class Timer implements IGarbageCollectable
     public function dispose() 
     {
         play = false;
-        Engine.instance.gc.push(this);
-    }
-
-    /**
-     * GarbageCollectable implementation
-     */
-    public function onDispose()
-    {
         destroyed = true;
     }
     //#endregion

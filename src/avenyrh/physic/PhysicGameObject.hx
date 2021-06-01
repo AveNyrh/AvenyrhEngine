@@ -21,7 +21,7 @@ class PhysicGameObject extends GameObject
 
     var inspectorInfo : InspectorInfo;
 
-    override public function new(name : String, parent : Object, world : World, colType : ColliderType) 
+    override public function new(name : String, parent : GameObject, world : World, colType : ColliderType) 
     {
         super(name, parent);
 
@@ -88,7 +88,7 @@ class PhysicGameObject extends GameObject
 
             //body.x/y : Float
             var pos : Array<Float> = [offset.x, offset.y];
-            if(Inspector.dragFields("Pos offset", uID, pos, 0.1))
+            if(Inspector.dragFloats("Pos offset", uID, pos, 0.1))
             {
                 offset.x = pos[0];
                 offset.y = pos[1];
@@ -96,12 +96,12 @@ class PhysicGameObject extends GameObject
 
             //body.rotation : Float
             var r : Array<Float> = [offset.rotation];
-            if(Inspector.dragFields("Rot offset", uID, r, 0.1))
+            if(Inspector.dragFloats("Rot offset", uID, r, 0.1))
                 offset.rotation = r[0];
 
             //body.scale_x/y : Float
             var sc : Array<Float> = [offset.scaleX, offset.scaleY];
-            if(Inspector.dragFields("Scale offset", uID, sc, 0.1))
+            if(Inspector.dragFloats("Scale offset", uID, sc, 0.1))
             {
                 offset.scaleX = sc[0];
                 offset.scaleY = sc[1];
@@ -109,22 +109,22 @@ class PhysicGameObject extends GameObject
 
             //body.mass : Float
             var m : Array<Float> = [body.mass];
-            if(Inspector.dragFields("Mass", uID, m, 0.1))
+            if(Inspector.dragFloats("Mass", uID, m, 0.1))
                 body.mass = m[0];
 
             //body.gravity_scale : Float
             var gs : Array<Float> = [body.gravity_scale];
-            if(Inspector.dragFields("Gravity scale", uID, gs, 0.1))
+            if(Inspector.dragFloats("Gravity scale", uID, gs, 0.1))
                 body.gravity_scale = gs[0];
 
             //body.elasticity : Float
             var e : Array<Float> = [body.elasticity];
-            if(Inspector.dragFields("Elasticity", uID, e, 0.1))
+            if(Inspector.dragFloats("Elasticity", uID, e, 0.1))
                 body.elasticity = e[0];
 
             //body.velocity : Vector2
             var v : Array<Float> = [body.velocity.x, body.velocity.y];
-            if(Inspector.dragFields("Velocity", uID, v, 0.1))
+            if(Inspector.dragFloats("Velocity", uID, v, 0.1))
             {
                 body.velocity.x = v[0];
                 body.velocity.y = v[1];
@@ -132,7 +132,7 @@ class PhysicGameObject extends GameObject
 
             //body.acceleration : Vector2
             var acc : Array<Float> = [body.acceleration.x, body.acceleration.y];
-            if(Inspector.dragFields("Acceleration", uID, acc, 0.1))
+            if(Inspector.dragFloats("Acceleration", uID, acc, 0.1))
             {
                 body.acceleration.x = acc[0];
                 body.acceleration.y = acc[1];
@@ -140,7 +140,7 @@ class PhysicGameObject extends GameObject
 
             //body.drag : Vector2
             var d : Array<Float> = [body.drag.x, body.drag.y];
-            if(Inspector.dragFields("Drag", uID, d, 0.1))
+            if(Inspector.dragFloats("Drag", uID, d, 0.1))
             {
                 body.drag.x = d[0];
                 body.drag.y = d[1];
@@ -182,18 +182,18 @@ class PhysicGameObject extends GameObject
         }
     }
 
-    override function setPosition(x : Float, y : Float) 
-    {
-        super.setPosition(x, y);
+    // override function setPosition(x : Float, y : Float) 
+    // {
+    //     super.setPosition(x, y);
 
-        if(posChanged)
-        {
-            body.set_position(x + offset.x, y + offset.y);
-            body.rotation = rotation + offset.rotation;
-            body.scale_x = scaleX * offset.scaleX;
-            body.scale_y = scaleY * offset.scaleY;
-        }
-    }
+    //     if(posChanged)
+    //     {
+    //         body.set_position(x + offset.x, y + offset.y);
+    //         body.rotation = rotation + offset.rotation;
+    //         body.scale_x = scaleX * offset.scaleX;
+    //         body.scale_y = scaleY * offset.scaleY;
+    //     }
+    // }
 
     function getBodyOptions(type : ColliderType, world : World) : BodyOptions
     {

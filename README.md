@@ -28,7 +28,7 @@ In the examples folder, there are some examples on how to work with this framewo
 
 - Scene is where are all GameObjects and UI elements
 
-- GameObject is an object with a Tile that can be placed in the Scene. It can have Components
+- GameObject is an object that can be placed in the Scene. It can have Components
 
 - Component is where you will moslty write code for the gameplay and add it to one or more GameObjects
 
@@ -43,18 +43,22 @@ Here is an example :
 ```haxe
 public function drawInfo()
 {
+    //Don't forget the super call to append to already drawn informations
+    //Get rid of this if you want to completely customize the display
+    super.drawInfo();
+
     //Two floats/ints on the same line
     var array : Array<Float> = [x, y];
-    Inspector.dragFields("Array", uID, array, 0.1);
+    Inspector.dragFloats("Array", uID, array, 0.1);
     x = array[0];
     y = array[1];
     
-    //One float/int
+    //One int
     var v : Array<Int> = [value];
-    Inspector.dragFields("Value", uID, v);
+    Inspector.dragInts("Value", uID, v);
     value = v[0];
 
-	//Enum fiel
+	//Enum field
     var i = Inspector.enumDropdown("Enum", uID, EnumName, currentEnumIndex);
     currentEnumIndex = haxe.EnumTools.createByIndex(EnumName, i);
 
@@ -67,6 +71,9 @@ public function drawInfo()
 
 	//Text
     Inspector.labelText("Text", uID, "Some text");
+
+    //Tile
+    Inspector.image("Tile", myTile);
 }
 ```
 

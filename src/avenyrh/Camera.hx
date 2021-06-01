@@ -1,6 +1,5 @@
 package avenyrh;
 
-import avenyrh.imgui.ImGui;
 import avenyrh.engine.Inspector;
 import avenyrh.utils.Timer;
 import avenyrh.engine.Scene;
@@ -166,50 +165,50 @@ class Camera extends Process
     {
         super.onDispose();
 
-        timer.onDispose();
+        timer.dispose();
     }
 
     override function drawInfo() 
     {
         super.drawInfo();
 
-        //Position
-        var pos : Array<Float> = [x, y];
-        Inspector.dragFields("Position", uID, pos, 0.1);
-        x = pos[0];
-        y = pos[1];
+        // //Position
+        // var pos : Array<Float> = [x, y];
+        // Inspector.dragFloats("Position", uID, pos, 0.1);
+        // x = pos[0];
+        // y = pos[1];
 
-        //Zoom
-        var z : Array<Float> = [zoom];
-        Inspector.dragFields("Zoom", uID, z, 0.1);
-        zoom = z[0];
+        // //Zoom
+        // var z : Array<Float> = [zoom];
+        // Inspector.dragFloats("Zoom", uID, z, 0.1);
+        // zoom = z[0];
 
-        //Target
-        Inspector.labelText("Target", uID, target == null ? "Null" : target.name);
+        // //Target
+        // Inspector.labelText("Target", uID, target == null ? "Null" : target.name);
 
         //Target offset
         var to : Array<Float> = [targetOffset.x, targetOffset.y];
-        Inspector.dragFields("Target offset", uID, to, 0.1);
+        Inspector.dragFloats("Target offset", uID, to, 0.1);
         targetOffset.x = to[0];
         targetOffset.y = to[1];
 
-        //Deadzone
-        var dz : Array<Float> = [deadzone];
-        Inspector.dragFields("Deadzone", uID, dz, 0.1);
-        deadzone = dz[0];
+        // //Deadzone
+        // var dz : Array<Float> = [deadzone];
+        // Inspector.dragFloats("Deadzone", uID, dz, 0.1);
+        // deadzone = dz[0];
 
-        //Smooth
-        var s : Array<Float> = [smooth];
-        Inspector.dragFields("Smooth", uID, s, 0.1);
-        smooth = s[0];
+        // //Smooth
+        // var s : Array<Float> = [smooth];
+        // Inspector.dragFloats("Smooth", uID, s, 0.1);
+        // smooth = s[0];
 
-        //Snap
-        snap = Inspector.checkbox("Snap", uID, snap);
+        // //Snap
+        // snap = Inspector.checkbox("Snap", uID, snap);
 
-        //Shake power
-        var sp : Array<Float> = [shakePower];
-        Inspector.dragFields("Shake power", uID, sp, 0.1);
-        shakePower = sp[0];
+        // //Shake power
+        // var sp : Array<Float> = [shakePower];
+        // Inspector.dragFloats("Shake power", uID, sp, 0.1);
+        // shakePower = sp[0];
     }
 
     //--------------------

@@ -1,9 +1,6 @@
 package avenyrh.stateMachine;
 
-import avenyrh.engine.Engine;
-import avenyrh.engine.IGarbageCollectable;
-
-class State implements IGarbageCollectable
+class State
 {
     /**
      * Unique ID used to set each state uID
@@ -165,17 +162,10 @@ class State implements IGarbageCollectable
     function _removed()
     {
         isActive = false;
-        Engine.instance.gc.push(this);
-    }
-
-    /**
-     * GarbageCollectable implementation \
-     * Destroys this state and removes the transitions
-     */
-    public function onDispose()
-    {
         transitions = [];
         destroyed = true;
+
+        removed();
     }
     //#endregion
 }

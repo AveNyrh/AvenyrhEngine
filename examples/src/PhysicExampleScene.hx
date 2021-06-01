@@ -17,12 +17,12 @@ class PhysicExampleScene extends PhysicScene
     {
         super.added();
 
-        po = new PhysicObject("po", scroller, world, Capsule);
+        po = new PhysicObject("po", null, world, Capsule);
 
-        po2 = new PhysicObject("po2", scroller, world, Capsule);
+        po2 = new PhysicObject("po2", null, world, Capsule);
         po2.setPosition(100, 0);
 
-        so = new StaticObject("so", scroller, world, Rect);
+        so = new StaticObject("so", null, world, Rect);
         so.setPosition(0, 200);
         so.scaleX = 4;
         so.scaleX = 50;

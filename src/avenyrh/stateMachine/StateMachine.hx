@@ -1,9 +1,6 @@
 package avenyrh.stateMachine;
 
-import avenyrh.engine.IGarbageCollectable;
-import avenyrh.engine.Engine;
-
-class StateMachine implements IGarbageCollectable
+class StateMachine
 {
     /**
      * Unique ID used to set each stateMachine uID
@@ -136,19 +133,10 @@ class StateMachine implements IGarbageCollectable
       isActive = false;
 
       for(s in states)
-        s.removed();
+        @:privateAccess s._removed();
 
-      Engine.instance.gc.push(this);
-    }
-    //#endregion
-    
-    /**
-     * GarbageCollectable implementation \
-     * Destroys this stateMachine and removes the states
-     */
-    public function onDispose()
-    {
       destroyed = true;
       states = [];
     }
+    //#endregion
 }
