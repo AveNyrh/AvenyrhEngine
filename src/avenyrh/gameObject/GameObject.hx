@@ -300,6 +300,7 @@ class GameObject extends Uniq implements IInspectable
     public function addComponent(component : Component) : Component
     {
         components.push(component);
+        component.gameObject = this;
 
         return component;
     }

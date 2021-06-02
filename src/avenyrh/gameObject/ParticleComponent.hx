@@ -21,40 +21,21 @@ class ParticleComponent extends GraphicComponent
     @hideInInspector
     public var loop (default, set) : Bool = true;
 
-    override public function new(name : String, gameObject : GameObject, texture : h3d.mat.Texture, frameCount : Int = 1, ?layer : Int = 0) 
-    {
-        super(name, gameObject);
+    @hideInInspector
+    public var layer (default, null) : Int;
 
-        particles = new Particles();
-        particles.name = 'Particle-${gameObject.name}';
+    override public function new(name : String, ?parent : Object, texture : h3d.mat.Texture, frameCount : Int = 1, ?layer : Int = 0) 
+    {
+        super(name);
+
+        this.layer = layer;
+
+        particles = new Particles(parent);
 		group = new ParticleGroup(particles);
         particles.addGroup(group);
 
         group.texture = texture;
         group.frameCount = frameCount;
-
-        var p : GameObject = gameObject;
-        var graph : Null<GraphicComponent>;
-        var added : Bool = false;
-        while(p != null)
-        {
-            p = p.parent;
-
-            if(p == null)
-                break;
-
-            graph = p.getComponent(GraphicComponent);
-
-            if(graph != null)
-            {
-                graph.getObject().addChild(particles);
-                added = true;
-                break;
-            }
-        }
-
-        if(!added)
-            gameObject.scene.scroller.addChildAt(particles, layer);
         
         loadParticle();
     }
@@ -356,6 +337,41 @@ class ParticleComponent extends GraphicComponent
             particles.onEnd = stop;
 
         return loop;
+    }
+    override function set_gameObject(go : GameObject) : GameObject 
+    {
+        if(gameObject != null)
+            return gameObject;
+
+        if(particles.parent != null)
+            return super.set_gameObject(go);
+
+        var p : GameObject = go;
+        var graph : Null<GraphicComponent>;
+        var added : Bool = false;
+        while(p != null)
+        {
+            p = p.parent;
+
+            if(p == null)
+                break;
+
+            graph = p.getComponent(GraphicComponent);
+
+            if(graph != null)
+            {
+                graph.getObject().addChild(particles);
+                added = true;
+                break;
+            }
+        }
+
+        if(!added)
+            go.scene.scroller.addChildAt(particles, layer);
+
+        particles.name = 'Particle-${go.name}';
+
+        return super.set_gameObject(go);
     }
 
     public function getObject() : Object { return particles; }

@@ -51,41 +51,17 @@ class SpriteComponent extends GraphicComponent
 
     public var visible (get, set) : Bool;
 
+    @hideInInspector
+    public var layer (default, null) : Int;
+
     public var tile (get, set) : Tile;
 
-    override public function new(name : String, gameObject : GameObject, ?tile : Tile, ?layer : Int = 0, ?pivot : Vector2) 
+    override public function new(?name : String, ?parent : Object, ?tile : Tile, ?layer : Int = 0, ?pivot : Vector2) 
     {
-        super(name, gameObject);
+        super(name == null ? "Sprite" : name);
 
-        bitmap = new Bitmap(tile);
-
-        var p : GameObject = gameObject;
-        var graph : Null<GraphicComponent>;
-        var added : Bool = false;
-        while(p != null)
-        {
-            p = p.parent;
-
-            if(p == null)
-                break;
-
-            graph = p.getComponent(GraphicComponent);
-
-            if(graph != null)
-            {
-                graph.getObject().addChild(bitmap);
-                added = true;
-                break;
-            }
-        }
-
-        if(!added)
-            gameObject.scene.scroller.addChildAt(bitmap, layer);
-
-        if(pivot != null)
-            this.pivot = pivot;
-        else
-            this.pivot = Pivot.CENTER;
+        this.layer = layer;
+        bitmap = new Bitmap(tile, parent);
     }
 
     override function postUpdate(dt : Float) 
@@ -160,6 +136,44 @@ class SpriteComponent extends GraphicComponent
         set_pivot(pivot);
 
         return bitmap.tile;
+    }
+
+    override function set_gameObject(go : GameObject) : GameObject 
+    {
+        if(gameObject != null)
+            return gameObject;
+
+        if(bitmap.parent != null)
+            return super.set_gameObject(go);
+
+        var p : GameObject = go;
+        var graph : Null<GraphicComponent>;
+        var added : Bool = false;
+        while(p != null)
+        {
+            p = p.parent;
+
+            if(p == null)
+                break;
+
+            graph = p.getComponent(GraphicComponent);
+
+            if(graph != null)
+            {
+                graph.getObject().addChild(bitmap);
+                added = true;
+                break;
+            }
+        }
+
+        if(!added)
+            go.scene.scroller.addChildAt(bitmap, layer);
+
+        if(pivot != null)
+            this.pivot = pivot;
+        else
+            this.pivot = Pivot.CENTER;
+        return super.set_gameObject(go);
     }
 
     public function getObject() : Object { return bitmap; } 

@@ -11,7 +11,7 @@ class Component extends Uniq
     /**
      * Name of the component
      */
-    public var name (default, null) : String;
+    public var name (default, null) : Null<String>;
 
     /**
      * Is the component enable or not
@@ -21,7 +21,7 @@ class Component extends Uniq
     /**
      * GameObject this component is attached to
      */
-    public var gameObject (default, null) : GameObject;
+    public var gameObject (default, set) : GameObject;
 
     /**
      * Is the component destroyed
@@ -30,13 +30,13 @@ class Component extends Uniq
 
     private var started : Bool;
 
-    public function new(name : String, gameObject : GameObject) 
+    public function new(?name : String) 
     {
         destroyed = false;
         uID = Uniq.UNIQ_ID++;
+
         this.name = name;
-        this.gameObject = gameObject;
-        gameObject.addComponent(this);
+
         started = false;
         enable = true;
 
@@ -166,6 +166,19 @@ class Component extends Uniq
         enable ? onEnable() : onDisable();
 
         return this.enable;
+    }
+
+    private function set_gameObject(go : GameObject) : GameObject 
+    {
+        if(gameObject != null)
+            return gameObject;
+
+        if(name == null)
+            name = '${go.name} ${Type.getClassName(Type.getClass(this))}';
+
+        gameObject = go;
+
+        return gameObject;
     }
     //#endregion
 }
