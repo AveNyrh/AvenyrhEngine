@@ -16,42 +16,52 @@ class ProgressBar extends Flow
      * Graphics to draw on
      */
     var graph : Graphics;
+
     /**
      * Tile used by graph
      */
     var tile : Null<Tile>;
+
     /**
      * Color of the graph tile
      */
     var color : Int;
+
     /**
      * Ease the fill bar or not
      */
     public var useTween (default, set) : Bool;
+
     /**
      * Tween used
      */
     var t : Null<Tween>;
+
     /**
      * Time of the easing
      */
     public var tweenTime : Float;
+
     /**
      * Type of easing
      */
     var tweenType : TweenType;
+
     /**
      * Callback for the end of the easing
      */
     var onEndTween : Null<Float -> Void>;
+
     /**
      * Width of the bar
      */
     var width : Float;
+
     /**
      * Height of the bar
      */
     var height : Float;
+    
     /**
      * Current amount value
      */

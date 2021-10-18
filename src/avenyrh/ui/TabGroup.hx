@@ -9,14 +9,17 @@ class TabGroup extends Flow
      * All the buttons and the tabs
      */
     var buttons : Map<TabButton, Object>;
+
     /**
      * Container for the buttons
      */
     public var buttonsFlow : Flow;
+
     /**
      * The current selected button
      */
     public var selectedButton (default, null) : TabButton;
+    
     /**
      * Default button to be selected when opening the tab group \
      * Can be null 

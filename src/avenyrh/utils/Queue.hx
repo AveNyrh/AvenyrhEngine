@@ -5,8 +5,14 @@ package avenyrh.utils;
  */
 class Queue<T> 
 {
+    /**
+     * Internal array of value
+     */
     public var array (default, null) : Array<T>;
 
+    /**
+     * Number of item in the Queue
+     */
     public var length (get, null) : Int;
     
     public function new() 

@@ -6,22 +6,27 @@ class Timer
      * Callback function called at the end of the timer
      */
     public var callback : Void -> Void;
+
     /**
      * Current time of the timer
      */
     public var currentTime : Float;
+
     /**
      * End time of the timer
      */
     public var maxTime : Float;
+
     /**
      * Quick way to current / max time
      */
     public var ratio (get, never) : Float;
+
     /**
      * Is the timer playing ?
      */
     public var play (default, null) : Bool;
+    
     /**
      * Is the timer looping ?
      */
@@ -67,7 +72,7 @@ class Timer
 
     public function update(dt : Float) 
     {
-        if(!play || !destroyed)
+        if(!play || destroyed)
             return;
 
         currentTime += dt;

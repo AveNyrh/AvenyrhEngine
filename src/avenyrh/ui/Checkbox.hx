@@ -12,26 +12,32 @@ class Checkbox extends Flow
      * Text field
      */
     public var txt : Text;
+
     /**
      * Check image
      */
     var check : Bitmap;
+
     /**
      * Box image
      */
     var box : Bitmap;
+
     /**
      * Bow and check container
      */
     var boxContainer : Flow;
+
     /**
      * Current value of the checkbox
      */
     public var value (default, set) : Bool;
+
     /**
      * Callback when the value is changed
      */
     public var onValueChange : Null<Bool -> Void>;
+    
     /**
      * If disabled, it can't be interacted with
      */

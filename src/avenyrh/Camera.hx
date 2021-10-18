@@ -12,37 +12,46 @@ class Camera extends Process
      * X position of the camera
      */
     public var x (default, null) : Float;
+
     /**
      * Y position of the camera
      */
     public var y (default, null) : Float;
+
     /**
      * Zoom of the camera
      */
     public var zoom : Float = 1;
+
     /**
      * Target to follow \
      * Can be null to have a fixed camera
      */
     public var target (default, set) : Null<GameObject>;
+
     /**
      * Offset between the target and the camera
      */
     public var targetOffset : Vector2 = Vector2.ZERO;
+
     /**
      * Deadzone of the target tracking
      */
     public var deadzone : Float = 6;
+
     /**
      * Smoothing of the target tracking
      */
     public var smooth : Float = 1;
+
     /**
      * Snaping to the target, ignoring deadzone & smoothing
      */
     public var snap : Bool = false;
 
     public var shakePower : Float = 1;
+
+    public var shakeSpeed : Float = 1;
 
     var dx : Float;
 
@@ -51,6 +60,8 @@ class Camera extends Process
     var scene : Scene;
 
     var bumpOffset : Vector2;
+
+    var shakeOffset : Vector2;
 
     var timer : Timer;
 
@@ -65,19 +76,25 @@ class Camera extends Process
         this.scene = scene;
         timer = new Timer(stopShake, 1, false, false);
         bumpOffset = Vector2.ZERO;
+        shakeOffset = Vector2.ZERO;
     }
 
     //--------------------
-    //Public API
+    //#region Public API
     //--------------------    
     public function bump(x : Float, y : Float) 
     {
         bumpOffset += Vector2.RIGHT *  x + Vector2.UP * y;
     }
 
-    public function shake(time : Float, ?power : Float = 1) 
+    public function shake(time : Float, ?power : Float, ?speed : Float) 
     {
-        shakePower = power;
+        if(power != null)
+            shakePower = power;
+
+        if(speed != null)
+            shakeSpeed = speed;
+
         timer.start(time);
     }
 
@@ -90,6 +107,8 @@ class Camera extends Process
     override function update(dt:Float) 
     {
         super.update(dt);
+
+        timer.update(dt);
 
         //Follow target
         if(target != null)
@@ -145,9 +164,18 @@ class Camera extends Process
         //Shake
         if(timer.play)
         {
-            sx += Math.cos(Process.time * 1.1) * 2.5 * shakePower * timer.ratio;
-            sy += Math.sin(0.3 + Process.time * 1.7) * 2.5 * shakePower * timer.ratio;
+            shakeOffset.x += Math.cos(Process.time * 1.1 * shakeSpeed) * 2.5 * shakePower;// * timer.ratio;
+            shakeOffset.y += Math.sin(0.3 + Process.time * 1.7 * shakeSpeed) * 2.5 * shakePower;// * timer.ratio;
         }
+        else if(shakeOffset.magnitude > 0)
+        {
+            //Shake friction
+            shakeOffset.x *= Math.pow(0.75, dt);
+            shakeOffset.y *= Math.pow(0.75, dt);
+        }
+
+        sx += shakeOffset.x;
+        sy += shakeOffset.y;
 
         //Scale
         // sx *= zoom;
@@ -187,10 +215,15 @@ class Camera extends Process
         // Inspector.labelText("Target", uID, target == null ? "Null" : target.name);
 
         //Target offset
-        var to : Array<Float> = [targetOffset.x, targetOffset.y];
-        Inspector.dragFloats("Target offset", uID, to, 0.1);
-        targetOffset.x = to[0];
-        targetOffset.y = to[1];
+        // var to : Array<Float> = [targetOffset.x, targetOffset.y];
+        // Inspector.dragFloats("Target offset", uID, to, 0.1);
+        // targetOffset.x = to[0];
+        // targetOffset.y = to[1];
+
+        // var bo : Array<Float> = [bumpOffset.x, bumpOffset.y];
+        // Inspector.dragFloats("Bump offset", uID, bo, 0.1);
+        // bumpOffset.x = bo[0];
+        // bumpOffset.y = bo[1];
 
         // //Deadzone
         // var dz : Array<Float> = [deadzone];
@@ -210,13 +243,15 @@ class Camera extends Process
         // Inspector.dragFloats("Shake power", uID, sp, 0.1);
         // shakePower = sp[0];
     }
+    //#endregion
 
     //--------------------
-    //Getters & Setters
+    //#region Getters & Setters
     //--------------------
     function set_target(go : GameObject) : GameObject
     {
         target = go;
         return target;
     }
+    //#endregion
 }

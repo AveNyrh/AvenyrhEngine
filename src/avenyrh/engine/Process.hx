@@ -241,7 +241,7 @@ class Process extends Uniq implements IInspectable
     //#endregion
     
     //-------------------------------
-    //#region Public static API
+    //#region Static API
     //-------------------------------
     /**
      * Updates all process

@@ -11,18 +11,22 @@ class Transition
      * Unique ID of the transition
      */
     public var uID (default, null) : Int;
+
     /**
      * State from where this transition begins
      */
     public var from (default, null) : State;
+
     /**
      * State to where this transition goes
      */
     public var to (default, null) : State;
+
     /**
      * Condition function to set this transition active
      */
     public var condition (default, null) : Void -> Bool;
+    
     /**
      * Priority of the transition when checking
      */

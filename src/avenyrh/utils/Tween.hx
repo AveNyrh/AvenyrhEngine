@@ -8,50 +8,62 @@ class Tween
      * Type of ease
      */
     public var type : TweenType;
+
     /**
      * Is the tween playing ?
      */
     public var play : Bool;
+
     /**
      * Is the tween looping when it ends ?
      */
     public var loop : Bool;
+
     /**
      * Starting value
      */
     public var from : Float;
+
     /**
      * Ending value
      */
     public var to : Float;
+
     /**
      * Current value
      */
     public var value (default, null) : Float;
+
     /**
      * Current time
      */
     public var time (default, null) : Float;
+
     /**
      * Duration of the tween
      */
     public var maxTime : Float;
+
     /**
      * Round to int the value if true
      */
     public var round : Bool;
+
     /**
      * Start callback
      */
     public var onStart : Null<Void -> Void>;
+
     /**
      * Update callback
      */
     public var onUpdate : Null<Float -> Void>;
+
     /**
      * End callback
      */
     public var onEnd : Null<Void -> Void>;
+    
     /**
      * Is the gameObject destroyed
      */

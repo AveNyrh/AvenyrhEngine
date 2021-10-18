@@ -11,30 +11,37 @@ class StateMachine
       * Unique ID of the stateMachine
       */
     public var uID (default, null) : Int;
+
     /**
       * Name of the stateMachine
       */
     public var name (default, null) : String;
+
     /**
      * Is this state active and running
      */
     public var isActive (default, null) : Bool;
+
     /**
      * All states in the stateMachine
      */
     public var states (default, null) : Array<State>;
+
     /**
      * Current active state
      */
     public var currentState (default, null) : State;
+
     /**
      * The default state of the stateMachine
      */
     public var defaultState (default, null) : State;
+
     /**
      * State Any, put transition with this state to be checked each frame
      */
     public var anyState : State;
+    
     /**
       * Is the gameObject destroyed
       */

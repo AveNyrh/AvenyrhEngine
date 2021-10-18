@@ -3,17 +3,19 @@ package avenyrh.engine;
 import h2d.Flow;
 import avenyrh.gameObject.GameObject;
 
-@:allow(avenyrh.engine.Engine)
+@:allow(avenyrh.engine.SceneManager)
 class Scene extends Process
 {
     /**
      * Parent for the scene graphs
      */
     public var scroller : h2d.Layers;
+
     /**
      * UI container
      */
     public var ui : Flow;
+    
     /**
      * Current active camera in the scene
      */

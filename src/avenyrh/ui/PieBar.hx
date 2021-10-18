@@ -10,6 +10,7 @@ class PieBar extends ProgressBar
      * Counted clockwise
      */
     var startAngle : Float;
+    
     /**
      * Radius of the pie \
      * Cut the tile to this radius if there is a tile

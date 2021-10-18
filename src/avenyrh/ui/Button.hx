@@ -16,34 +16,42 @@ class Button extends Interactive
      * Current state of the button
      */
     public var state : ButtonState;
+
     /**
      * Use color graphs or tile graphs
      */
     public var useColor :  Bool;
+
     /**
      * Idle graphs
      */
     public var idle : ButtonStateGraph;
+
     /**
      * Hover graphs
      */
     public var hover : ButtonStateGraph;
+
     /**
      * Pressed graphs
      */
     public var press : ButtonStateGraph;
+
     /**
      * Hold graphs
      */
     public var hold : ButtonStateGraph;
+
     /**
      * Disable graphs
      */
     public var disable : ButtonStateGraph;
+
     /**
      * If false, it can't be interacted with
      */
     public var interactable : Bool;
+    
     /**
      * Text displayed on the button
      */

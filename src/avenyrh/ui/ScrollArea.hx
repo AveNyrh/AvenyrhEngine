@@ -15,38 +15,47 @@ class ScrollArea extends Flow
      * Mask the hides the content view
      */
     var mask : Mask;
+
     /**
      * Flow for the content
      */
     public var maskFlow : Flow;
+
     /**
      * Horizontal bar containter
      */
     var hBar : Null<Flow>;
+
     /**
      * Vertical bar containter
      */
     var vBar : Null<Flow>;
+
     /**
      * Horizontal handle
      */
     var hHandle : Null<Interactive>;
+
     /**
      * Vertical handle
      */
     var vHandle : Null<Interactive>;
+
     /**
      * Allow horizontal scrolling
      */
     public var allowHorizontal (default, set) : Bool = true;
+
     /**
      * Allow vertical scrolling
      */
     public var allowVertical (default, set) : Bool = true;
+
     /**
      * True when the handle is dragged
      */
     public var isScrolling (default, null) : Bool;
+    
     /**
      * Speed for the wheel scroll
      */

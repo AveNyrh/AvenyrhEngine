@@ -11,22 +11,27 @@ class State
      * Unique ID of the state
      */
     public var uID (default, null) : Int;
+
     /**
      * StateMachine containing this tate
      */
     public var stateMachine (default, null) : StateMachine;
+
     /**
      * Name of the state
      */
     public var name (default, null) : String;
+
     /**
      * All transition going from this state
      */
     public var transitions (default, null) : Array<Transition>;
+
     /**
      * Is this state active and running
      */
     public var isActive (default, null) : Bool;
+    
     /**
      * Is the gameObject destroyed
      */

@@ -10,7 +10,9 @@ import haxe.ds.StringMap;
 class InputManager
 {
     private static var keyMap : StringMap<KeyBinding>;
+
     private static var axisMap : StringMap<AxisBinding>;
+    
     private static var pads : IntMap<Null<Pad>>;
 
     private static var initialized : Bool = false;
