@@ -1,14 +1,10 @@
+import avenyrh.engine.SceneManager;
+import avenyrh.AvenyrhApp;
 import examples.src.*;
-import examples.src.pathfinding.PFScene;
-import avenyrh.engine.Engine;
-import avenyrh.engine.Process;
 
-class Main extends hxd.App
+
+class Main extends AvenyrhApp
 {
-    public static var instance (default, null) : Main;
-    
-    public static var avenyrhEngine (default, null) : Engine;
-
     /**
      * Main
      */
@@ -24,30 +20,9 @@ class Main extends hxd.App
     {
         super.init();
 
-        instance = this;
-
-        avenyrhEngine = new Engine(s2d, engine);
-
-        avenyrhEngine.addScene(new GameObjectScene());
-        //avenyrhEngine.addScene(new UIScene());
-        //avenyrhEngine.addScene(new PFScene());
-        //avenyrhEngine.addScene(new PhysicExampleScene());
-    }
-
-    /**
-     * Update the engine
-     * @param dt deltaTime
-     */
-    override function update(dt : Float) 
-    {
-        super.update(dt);
-        Process.updateAll(dt);
-    }
-
-    override function onResize() 
-    {
-        super.onResize();
-
-        Process.resizeAll();
+        SceneManager.addScene(new GameObjectScene());
+        //SceneManager.addScene(new UIScene());
+        //SceneManager.addScene(new PFScene());
+        //SceneManager.addScene(new PhysicExampleScene());
     }
 }
