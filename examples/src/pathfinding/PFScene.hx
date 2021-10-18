@@ -1,12 +1,11 @@
 package examples.src.pathfinding;
 
-import avenyrh.engine.Engine;
 import h2d.Text;
 import avenyrh.Vector2;
-import avenyrh.InputManager;
 import h2d.Object;
 import avenyrh.pathfinding.*;
 import avenyrh.engine.Scene;
+import avenyrh.engine.SceneManager;
 
 /**
  * Example scene to try out the AStarPathfinding \
@@ -99,12 +98,12 @@ class PFScene extends Scene
 
         if(hxd.Key.isPressed(hxd.Key.RIGHT))
         {
-            Engine.instance.addScene(new GameObjectScene());
+            SceneManager.addScene(new GameObjectScene());
             return;
         }
         else if(hxd.Key.isPressed(hxd.Key.LEFT))
         {
-            Engine.instance.addScene(new UIScene());
+            SceneManager.addScene(new UIScene());
             return;
         }
 

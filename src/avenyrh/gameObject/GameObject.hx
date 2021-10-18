@@ -1,5 +1,6 @@
 package avenyrh.gameObject;
 
+import avenyrh.engine.SceneManager;
 using Lambda;
 import avenyrh.engine.Uniq;
 import avenyrh.imgui.ImGui;
@@ -81,7 +82,7 @@ class GameObject extends Uniq implements IInspectable
     public function new(name : String = "", parent : GameObject = null) 
     {
         uID = Uniq.UNIQ_ID++;
-        scene = Engine.instance.currentScene;
+        scene = SceneManager.CurrentScene;
         
         destroyed = false;
         components = [];

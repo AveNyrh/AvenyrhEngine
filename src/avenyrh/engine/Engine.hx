@@ -11,8 +11,6 @@ class Engine extends Process
 
     public static var console (default, null) : Console;
 
-    public var currentScene (default, null) : Scene;
-
     public var fixedFPS : Int = 30;
 
     var currentTime : Float = 0;
@@ -31,6 +29,9 @@ class Engine extends Process
 
         createRoot(s);
         Process.S2D = s;
+
+        //Scene manager
+        @:privateAccess SceneManager.init(this, initScene);
 
         //Resources
 		#if debug
@@ -62,44 +63,14 @@ class Engine extends Process
     {
         super.update(dt);
 
-        GamePad.lateUpdateAll();
-
         currentTime += dt;
         if(currentTime >= 1 / fixedFPS)
         {
             Process._fixedUpdate(this, currentTime);
             currentTime = 0;
         }
-    }
 
-    /**
-    * Adds a new scene to be loaded by the engine
-    * @param scene The new scene to be loaded
-    * @return The scene that was loaded
-    */
-	public function addScene(scene : Scene, ?removeCurrent : Bool = true) : Scene
-    {
-        if (currentScene != null && removeCurrent)
-            removeScene(currentScene);
-        
-        currentScene = scene;
-        addChild(scene);
-        currentScene._added();
-
-        return scene;
-    }
-
-    /**
-     * Removes a scene from the screen
-     * @param scene 
-     */
-    public function removeScene(scene : Scene) 
-    {
-        if(scene == currentScene)
-            currentScene = null;
-
-        removeChild(scene);
-        scene.removed();
+        GamePad.lateUpdateAll();
     }
     //#endregion
 

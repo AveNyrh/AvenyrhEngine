@@ -2,7 +2,7 @@ package examples.src;
 
 import avenyrh.ui.Fold;
 import examples.src.pathfinding.PFScene;
-import avenyrh.engine.Engine;
+import avenyrh.engine.SceneManager;
 import avenyrh.ui.Dropdown;
 import avenyrh.ui.ScrollArea;
 import h2d.Mask;
@@ -293,11 +293,11 @@ class UIScene extends Scene
 
         if(hxd.Key.isPressed(hxd.Key.RIGHT))
         {
-            Engine.instance.addScene(new PFScene());
+            SceneManager.addScene(new PFScene());
         }
         else if(hxd.Key.isPressed(hxd.Key.LEFT))
         {
-            Engine.instance.addScene(new GameObjectScene());
+            SceneManager.addScene(new GameObjectScene());
         }
     }
 }

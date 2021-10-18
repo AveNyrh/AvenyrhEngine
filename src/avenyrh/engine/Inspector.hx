@@ -1,7 +1,7 @@
 package avenyrh.engine;
 
-import haxe.EnumTools;
 using Lambda;
+import haxe.EnumTools;
 import avenyrh.imgui.ImGui;
 import avenyrh.imgui.ImGuiDrawable;
 import h2d.Tile;
@@ -78,7 +78,18 @@ class Inspector extends Process
         //Hierarchy window
         ImGui.begin("Hierarchy");
 
-        var scene : Scene = Engine.instance.currentScene;
+        var scene : Scene = SceneManager.CurrentScene;
+
+        if(ImGui.button("Serialize",  {x : 200, y : 20}))
+        {
+            SceneSerializer.Serialize(scene);
+        }
+
+        if(ImGui.button("Deserialize",  {x : 200, y : 20}))
+        {
+            SceneSerializer.Deserialize(scene.name);
+        }
+
         var flags : ImGuiTreeNodeFlags = DefaultOpen;
 
         ImGui.separator();
@@ -163,7 +174,7 @@ class Inspector extends Process
     //#endregion
 
     //-------------------------------
-    //#region Public static API
+    //#region Static API
     //-------------------------------
     /**
      * Draws the parameter fields on the Inspector
@@ -175,7 +186,7 @@ class Inspector extends Process
 
         for(f in rtti.fields)
         {
-            if(f.isPublic && !f.meta.exists(m -> m.name == "hideInInspector"))
+            if(f.isPublic && !f.meta.exists(m -> m.name == "hideInInspector") || f.meta.exists(m -> m.name == "serializable"))
             {
                 if(fields.contains(f.name))
                 {
@@ -194,6 +205,7 @@ class Inspector extends Process
     static var iv : Array<Int>;
     static var mini : Int;
     static var maxi : Int;
+    static var vec2 : Vector2;
     static var tile : Tile;
     static var ev : EnumValue;
     static var e : Enum<Dynamic>;
@@ -236,6 +248,12 @@ class Inspector extends Process
                 e = Type.getEnum(ev);
                 index = Inspector.enumDropdown(field.name, u.uID, e, ev.getIndex());
                 return EnumTools.createByIndex(e, index);
+            case CAbstract("avenyrh.Vector2", []) : //Vector2
+                vec2 = Reflect.getProperty(u, field.name);
+                fv = [vec2.x, vec2.y];
+                Inspector.dragFloats(field.name, u.uID, fv, 0.1);
+                vec2 = new Vector2(fv[0], fv[1]);
+                return vec2;
             case CClass("h2d.Tile", []) : //Tile
                 tile = cast(Reflect.getProperty(u, field.name), Tile);
                 Inspector.image(field.name, tile);

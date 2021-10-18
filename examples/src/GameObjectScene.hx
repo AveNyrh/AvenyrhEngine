@@ -1,8 +1,9 @@
 package examples.src;
 
+import echo.util.Debug;
+import avenyrh.engine.SceneManager;
 import avenyrh.InputManager;
 import examples.src.pathfinding.PFScene;
-import avenyrh.engine.Engine;
 import avenyrh.gameObject.GameObject;
 import avenyrh.engine.Scene;
 
@@ -38,15 +39,17 @@ class GameObjectScene extends Scene
     {
         super.update(dt);
 
-        return;
-
         if(hxd.Key.isPressed(hxd.Key.RIGHT))
         {
-            Engine.instance.addScene(new UIScene());
+            SceneManager.addScene(new UIScene());
         }
         else if(hxd.Key.isPressed(hxd.Key.LEFT))
         {
-            Engine.instance.addScene(new PFScene());
+            SceneManager.addScene(new PFScene());
+        }
+        else if(hxd.Key.isPressed(hxd.Key.SPACE))
+        {
+            camera.shake(2, 2, 10);
         }
     }
 }
