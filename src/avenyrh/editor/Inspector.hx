@@ -22,6 +22,11 @@ class Inspector extends Process
      */
     public static var currentInspectable : Null<IInspectable>;
 
+    /**
+     * Indent space for the hierarchy
+     */
+    public static inline var indentSpace : Float = 10;
+
     static var fields : Array<String>;
     
     static var rtti : haxe.rtti.CType.Classdef;
@@ -94,6 +99,7 @@ class Inspector extends Process
         ImGui.separator();
         if(ImGui.treeNodeEx("Process", flags))
         {
+            ImGui.spacing();
             var i : IInspectable = scene.drawHierarchy();
             if(i != null)
                 currentInspectable = i;

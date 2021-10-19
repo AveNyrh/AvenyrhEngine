@@ -488,6 +488,8 @@ class GameObject extends Uniq implements IInspectable
         var inspec : Null<IInspectable> = null;
         var i : Null<IInspectable> = null;
 
+        ImGui.indent(Inspector.indentSpace);
+
         if(ImGui.selectable('$name###$name$uID', this == Inspector.currentInspectable))
             inspec = this;
 
@@ -501,6 +503,8 @@ class GameObject extends Uniq implements IInspectable
 
         if(i != null && inspec == null)
             inspec = i;
+
+        ImGui.unindent(Inspector.indentSpace);
 
         return inspec;
     }
