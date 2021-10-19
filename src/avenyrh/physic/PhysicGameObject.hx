@@ -1,5 +1,7 @@
 package avenyrh.physic;
 
+#if physic
+
 import avenyrh.gameObject.GameObject;
 import avenyrh.imgui.ImGui;
 import avenyrh.engine.Inspector;
@@ -417,3 +419,5 @@ typedef InspectorInfo =
     var sY : Float;
     var changed : Bool;
 }
+
+#end

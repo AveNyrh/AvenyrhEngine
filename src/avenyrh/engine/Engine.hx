@@ -53,7 +53,9 @@ class Engine extends Process
         InputManager.init();
         new Tweeny("Tweeny", this);
         @:privateAccess ParticleComponent.initData();
+        #if physic
         @:privateAccess PhysicGameObject.initData();
+        #end
     }
 
     //-------------------------------
