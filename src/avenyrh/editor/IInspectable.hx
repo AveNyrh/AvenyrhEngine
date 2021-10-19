@@ -1,4 +1,4 @@
-package avenyrh.engine;
+package avenyrh.editor;
 
 interface IInspectable 
 {

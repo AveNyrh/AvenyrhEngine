@@ -1,6 +1,6 @@
 package avenyrh.gameObject;
 
-import avenyrh.engine.Inspector;
+import avenyrh.editor.Inspector;
 import avenyrh.engine.Uniq;
 import avenyrh.imgui.ImGui;
 

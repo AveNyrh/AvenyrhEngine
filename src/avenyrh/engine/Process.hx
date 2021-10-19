@@ -1,5 +1,7 @@
 package avenyrh.engine;
 
+import avenyrh.editor.Inspector;
+import avenyrh.editor.IInspectable;
 import avenyrh.imgui.ImGui;
 
 @:rtti

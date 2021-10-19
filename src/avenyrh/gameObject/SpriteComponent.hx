@@ -1,7 +1,7 @@
 package avenyrh.gameObject;
 
 import h2d.Object;
-import avenyrh.engine.Inspector;
+import avenyrh.editor.Inspector;
 import h2d.Tile;
 import h2d.Bitmap;
 

@@ -1,6 +1,6 @@
 package avenyrh;
 
-import avenyrh.engine.Inspector;
+import avenyrh.editor.Inspector;
 import avenyrh.utils.Timer;
 import avenyrh.engine.Scene;
 import avenyrh.gameObject.GameObject;

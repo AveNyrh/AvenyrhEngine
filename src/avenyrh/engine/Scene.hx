@@ -2,6 +2,7 @@ package avenyrh.engine;
 
 import h2d.Flow;
 import avenyrh.gameObject.GameObject;
+import avenyrh.editor.IInspectable;
 
 @:allow(avenyrh.engine.SceneManager)
 class Scene extends Process

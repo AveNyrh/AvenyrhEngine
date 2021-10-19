@@ -4,7 +4,7 @@ import h2d.Object;
 import haxe.Unserializer;
 import haxe.ds.StringMap;
 import avenyrh.engine.SaveLoader;
-import avenyrh.engine.Inspector;
+import avenyrh.editor.Inspector;
 import h2d.Particles;
 
 class ParticleComponent extends GraphicComponent

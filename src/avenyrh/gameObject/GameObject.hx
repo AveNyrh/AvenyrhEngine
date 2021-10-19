@@ -4,8 +4,8 @@ import avenyrh.engine.SceneManager;
 using Lambda;
 import avenyrh.engine.Uniq;
 import avenyrh.imgui.ImGui;
-import avenyrh.engine.Inspector;
-import avenyrh.engine.IInspectable;
+import avenyrh.editor.Inspector;
+import avenyrh.editor.IInspectable;
 import avenyrh.engine.Scene;
 import avenyrh.engine.Engine;
 

@@ -1,18 +1,14 @@
-package avenyrh.engine;
+package avenyrh.editor;
 
 using Lambda;
 import haxe.EnumTools;
 import avenyrh.imgui.ImGui;
 import avenyrh.imgui.ImGuiDrawable;
+import avenyrh.engine.Process;
+import avenyrh.engine.Scene;
+import avenyrh.engine.SceneManager;
+import avenyrh.engine.Uniq;
 import h2d.Tile;
-
-/**
- * To compile ImGui
- * cd where/you/cloned/hlimgui/
- * cd extension
- * mkdir build
- * cl /I%HASHLINK%\include /I. /Iimgui *.cpp imgui\*.cpp /Fobuild\ /Fe"hlimgui.hdll" /link /DLL /libpath:%HASHLINK% libhl.lib
- */
 
 class Inspector extends Process
 {
@@ -42,6 +38,7 @@ class Inspector extends Process
         drawable = new ImGuiDrawable(root);
 
         ImGui.loadIniSettingsFromDisk("default.ini");
+        ImGui.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 
         close();
     }
@@ -80,14 +77,16 @@ class Inspector extends Process
 
         var scene : Scene = SceneManager.CurrentScene;
 
-        if(ImGui.button("Serialize",  {x : 200, y : 20}))
+        if(ImGui.button("Serialize",  {x : 100, y : 20}))
         {
-            SceneSerializer.Serialize(scene);
+            //SceneSerializer.Serialize(scene);
         }
 
-        if(ImGui.button("Deserialize",  {x : 200, y : 20}))
+        ImGui.sameLine(110);
+
+        if(ImGui.button("Deserialize",  {x : 100, y : 20}))
         {
-            SceneSerializer.Deserialize(scene.name);
+            //SceneSerializer.Deserialize(scene.name);
         }
 
         var flags : ImGuiTreeNodeFlags = DefaultOpen;
@@ -403,8 +402,8 @@ class Inspector extends Process
         var tex = tile.getTexture();
         var id = textures[tex];
 
-        if (id == null)
-            textures[tex] = id = avenyrh.imgui.ImGuiDrawable.ImGuiDrawableBuffers.instance.registerTexture(tex);
+        // if (id == null)
+        //     textures[tex] = id = avenyrh.imgui.ImGuiDrawable.ImGuiDrawableBuffers.instance.registerTexture(tex);
 
         ImGui.text('$label');
         ImGui.image(id, {x : tile.width, y : tile.height}, {x : tile.u, y : tile.v}, {x : tile.u2, y : tile.v2});

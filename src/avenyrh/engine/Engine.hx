@@ -2,6 +2,7 @@ package avenyrh.engine;
 
 import avenyrh.physic.PhysicGameObject;
 import avenyrh.gameObject.ParticleComponent;
+import avenyrh.editor.Inspector;
 import h2d.Console;
 import avenyrh.InputManager;
 

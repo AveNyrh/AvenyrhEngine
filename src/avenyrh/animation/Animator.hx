@@ -1,7 +1,7 @@
 package avenyrh.animation;
 
 import avenyrh.imgui.ImGui;
-import avenyrh.engine.Inspector;
+import avenyrh.editor.Inspector;
 import avenyrh.gameObject.Component;
 import avenyrh.stateMachine.*;
 
