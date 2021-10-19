@@ -1,5 +1,7 @@
 package avenyrh.imgui;
 
+import haxe.io.Bytes;
+
 abstract ExtDynamic<T>(Dynamic) from T to T {}
 
 @:enum abstract ImGuiWindowFlags(Int) from Int to Int {
@@ -24,9 +26,24 @@ abstract ExtDynamic<T>(Dynamic) from T to T {}
 	var NoNavInputs : Int = 262144;
 	var NoNavFocus : Int = 524288;
 	var UnsavedDocument : Int = 1048576;
+	var NoDocking : Int = 2097152;
 	var NoNav : Int = 786432;
 	var NoDecoration : Int = 43;
 	var NoInputs : Int = 786944;
+}
+
+@:enum abstract ImGuiDockNodeFlags(Int) from Int to Int {
+	var None : Int = 0;
+	var KeepAliveOnly : Int = 1;
+	var NoCentralNode : Int = 2;
+	var NoDockingInCentralNode : Int = 4;
+	var NoSplit : Int = 8;
+	var NoResize : Int = 16;
+	var PassthruCentralNode : Int = 32;
+	var AutoHideTabBar : Int = 64;
+	// Private/experimental flags
+	var NoDocking : Int = 65536;
+	var NoDockingSplitMe : Int = 131072;
 }
 
 @:enum abstract ImGuiTreeNodeFlags(Int) from Int to Int {
@@ -270,6 +287,8 @@ abstract ExtDynamic<T>(Dynamic) from T to T {}
 	var NavNoCaptureKeyboard : Int = 8;
 	var NoMouse : Int = 16;
 	var NoMouseCursorChange : Int = 32;
+	var DockingEnable : Int = 64;
+	var ViewportsEnable : Int = 1024;
 	var IsSRGB : Int = 1048576;
 	var IsTouchScreen : Int = 2097152;
 }
@@ -397,6 +416,14 @@ abstract ExtDynamic<T>(Dynamic) from T to T {}
 	var AllowVtxOffset : Int = 4;
 }
 
+@:enum abstract ImGuiSliderFlags(Int) from Int to Int {
+	var None : Int = 0;
+	var AlwaysClamp : Int = 16;
+	var Logarithmic : Int = 32;
+	var NoRoundToFormat : Int = 64;
+	var NoInput : Int = 128;
+}
+
 @:enum abstract ImDrawCornerFlags(Int) from Int to Int {
 	var None : Int = 0;
 	var TopLeft : Int = 1;
@@ -422,7 +449,9 @@ typedef ImEvents = {
 	alt : Bool
 }
 
-typedef ImTextureID = Int;
+// In reality it's h3d.mat.Texture, but HL really dislike passing instances
+// directly for some reason.
+typedef ImTextureID = Dynamic;
 typedef ImU32 = Int;
 typedef ImGuiID = Int;
 
@@ -464,7 +493,7 @@ typedef ImGuiStyle = {
     GrabRounding : Single,
     TabRounding : Single,
     TabBorderSize : Single,
-    TabMinWidthForUnselectedCloseButton : Single,
+    TabMinWidthForCloseButton : Single,
     ColorButtonPosition : ImGuiDir,
     ButtonTextAlign : ImVec2,
     SelectableTextAlign : ImVec2,
@@ -478,6 +507,84 @@ typedef ImGuiStyle = {
     Colors : hl.NativeArray<ImVec4>
 };
 
+/**
+ * ImFontConfig
+ * Currently we don't support passing this struct back into haxe on creation; so it's current definition
+ * and use cases are limited to configuring a font you're about to create.
+ *
+ * As a technical note, glypgRanges will currently leak memory, so avoid paths which use this feature per frame.
+ */
+ @:structInit
+class ImFontConfig
+{
+	var OversampleH: Int = 3;						// Rasterize at higher quality for sub-pixel positioning. Read https://github.com/nothings/stb/blob/master/tests/oversample/README.md for details.
+	var OversampleV: Int = 1;						// Rasterize at higher quality for sub-pixel positioning. We don't use sub-pixel positions on the Y axis.// Rasterize at higher quality for sub-pixel positioning. We don't use sub-pixel positions on the Y axis.
+	var PixelSnapH: Bool = false;					// Align every glyph to pixel boundary. Useful e.g. if you are merging a non-pixel aligned font with the default font. If enabled, you can set OversampleH/V to 1.
+	var GlyphExtraSpacing: ImVec2 = {x: 0, y:0};	// Extra spacing (in pixels) between glyphs. Only X axis is supported for now.
+	var GlyphOffset: ImVec2 =  {x: 0, y:0};			// Offset all glyphs from this font input.
+	var GlyphRanges: hl.NativeArray<hl.UI16> = null;// Pointer to a user-provided list of Unicode range (2 value per range, values are inclusive, zero-terminated list). THE ARRAY DATA NEEDS TO PERSIST AS LONG AS THE FONT IS ALIVE, currently this will just leak.
+	var GlyphMinAdvanceX: Single = 0;				// Minimum AdvanceX for glyphs, set Min to align font icons, set both Min/Max to enforce mono-space font
+	var GlyphMaxAdvanceX: Single = 3.402823E+38;	// FLT_MAX  // Maximum AdvanceX for glyphs
+	var MergeMode: Bool = false;					// Merge into previous ImFont, so you can combine multiple inputs font into one ImFont (e.g. ASCII font + icons + Japanese glyphs). You may want to use GlyphOffset.y when merge font of different heights.
+	var RasterizerFlags: Int = 0;					// Settings for custom font rasterizer (e.g. ImGuiFreeType). Leave as zero if you aren't using one.
+	var RasterizerMultiply: Single = 1;				// Brighten (>1.0f) or darken (<1.0f) font output. Brightening small fonts may be a good workaround to make them more readable.
+	var EllipsisChar: Int = -1;						// Explicitly specify unicode codepoint of ellipsis character. When fonts are being merged first specified ellipsis will be used.
+}
+
+private typedef ImFontPtr = hl.Abstract<"imfont">;
+private typedef ImDrawListPtr = hl.Abstract<"imdrawlist">;
+private typedef ImGuiDockNode = hl.Abstract<"imguidocknode">;
+
+@:hlNative("hlimgui")
+class ImDrawList
+{
+	var ptr: ImDrawListPtr;
+
+	public function new(ptr: ImDrawListPtr) { this.ptr = ptr; }
+
+	public function addLine( p1: ImVec2, p2: ImVec2, col: ImU32, thickness: Single = 1.0 ) { drawlist_add_line( ptr, p1, p2, col, thickness ); }
+	public function addRect( pMin: ImVec2, pMax: ImVec2, col: ImU32, rounding: Single = 0.0, roundingCorners: ImDrawCornerFlags = ImDrawCornerFlags.All, thickness: Single = 1.0 ) { drawlist_add_rect( ptr, pMin, pMax, col, rounding, roundingCorners, thickness ); }
+	public function addRectFilled( pMin: ImVec2, pMax: ImVec2, col: ImU32, rounding: Single = 0.0, roundingCorners: ImDrawCornerFlags = ImDrawCornerFlags.All ) { drawlist_add_rect_filled( ptr, pMin, pMax, col, rounding, roundingCorners); }
+	public function addRectFilledMultiColor( pMin: ExtDynamic<ImVec2>, pMax: ExtDynamic<ImVec2>, col_upr_left: ImU32, col_upr_right: ImU32, col_bot_right: ImU32, col_bot_left: ImU32 ) { drawlist_add_rect_filled_multicolor( ptr, pMin, pMax, col_upr_left, col_upr_right, col_bot_right, col_bot_left ); }
+	public function addQuad( p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, p4: ExtDynamic<ImVec2>, col: ImU32, thickness: Single = 1.0 ) { drawlist_add_quad(ptr, p1, p2, p3, p4, col, thickness ); }
+	public function addQuadFilled( p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, p4: ExtDynamic<ImVec2>, col: ImU32 ) { drawlist_add_quad_filled( ptr, p1, p2, p3, p4, col ); }
+	public function addTriangle( p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, col: ImU32, thickness: Single = 1.0 ) { drawlist_add_triangle(ptr, p1, p2, p3, col, thickness ); }
+	public function addTriangleFilled( p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, col: ImU32 ) { drawlist_add_triangle_filled(ptr, p1, p2, p3, col ); }
+	public function addCircle( center: ExtDynamic<ImVec2>, radius: Single, col: ImU32, num_segments: Int = 0, thickness: Single = 1.0 ) { drawlist_add_circle( ptr, center, radius, col, num_segments, thickness ); }
+	public function addCircleFilled( center: ExtDynamic<ImVec2>, radius: Single, col: ImU32, num_segments: Int = 0) { drawlist_add_circle_filled(ptr, center, radius, col, num_segments ); }
+	public function addNgon( center: ExtDynamic<ImVec2>, radius: Single, col: ImU32, num_segments: Int, thickness: Single = 1.0 ) { drawlist_add_ngon(ptr, center, radius, col, num_segments, thickness ); }
+	public function addNgonFilled( center: ExtDynamic<ImVec2>, radius: Single, col: ImU32, num_segments: Int = 0) { drawlist_add_ngon_filled(ptr, center, radius, col, num_segments ); }
+	//public function addPolyLine( points: hl.NativeArray<ImVec2>, col: ImU32, closed: Bool, thickness: Single = 1.0 ) { drawlist_add_poly_line(ptr, points, col, closed, thickness ); }
+	//public function addConvexPolyFilled( points: hl.NativeArray<ExtDynamic<ImVec2>>, col: ImU32 ) { drawlist_add_convex_poly_filled(ptr, points, col ); }
+	public function addBezierCurve( p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, p4: ExtDynamic<ImVec2>, col: ImU32, thickness: Single = 1.0, num_segments: Int = 0 ) { drawlist_add_bezier_curve(ptr, p1, p2, p3, p4, col, thickness, num_segments ); }
+
+	static function drawlist_add_line( drawlist: ImDrawListPtr, p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, col: ImU32, thickness: Single ) {}
+	static function drawlist_add_rect( drawlist: ImDrawListPtr, pMin: ExtDynamic<ImVec2>, pMax: ExtDynamic<ImVec2>, col: ImU32, rounding: Single, roundingCorners: ImDrawCornerFlags, thickness ) {}
+	static function drawlist_add_rect_filled( drawlist: ImDrawListPtr, pMin: ExtDynamic<ImVec2>, pMax: ExtDynamic<ImVec2>, col: ImU32, rounding: Single, roundingCorners: ImDrawCornerFlags ) {}
+	static function drawlist_add_rect_filled_multicolor( drawlist: ImDrawListPtr, pMin: ExtDynamic<ImVec2>, pMax: ExtDynamic<ImVec2>, col_upr_left: ImU32, col_upr_right: ImU32, col_bot_right: ImU32, col_bot_left: ImU32 ) {}
+	static function drawlist_add_quad( drawlist: ImDrawListPtr, p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, p4: ExtDynamic<ImVec2>, col: ImU32, thickness: Single ) {}
+	static function drawlist_add_quad_filled( drawlist: ImDrawListPtr, p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, p4: ExtDynamic<ImVec2>, col: ImU32 ) {}
+	static function drawlist_add_triangle( drawlist: ImDrawListPtr, p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, col: ImU32, thickness: Single ) {}
+	static function drawlist_add_triangle_filled( drawlist: ImDrawListPtr, p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, col: ImU32 ) {}
+	static function drawlist_add_circle( drawlist: ImDrawListPtr, center: ExtDynamic<ImVec2>, radius: Single, col: ImU32, num_segments: Int, thickness: Single ) {}
+	static function drawlist_add_circle_filled( drawlist: ImDrawListPtr, center: ExtDynamic<ImVec2>, radius: Single, col: ImU32, num_segments: Int) {}
+	static function drawlist_add_ngon( drawlist: ImDrawListPtr, center: ExtDynamic<ImVec2>, radius: Single, col: ImU32, num_segments: Int, thickness: Single ) {}
+	static function drawlist_add_ngon_filled( drawlist: ImDrawListPtr, center: ExtDynamic<ImVec2>, radius: Single, col: ImU32, num_segments: Int) {}
+	static function drawlist_add_poly_line( drawlist: ImDrawListPtr, points: hl.NativeArray<ImVec2>, col: ImU32, closed: Bool, thickness: Single ) {}
+	static function drawlist_add_convex_poly_filled( drawlist: ImDrawListPtr, points: hl.NativeArray<ExtDynamic<ImVec2>>, col: ImU32 ) {}
+	static function drawlist_add_bezier_curve( drawlist: ImDrawListPtr, p1: ExtDynamic<ImVec2>, p2: ExtDynamic<ImVec2>, p3: ExtDynamic<ImVec2>, p4: ExtDynamic<ImVec2>, col: ImU32, thickness: Single, num_segments: Int ) {}
+}
+
+
+@:hlNative("hlimgui")
+class ImFont
+{
+	var ptr: ImFontPtr;
+
+	public function new(ptr: ImFontPtr) { this.ptr = ptr; }
+}
+
+
 
 @:hlNative("hlimgui")
 class ImGui
@@ -489,9 +596,10 @@ class ImGui
     public static function destroyContext(ctx : hl.Bytes = null) {}
     public static function getCurrentContext() : hl.Bytes {return null;}
 	public static function setCurrentContext(ctx : hl.Bytes) {}
-	
+
 	// Main
 	public static function getStyle() : ExtDynamic<ImGuiStyle> {return null;}
+	public static function setStyle(style : ExtDynamic<ImGuiStyle>) {}
 	public static function newFrame() {}
 	public static function endFrame() {}
 	public static function render() {}
@@ -522,7 +630,7 @@ class ImGui
     public static function beginChild(str_id : String, size : ExtDynamic<ImVec2> = null, border : Bool = false, flags : ImGuiWindowFlags = 0) : Bool {return false;}
     public static function beginChild2(id : Int, size : ExtDynamic<ImVec2> = null, border : Bool = false, flags : ImGuiWindowFlags = 0) : Bool {return false;}
 	public static function endChild() {}
-	
+
 	// Windows utilities
 	public static function isWindowAppearing() : Bool {return false;}
     public static function isWindowCollapsed() : Bool {return false;}
@@ -532,7 +640,7 @@ class ImGui
     public static function getWindowSize() : ExtDynamic<ImVec2> {return null;}
     public static function getWindowWidth() : Single {return 0;}
 	public static function getWindowHeight(): Single {return 0;}
-	
+
     public static function setNextWindowPos(pos : ExtDynamic<ImVec2>, cond : ImGuiCond = 0, pivot : ExtDynamic<ImVec2> = null) {}
     public static function setNextWindowSize(size: ExtDynamic<ImVec2>, cond : ImGuiCond = 0) {}
     public static function setNextWindowSizeConstraints(size_min : ExtDynamic<ImVec2>, size_max : ExtDynamic<ImVec2>) {}
@@ -549,14 +657,34 @@ class ImGui
     public static function setWindowSize2(name : String, size : ExtDynamic<ImVec2>, cond : ImGuiCond = 0) {}
     public static function setWindowCollapsed2(name : String, collapsed : Bool, cond : ImGuiCond = 0) {}
 	public static function setWindowFocus2(name : String) {}
-	
+
+	// Docking
+	public static function dockSpace(id : ImGuiID, size : ExtDynamic<ImVec2> = null, flags : ImGuiDockNodeFlags = 0) {}
+	public static function setNextWindowDockId(id : ImGuiID, cond : ImGuiCond = 0) {}
+	public static function getWindowDockId() : ImGuiID { return 0; }
+	public static function isWindowDocked() : Bool { return false; }
+
+	// Dock Builder
+	public static function dockBuilderDockWindow(window_name: String, node_id : ImGuiID) {}
+	public static function dockBuilderGetNode(node_id : ImGuiID) : ImGuiDockNode { return null; }
+	public static function dockBuilderGetCentralNode(node_id : ImGuiID) : ImGuiDockNode { return null; }
+	public static function dockBuilderAddNode(node_id : ImGuiID, flags: ImGuiDockNodeFlags) : ImGuiID { return 0; }
+	public static function dockBuilderRemoveNode(node_id : ImGuiID) {}
+	public static function dockBuilderRemoveNodeDockedWindows(node_id : ImGuiID, clear_settings_refs: Bool) {}
+	public static function dockBuilderRemoveNodeChildNodes(node_id : ImGuiID) {}
+	public static function dockBuilderSetNodePos(node_id : ImGuiID, pos: ExtDynamic<ImVec2> ) {}
+	public static function dockBuilderSetNodeSize(node_id : ImGuiID, size: ExtDynamic<ImVec2> ) {}
+	public static function dockBuilderSplitNode(node_id : ImGuiID, split_dir: ImGuiDir, size_ratio_for_node_at_dir: Single, out_id_at_dir: hl.Ref<ImGuiID>, out_id_at_opposite_dir: hl.Ref<ImGuiID> ) { return 0; }
+	public static function dockBuilderCopyWindowSettings(src_name: String, dst_name: String) {}
+	public static function dockBuilderFinish(node_id : ImGuiID) {}
+
 	// Content region
 	public static function getContentRegionMax() : ExtDynamic<ImVec2> {return null;}
     public static function getContentRegionAvail() : ExtDynamic<ImVec2> {return null;}
     public static function getWindowContentRegionMin() : ExtDynamic<ImVec2> {return null;}
     public static function getWindowContentRegionMax() : ExtDynamic<ImVec2> {return null;}
 	public static function getWindowContentRegionWidth() : Single {return 0;}
-	
+
 	// Windows Scrolling
 	public static function getScrollX() : Single {return 0;}
     public static function getScrollY() : Single {return 0;}
@@ -567,8 +695,8 @@ class ImGui
     public static function setScrollHereX(center_x_ratio : Single = 0.5) {}
     public static function setScrollHereY(center_y_ratio : Single = 0.5) {}
     public static function setScrollFromPosX(local_x : Single, center_x_ratio : Single = 0.5) {}
-	public static function setScrollFromPosY(local_y : Single, center_y_ratio : Single = 0.5) {}	
-	
+	public static function setScrollFromPosY(local_y : Single, center_y_ratio : Single = 0.5) {}
+
 	// Parameters stacks
     public static function pushStyleColor(idx : ImGuiCol, col : ImU32) {}
     public static function pushStyleColor2(idx : ImGuiCol, col : ExtDynamic<ImVec4>) {}
@@ -635,9 +763,9 @@ class ImGui
     public static function bulletText(text : String) {}
 
 	// Widgets: Main
-	public static function button(name : String, size : ExtDynamic<ImVec2>) : Bool {return false;}
+	public static function button(name : String, ?size : ExtDynamic<ImVec2>) : Bool {return false;}
 	public static function smallButton(label : String) : Bool {return false;}
-    public static function invisibleButton(str_id : String, size : ExtDynamic<ImVec2>) : Bool {return false;}
+    public static function invisibleButton(str_id : String, ?size : ExtDynamic<ImVec2>) : Bool {return false;}
     public static function arrowButton(str_id : String, dir : ImGuiDir) : Bool {return false;}
     public static function image(user_texture_id : ImTextureID, size : ExtDynamic<ImVec2>, uv0 : ExtDynamic<ImVec2> = null, uv1 : ExtDynamic<ImVec2> = null, tint_col : ExtDynamic<ImVec4> = null, border_col : ExtDynamic<ImVec4> = null) {}
     public static function imageButton(user_texture_id : ImTextureID, size : ExtDynamic<ImVec2>, uv0 : ExtDynamic<ImVec2> = null,  uv1 : ExtDynamic<ImVec2> = null, frame_padding : Int = -1, bg_col : ExtDynamic<ImVec4> = null, tint_col : ExtDynamic<ImVec4> = null) : Bool {return false;}
@@ -653,20 +781,20 @@ class ImGui
     public static function endCombo() {}
     public static function combo(label : String, current_item : hl.Ref<Int>, items : hl.NativeArray<String>, popup_max_height_in_items : Int = -1) : Bool {return false;}
 	public static function combo2(label : String, current_item : hl.Ref<Int>, items_separated_by_zeros : String, popup_max_height_in_items : Int = -1) : Bool {return false;}
-	
+
     // Widgets: Drags
     public static function dragFloat(label : String, v : hl.NativeArray<Single>, v_speed : Single = 1.0, v_min : Single = 0.0, v_max : Single = 0.0, format : String = "%.3f", power : Single = 1.0) : Bool {return false;}
     public static function dragFloatRange2(label : String, v_current_min : hl.Ref<Single>, v_current_max : hl.Ref<Single>, v_speed : Single = 1.0, v_min : Single = 0.0, v_max : Single = 0.0, format : String = "%.3f", format_max : String = null, power : Single = 1.0) : Bool {return false;}
     public static function dragInt(label : String, v : hl.NativeArray<Int>, v_speed : Single = 1.0, v_min : Single = 0.0, v_max : Single = 0.0, format : String = "%.3f") : Bool {return false;}
 	public static function dragIntRange2(label : String, v_current_min : hl.Ref<Int>, v_current_max : hl.Ref<Int>, v_speed : Single = 1.0, v_min : Single = 0.0, v_max : Single = 0.0, format : String = "%.3f", format_max : String = null) : Bool {return false;}
-	
+
 	// Widgets: Sliders
     public static function sliderFloat(label : String, v : hl.NativeArray<Single>, v_min : Single, v_max : Single, format : String = "%.3f", power : Single = 1.0) : Bool {return false;}
-    public static function sliderAngle(label : String, v_rad : hl.Ref<Single>, v_degrees_min : Single = -360.0, v_degrees_max : Single = 360.0, format : String = "%.0f deg") : Bool {return false;}
+    public static function sliderAngle(label : String, v_rad : hl.Ref<Single>, v_degrees_min : Single = -360.0, v_degrees_max : Single = 360.0, format : String = "%.0f deg", flags : ImGuiSliderFlags = 0) : Bool {return false;}
     public static function sliderInt(label : String, v : hl.NativeArray<Int>, v_min : Int, v_max : Int, format : String = "%d") : Bool {return false;}
-    public static function vSliderFloat(label : String, size : ExtDynamic<ImVec2>, v : hl.Ref<Single>, v_min : Single, v_max : Single, format : String = "%.3f", power : Single = 1.0) : Bool {return false;}
+    public static function vSliderFloat(label : String, size : ExtDynamic<ImVec2>, v : hl.Ref<Single>, v_min : Single, v_max : Single, format : String = "%.3f", flags : ImGuiSliderFlags = 0) : Bool {return false;}
 	public static function vSliderInt(label : String, size : ExtDynamic<ImVec2>, v : hl.Ref<Int>, v_min : Int, v_max : Int, format : String = "%d") : Bool {return false;}
-	
+
     // Widgets: Input with Keyboard
     public static function inputText(label : String, buf : hl.Bytes, buf_size : Int, flags : ImGuiInputTextFlags = 0) : Bool {return false;}
     public static function inputTextMultiline(label : String, buf : hl.Bytes, buf_size : Int, size : ExtDynamic<ImVec2> = null, flags : ImGuiInputTextFlags = 0) : Bool {return false;}
@@ -680,7 +808,7 @@ class ImGui
     public static function inputInt3(label : String, v : hl.NativeArray<Int>, flags : ImGuiInputTextFlags = 0) : Bool {return false;}
     public static function inputInt4(label : String, v : hl.NativeArray<Int>, flags : ImGuiInputTextFlags = 0) : Bool {return false;}
 	public static function inputDouble(label : String, v : hl.Ref<Float>, step : Float = 0.0, step_fast : Float = 0.0, format : String = "%.6f", flags : ImGuiInputTextFlags = 0) : Bool {return false;}
-	
+
 	// Widgets: Color Editor/Picker
     public static function colorEdit3(label : String, col : hl.NativeArray<Single>, flags : ImGuiColorEditFlags = 0) : Bool {return false;}
     public static function colorEdit4(label : String, col : hl.NativeArray<Single>,  flags : ImGuiColorEditFlags = 0) : Bool {return false;}
@@ -688,7 +816,7 @@ class ImGui
     public static function colorPicker4(label : String, col : hl.NativeArray<Single>, flags : ImGuiColorEditFlags = 0, ref_col : hl.Ref<Single> = null) : Bool {return false;}
     public static function colorButton(desc_id : String, col : ExtDynamic<ImVec4> = null, flags : ImGuiColorEditFlags = 0, size : ExtDynamic<ImVec2> = null) : Bool {return false;}
 	public static function setColorEditOptions(flags : ImGuiColorEditFlags) {}
-	
+
 	// Widgets: Trees
 	public static function treeNode(label : String) : Bool {return false;}
     public static function treeNode2(str_id : String, label : String) : Bool {return false;}
@@ -700,26 +828,26 @@ class ImGui
     public static function collapsingHeader(label : String, flags : ImGuiTreeNodeFlags = 0) : Bool {return false;}
     public static function collapsingHeader2(label : String, p_open : hl.Ref<Bool>, flags : ImGuiTreeNodeFlags = 0) : Bool {return false;}
 	public static function setNextItemOpen(is_open : Bool, cond : ImGuiCond = 0) {}
-	
+
 	// Widgets: Selectables
     public static function selectable(label : String, selected : Bool = false, flags : ImGuiSelectableFlags = 0, size : ExtDynamic<ImVec2> = null) : Bool {return false;}
 	public static function selectable2(label : String, p_selected : hl.Ref<Bool>, flags : ImGuiSelectableFlags = 0, size : ExtDynamic<ImVec2> = null) : Bool {return false;}
-	
+
     // Widgets: List Boxes
     public static function listBox(label : String, current_item : hl.Ref<Int>, items : hl.NativeArray<String>, height_in_items : Int = -1) : Bool {return false;}
     public static function listBoxHeader(label : String, size : ExtDynamic<ImVec2> = null) : Bool {return false;}
     public static function listBoxHeader2(label : String, items_count : Int, height_in_items : Int = -1) : Bool {return false;}
 	public static function listBoxFooter() {}
-	
+
 	// Widgets: Data Plotting
     public static function plotLines(label : String, values : hl.NativeArray<Single>, values_offset : Int = 0, overlay_text : String = null, scale_min : Single = FLT_MAX, scale_max : Single = FLT_MAX, graph_size : ExtDynamic<ImVec2>) {}
 	public static function plotHistogram(label : String, values : hl.NativeArray<Single>, values_offset : Int = 0, overlay_text : String = null, scale_min : Single = FLT_MAX, scale_max : Single = FLT_MAX, graph_size : ExtDynamic<ImVec2>) {}
-	
+
     // Widgets: Value() Helpers.
     public static function valueBool(prefix : String, b : Bool) {}
     public static function valueInt(prefix : String, v : Int) {}
 	public static function valueSingle(prefix : String, v : Single, float_format : String = null) {}
-	
+
     // Widgets: Menus
     public static function beginMenuBar() : Bool {return false;}
     public static function endMenuBar() {}
@@ -729,12 +857,12 @@ class ImGui
     public static function endMenu() {}
     public static function menuItem(label : String, shortcut : String = null, selected : Bool = false, enabled : Bool = true) : Bool {return false;}
     public static function menuItem2(label : String, shortcut : String, p_selected : hl.Ref<Bool>, enabled : Bool = true) : Bool {return false;}
-	
+
 	// ToolTips
     public static function beginTooltip() {}
     public static function endTooltip() {}
 	public static function setTooltip(fmt : String) {}
-	
+
 	// Popups
 	public static function openPopup(str_id : String) {}
     public static function beginPopup(str_id : String, flags : ImGuiWindowFlags = 0) : Bool {return false;}
@@ -743,10 +871,10 @@ class ImGui
     public static function beginPopupContextVoid(str_id : String = null, mouse_button : ImGuiMouseButton= 1) : Bool {return false;}
     public static function beginPopupModal(name : String, p_open : hl.Ref<Bool> = null, flags : ImGuiWindowFlags = 0) : Bool {return false;}
     public static function endPopup() {}
-    public static function openPopupOnItemClick(str_id : String = null, mouse_button : ImGuiMouseButton = 1) : Bool {return false;}
+    public static function openPopupOnItemClick(str_id : String = null, mouse_button : ImGuiMouseButton = 1) : Void {}
     public static function isPopupOpen(str_id : String) : Bool {return false;}
 	public static function closeCurrentPopup() {}
-	
+
     // Columns
     public static function columns(count : Int = 1, id : String = null, border : Bool = true) {}
     public static function nextColumn() {}
@@ -756,14 +884,14 @@ class ImGui
     public static function getColumnOffset(column_index : Int = -1) : Single {return 0;}
     public static function setColumnOffset(column_index : Int, offset_x : Single) {}
 	public static function getColumnsCount() : Int {return 0;}
-	
+
 	// Tab Bars, Tabs
 	public static function beginTabBar(str_id : String, flags : ImGuiTabBarFlags = 0) : Bool {return false;}
 	public static function endTabBar() {}
 	public static function beginTabItem(label : String, p_open : hl.Ref<Bool> = null, flags : ImGuiTabItemFlags = 0) : Bool {return false;}
 	public static function endTabItem() {}
 	public static function setTabItemClosed(tab_or_docked_window_label : String) {}
-	
+
 	// Logging/Capture
 	public static function logToTTY(auto_open_depth : Int = -1) {}
 	public static function logToFile(auto_open_depth : Int = -1, filename : String = null) {}
@@ -771,7 +899,7 @@ class ImGui
 	public static function logFinish() {}
 	public static function logButtons() {}
 	public static function logText(text : String) {}
-	
+
     // Clipping
     public static function pushClipRect(clip_rect_min : ExtDynamic<ImVec2>, clip_rect_max : ExtDynamic<ImVec2>, intersect_with_current_clip_rect : Bool) {}
     public static function popClipRect() {}
@@ -779,7 +907,7 @@ class ImGui
     // Focus, Activation
     public static function setItemDefaultFocus() {}
 	public static function setKeyboardFocusHere(offset : Int = 0) {}
-	
+
 	// Item/Widgets Utilities
     public static function isItemHovered(flags : ImGuiHoveredFlags = 0) : Bool {return false;}
     public static function isItemActive() : Bool {return false;}
@@ -811,13 +939,13 @@ class ImGui
     public static function calcListClipping(items_count : Int, items_height : Single, out_items_display_start : hl.Ref<Int>, out_items_display_end : hl.Ref<Int>) {}
     public static function beginChildFrame(id : ImGuiID, size : ExtDynamic<ImVec2>, flags : ImGuiWindowFlags = 0) : Bool {return false;}
 	public static function endChildFrame() {}
-	
+
 	// Text Utilities
 	public static function calcTextSize(text : String, text_end : String = null, hide_text_after_double_hash : Bool = false, wrap_width : Single = -1.0) : ExtDynamic<ImVec2> {return null;}
 
     // Color Utilities
-    public static function colorConvertU32ToFloat4(color : ImU32) : ExtDynamic<ImVec2> {return null;}
-    public static function colorConvertFloat4ToU32(color : ExtDynamic<ImVec2>) : ImU32 {return 0;}
+    public static function colorConvertU32ToFloat4(color : ImU32) : ExtDynamic<ImVec4> {return null;}
+    public static function colorConvertFloat4ToU32(color : ExtDynamic<ImVec4>) : ImU32 {return 0;}
     public static function colorConvertRGBtoHSV(r : Single, g : Single, b : Single, out_h : hl.Ref<Single>, out_s : hl.Ref<Single>, out_v : hl.Ref<Single>) {}
     public static function colorConvertHSVtoRGB(h : Single, s : Single, v : Single, out_r : hl.Ref<Single>, out_g : hl.Ref<Single>, out_b : hl.Ref<Single>) {}
 
@@ -846,6 +974,38 @@ class ImGui
     public static function setMouseCursor(cursor_type : ImGuiMouseCursor) {}
     public static function captureMouseFromApp(want_capture_mouse_value : Bool = true) {}
 
+	// Drag and drop
+	public static function beginDragDropTarget(): Bool { return false; }
+	public static function endDragDropTarget() {}
+	public static function beginDragDropSource( flags: ImGuiDragDropFlags = 0 ): Bool { return false; }
+	public static function endDragDropSource() {}
+	public static function setDragDropPayload(type: String, payload: hl.Bytes, length: Int, cond: ImGuiCond = 0 ) : Bool { return false; }
+	public static function acceptDragDropPayload(type: String, cond: ImGuiCond = 0 ) : hl.Bytes { return null; }
+
+	// Payload helpers
+	public static inline function setDragDropPayloadString(type: String, payload: String, cond: ImGuiCond = 0 ) : Bool {
+		var b = Bytes.ofString( payload + '\x00' );
+		return setDragDropPayload(type, b, b.length, cond);
+	 }
+	public static inline function acceptDragDropPayloadString(type: String, cond: ImGuiCond = 0 ) : String {
+		var bytes = ImGui.acceptDragDropPayload(type);
+		if( bytes != null )
+			return @:privateAccess String.fromUTF8( bytes );
+		return null;
+	}
+	public static inline function setDragDropPayloadInt(type: String, payload: Int, cond: ImGuiCond = 0 ) : Bool {
+		var b = Bytes.alloc( 4 );
+		b.setInt32( payload, 0 );
+		return setDragDropPayload(type, b, b.length, cond);
+	 }
+	public static inline function acceptDragDropPayloadInt(type: String, cond: ImGuiCond = 0 ) : Int {
+		var bytes = ImGui.acceptDragDropPayload(type);
+		if( bytes != null )
+			return bytes.getI32(0);
+		return 0;
+	}
+
+
     // Clipboard Utilities
 	static function get_clipboard_text() : hl.Bytes {return null;}
     public static function getClipboardText() : String {
@@ -865,14 +1025,34 @@ class ImGui
 	// IO
 	public static function setIniFilename(filename : String) {}
 
+	// Fonts
+
+	public static inline function addFontFromFileTtf( filename: String, size: Single, ?config: ImFontConfig = null, ?glyphRanges: hl.NativeArray<hl.UI16> = null ) : ImFont { return new ImFont(imguiAddFontFromFileTtf(filename, size, config, glyphRanges)); }
+	public static function imguiAddFontFromFileTtf( filename: String, size: Single, config: ExtDynamic<ImFontConfig>, glyphRanges: hl.NativeArray<hl.UI16>) : ImFontPtr { return null; }
+	public static inline function pushFont( font: ImFont ) { imguiPushFont( @:privateAccess font.ptr );	}
+	static function imguiPushFont( font: ImFontPtr ) {}
+	public static function popFont() {}
+	public static function buildFont() {} // flat version of ImGui::GetIO().Fonts->Build();
+	public static function getTexDataAsRgba32() : Dynamic {return null;} // : {buffer:hl.Bytes, width:Int, height:Int} { return{ buffer: null, width: 0, height: 0 }; }
+
 	// internal functions
 	public static function initialize(render_fn:Dynamic->Void) : Dynamic {return null;}
-	public static function setFontTexture(texture_id : Int) {}
+	public static function setFontTexture(texture_id : ImTextureID) {}
 	public static function setKeyState(key : Int, down : Bool) {}
-	public static function setSpecialKeyState(shift : Bool, ctrl : Bool, alt : Bool) {}
+	public static function setSpecialKeyState(shift : Bool, ctrl : Bool, alt : Bool, super : Bool) {}
 	public static function addKeyChar(c : Int) {}
 	public static function setEvents(dt : Single, mouse_x : Single, mouse_y : Single, wheel : Single, left_click : Bool, right_click : Bool) {}
 	public static function setDisplaySize(display_width:Int, display_height:Int) {}
 	public static function wantCaptureMouse() : Bool {return false;}
 	public static function wantCaptureKeyboard() : Bool {return false;}
+	public static function setConfigFlags(flags:ImGuiConfigFlags = 0) : Void {}
+
+	// Draw Lists
+	public static inline function getWindowDrawList() : ImDrawList { return new ImDrawList( drawlist_get_window_draw_list() ); }
+	public static inline function getForegroundDrawList() : ImDrawList { return new ImDrawList( drawlist_get_foreground_draw_list() ); }
+	public static inline function getBackgroundDrawList() : ImDrawList { return new ImDrawList( drawlist_get_background_draw_list() ); }
+
+	static function drawlist_get_window_draw_list() : ImDrawListPtr { return null; }
+	static function drawlist_get_foreground_draw_list() : ImDrawListPtr { return null; }
+	static function drawlist_get_background_draw_list() : ImDrawListPtr { return null; }
 }

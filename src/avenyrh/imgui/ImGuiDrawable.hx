@@ -7,11 +7,11 @@ import hxd.Key;
 class ImGuiDrawableBuffers {
 
 	public static final instance = new ImGuiDrawableBuffers();
-
+	
 	public var vertex_buffers(default, null) : Array<h3d.Buffer> = [];
 	public var index_buffers(default, null) : Array<{
-		texture_id:Int, 
-		vertex_buffer_id:Int, 
+		texture_id:ImTextureID,
+		vertex_buffer_id:Int,
 		clip_rect:{x:Int, y:Int, width:Int, height:Int},
 		buffer:h3d.Indexes}> = [];
 
@@ -28,13 +28,14 @@ class ImGuiDrawableBuffers {
 
 		// create font texture
 		var texture_size = font_info.width * font_info.height * 4;
-		var font_texture_id = registerTexture(Texture.fromPixels(new hxd.Pixels(
-			font_info.width, 
-			font_info.height, 
+		font_texture = Texture.fromPixels(new hxd.Pixels(
+			font_info.width,
+			font_info.height,
 			font_info.buffer.toBytes(texture_size),
-			hxd.PixelFormat.RGBA)));
-		ImGui.setFontTexture(font_texture_id);
-		
+			hxd.PixelFormat.RGBA
+		));
+		ImGui.setFontTexture(font_texture);
+
 		this.initialized = true;
 	}
 
@@ -55,16 +56,6 @@ class ImGuiDrawableBuffers {
 		this.textures = [];
 
 		this.initialized = false;
-	}
-
-	public function registerTexture(texture : Texture) : Int {
-		var texture_id = this.textures.length;
-		this.textures.push(texture);
-		return texture_id + 1;
-	}
-
-	public function getTexture(texture_id) : Texture {
-		return this.textures[texture_id-1];
 	}
 
 	private function new() {
@@ -98,7 +89,7 @@ class ImGuiDrawableBuffers {
 			// read cmd buffers
 			for (draw_object_index in 0...draw_objects.length) {
 				var draw_object = draw_objects[draw_object_index];
-				
+
 				var ext_index_buffer:hl.Bytes = draw_object.index_buffer;
 				var nb_indices = Std.int(draw_object.index_buffer_size/2);
 				var clip_rect = {
@@ -111,15 +102,15 @@ class ImGuiDrawableBuffers {
 				// create or reuse index buffer
 				if (index_buffer_index >= this.index_buffers.length) {
 					this.index_buffers[index_buffer_index] = {
-						buffer: new h3d.Indexes(nb_indices), 
-						vertex_buffer_id: vertex_buffer_index, 
+						buffer: new h3d.Indexes(nb_indices),
+						vertex_buffer_id: vertex_buffer_index,
 						clip_rect: clip_rect,
 						texture_id: draw_object.texture_id};
 				} else if (this.index_buffers[index_buffer_index].buffer.count != nb_indices) {
 					this.index_buffers[index_buffer_index].buffer.dispose();
 					this.index_buffers[index_buffer_index] = {
-						buffer: new h3d.Indexes(nb_indices), 
-						vertex_buffer_id: vertex_buffer_index, 
+						buffer: new h3d.Indexes(nb_indices),
+						vertex_buffer_id: vertex_buffer_index,
 						clip_rect: clip_rect,
 						texture_id: draw_object.texture_id
 					};
@@ -177,8 +168,8 @@ class ImGuiDrawable extends h2d.Drawable {
 
 		var scene = getScene();
 		ImGui.setDisplaySize(scene.width, scene.height);
-		this.scene_size = {width: scene.width, height:scene.width};
-		
+		this.scene_size = {width: scene.width, height:scene.height};
+
 		this.keycode_map = [
 			Key.TAB => ImGuiKey.Tab,
 			Key.LEFT => ImGuiKey.LeftArrow,
@@ -216,13 +207,14 @@ class ImGuiDrawable extends h2d.Drawable {
 	public function dispose() {
 		ImGuiDrawableBuffers.instance.dispose();
 	}
-	
+
 	public function update(dt:Float) {
 		ImGui.setEvents(dt, this.mouse_x, this.mouse_y, this.mouse_delta, mouse_down[0], mouse_down[1]);
 		ImGui.setSpecialKeyState(
-			Key.isPressed(Key.LSHIFT) || Key.isPressed(Key.RSHIFT), 
-			Key.isPressed(Key.LCTRL) || Key.isPressed(Key.RCTRL), 
-			Key.isPressed(Key.LALT) || Key.isPressed(Key.RALT));
+			Key.isDown(Key.LSHIFT) || Key.isDown(Key.RSHIFT),
+			Key.isDown(Key.LCTRL) || Key.isDown(Key.RCTRL),
+			Key.isDown(Key.LALT) || Key.isDown(Key.RALT),
+			Key.isDown(Key.LEFT_WINDOW_KEY) || Key.isDown(Key.RIGHT_WINDOW_KEY));
 		this.mouse_delta = 0;
 
 		var scene = getScene();
@@ -288,7 +280,7 @@ class ImGuiDrawable extends h2d.Drawable {
 
 		for (i in 0...index_buffers.length) {
 			var index_buffer = index_buffers[i];
-			if (ctx.beginDrawObject(this,  index_buffer.texture_id == 0 ? this.empty_tile.getTexture() : ImGuiDrawableBuffers.instance.getTexture(index_buffer.texture_id))) {
+			if (ctx.beginDrawObject(this,  index_buffer.texture_id == null ? this.empty_tile.getTexture() : index_buffer.texture_id)) {
 				var clip_rect = index_buffer.clip_rect;
 				ctx.engine.setRenderZone(clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
 				ctx.engine.renderIndexed(vertex_buffers[index_buffer.vertex_buffer_id], index_buffer.buffer);
