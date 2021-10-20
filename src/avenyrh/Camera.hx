@@ -1,6 +1,5 @@
 package avenyrh;
 
-import avenyrh.editor.Inspector;
 import avenyrh.utils.Timer;
 import avenyrh.engine.Scene;
 import avenyrh.gameObject.GameObject;
@@ -194,54 +193,6 @@ class Camera extends Process
         super.onDispose();
 
         timer.dispose();
-    }
-
-    override function drawInfo() 
-    {
-        super.drawInfo();
-
-        // //Position
-        // var pos : Array<Float> = [x, y];
-        // Inspector.dragFloats("Position", uID, pos, 0.1);
-        // x = pos[0];
-        // y = pos[1];
-
-        // //Zoom
-        // var z : Array<Float> = [zoom];
-        // Inspector.dragFloats("Zoom", uID, z, 0.1);
-        // zoom = z[0];
-
-        // //Target
-        // Inspector.labelText("Target", uID, target == null ? "Null" : target.name);
-
-        //Target offset
-        // var to : Array<Float> = [targetOffset.x, targetOffset.y];
-        // Inspector.dragFloats("Target offset", uID, to, 0.1);
-        // targetOffset.x = to[0];
-        // targetOffset.y = to[1];
-
-        // var bo : Array<Float> = [bumpOffset.x, bumpOffset.y];
-        // Inspector.dragFloats("Bump offset", uID, bo, 0.1);
-        // bumpOffset.x = bo[0];
-        // bumpOffset.y = bo[1];
-
-        // //Deadzone
-        // var dz : Array<Float> = [deadzone];
-        // Inspector.dragFloats("Deadzone", uID, dz, 0.1);
-        // deadzone = dz[0];
-
-        // //Smooth
-        // var s : Array<Float> = [smooth];
-        // Inspector.dragFloats("Smooth", uID, s, 0.1);
-        // smooth = s[0];
-
-        // //Snap
-        // snap = Inspector.checkbox("Snap", uID, snap);
-
-        // //Shake power
-        // var sp : Array<Float> = [shakePower];
-        // Inspector.dragFloats("Shake power", uID, sp, 0.1);
-        // shakePower = sp[0];
     }
     //#endregion
 
