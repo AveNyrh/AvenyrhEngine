@@ -13,9 +13,11 @@ class TestScene extends Scene
 
     public var testString : String = "This is a test string";
 
-    //public var testEnum : TestSceneEnum = Value1;
+    public var testIntArray : Array<Int> = [0, 1, 2, 3, 4, 5, 6];
 
-    //public var testGo : GameObject;
+    public var testEnum : TestSceneEnum = Value1;
+
+    public var testGo : GameObject;
 
     public override function new() 
     {
@@ -26,7 +28,7 @@ class TestScene extends Scene
     {
         super.added();
 
-        //testGo = new GameObject("TestGo", null);
+        testGo = new GameObject("TestGo", null);
     }
 }
 

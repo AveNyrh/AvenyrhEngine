@@ -1,0 +1,17 @@
+"Name" : Test Scene
+"testInt" : 4
+"testFloat" : 2.6
+"testBool" : true
+"testString" : This is a test string
+"testIntArray" :
+[
+	0,
+	1,
+	2,
+	3,
+	4,
+	5,
+	6
+]
+"testEnum" : Value1
+"testGo" : 6
