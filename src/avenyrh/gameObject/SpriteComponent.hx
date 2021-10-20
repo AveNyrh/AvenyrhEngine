@@ -81,7 +81,7 @@ class SpriteComponent extends GraphicComponent
     {
         super.drawInfo();
 
-        Inspector.image("Tile", bitmap.tile);
+        Inspector.image("tile", bitmap.tile);
     }
 
     //-------------------------------
