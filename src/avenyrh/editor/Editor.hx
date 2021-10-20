@@ -57,8 +57,7 @@ class Editor extends Process
 
         ImGui.newFrame();
 
-        var b = true;
-        ImGui.showDemoWindow(b);
+        //ImGui.showDemoWindow();
 
         menuBar.draw(dt);
         inspector.draw(dt);

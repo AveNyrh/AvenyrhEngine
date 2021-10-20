@@ -5,6 +5,7 @@ import haxe.EnumTools;
 import avenyrh.imgui.ImGui;
 import avenyrh.engine.Scene;
 import avenyrh.engine.SceneManager;
+import avenyrh.engine.SceneSerializer;
 import avenyrh.engine.Uniq;
 import h2d.Tile;
 
@@ -26,6 +27,8 @@ class Inspector extends EditorWidget
 
     static var textures : Map<h3d.mat.Texture, Int> = [];
 
+    static var off : Int = 226;
+
     //-------------------------------
     //#region Public API
     //-------------------------------
@@ -40,14 +43,14 @@ class Inspector extends EditorWidget
 
         if(ImGui.button("Serialize",  {x : 100, y : 20}))
         {
-            //SceneSerializer.Serialize(scene);
+            SceneSerializer.serialize(scene);
         }
 
         ImGui.sameLine(110);
 
         if(ImGui.button("Deserialize",  {x : 100, y : 20}))
         {
-            //SceneSerializer.Deserialize(scene.name);
+            SceneSerializer.deserialize(scene.name);
         }
 
         var flags : ImGuiTreeNodeFlags = DefaultOpen;
@@ -174,6 +177,7 @@ class Inspector extends EditorWidget
                     Inspector.dragFloats(field.name, u.uID, fv, 0.1);
 
                 return cast fv[0];
+
             case CAbstract("Int", []) : //Int
                 iv = [cast value];
 
@@ -187,23 +191,33 @@ class Inspector extends EditorWidget
                     Inspector.dragInts(field.name, u.uID, iv);
 
                 return cast iv[0];
+
             case CAbstract("Bool", []) : //Bool
                 return cast Inspector.checkbox(field.name, u.uID, cast value);
+
+            case CClass("String", []) : //String
+                //Atm, just draws the string, not possible to change it
+                Inspector.labelText(field.name, u.uID, cast value);
+                return value;
+
             case CEnum(_, []) : //Enum
                 ev = cast Reflect.getProperty(u, field.name);
                 e = Type.getEnum(ev);
                 index = Inspector.enumDropdown(field.name, u.uID, e, ev.getIndex());
                 return EnumTools.createByIndex(e, index);
+
             case CAbstract("avenyrh.Vector2", []) : //Vector2
                 vec2 = Reflect.getProperty(u, field.name);
                 fv = [vec2.x, vec2.y];
                 Inspector.dragFloats(field.name, u.uID, fv, 0.1);
                 vec2 = new Vector2(fv[0], fv[1]);
                 return vec2;
+
             case CClass("h2d.Tile", []) : //Tile
                 tile = cast(Reflect.getProperty(u, field.name), Tile);
                 Inspector.image(field.name, tile);
                 return tile;
+
             default :
                 return null;
         }
@@ -335,7 +349,9 @@ class Inspector extends EditorWidget
     public static function checkbox(label : String, id : Int, value : Bool)  : Bool
     {
         var v : hl.Ref<Bool> = cast value;
-        ImGui.checkbox('$label###$label$id', v);
+        ImGui.checkbox("", v);
+        ImGui.sameLine(off);
+        ImGui.text('$label');
         return v.get();
     }
 
@@ -344,7 +360,6 @@ class Inspector extends EditorWidget
         ImGui.labelText('$label###$label$id', text);
     }
 
-    static var off : Int = 226;
     public static function image(label : String, tile : Tile) @:privateAccess
     {
         ImGui.image(tile.getTexture(), {x : tile.width, y : tile.height}, {x : tile.u, y : tile.v}, {x : tile.u2, y : tile.v2});

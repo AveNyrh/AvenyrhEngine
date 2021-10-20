@@ -3,7 +3,7 @@
 -lib hlsdl
 -lib echo
 
--D inspector
+-D avenyrhEditor
 
 -D resourcesPath=examples/res
 -D windowTitle=AveNyrhEngine
