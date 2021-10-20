@@ -20,7 +20,8 @@ class Main extends AvenyrhApp
     {
         super.init();
 
-        SceneManager.addScene(new GameObjectScene());
+        SceneManager.addScene(new TestScene());
+        //SceneManager.addScene(new GameObjectScene());
         //SceneManager.addScene(new UIScene());
         //SceneManager.addScene(new PFScene());
         //SceneManager.addScene(new PhysicExampleScene());
