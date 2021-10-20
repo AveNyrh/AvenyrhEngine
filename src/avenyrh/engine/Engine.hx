@@ -2,7 +2,7 @@ package avenyrh.engine;
 
 import avenyrh.physic.PhysicGameObject;
 import avenyrh.gameObject.ParticleComponent;
-import avenyrh.editor.Inspector;
+import avenyrh.editor.Editor;
 import h2d.Console;
 import avenyrh.InputManager;
 
@@ -45,9 +45,9 @@ class Engine extends Process
         console = new h2d.Console(hxd.res.DefaultFont.get(), s);
         console.shortKeyChar = "²".code;
 
-        //Inspector
-        #if inspector
-        new Inspector();
+        //Editor
+        #if avenyrhEditor
+        new Editor();
         #end
 
         //Init options

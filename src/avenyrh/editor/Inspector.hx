@@ -3,20 +3,13 @@ package avenyrh.editor;
 using Lambda;
 import haxe.EnumTools;
 import avenyrh.imgui.ImGui;
-import avenyrh.imgui.ImGuiDrawable;
-import avenyrh.engine.Process;
 import avenyrh.engine.Scene;
 import avenyrh.engine.SceneManager;
 import avenyrh.engine.Uniq;
 import h2d.Tile;
 
-class Inspector extends Process
+class Inspector extends EditorWidget
 {
-    /**
-     * Is the inspector running
-     */
-    var enable : Bool;
-
     /**
      * Current object being inspected
      */
@@ -31,51 +24,14 @@ class Inspector extends Process
     
     static var rtti : haxe.rtti.CType.Classdef;
 
-    var drawable : ImGuiDrawable;
-
     static var textures : Map<h3d.mat.Texture, Int> = [];
 
-    override public function new() 
-    {
-        super("Inspector");
-
-        createRoot(Process.S2D, 10);
-        drawable = new ImGuiDrawable(root);
-
-        ImGui.loadIniSettingsFromDisk("default.ini");
-        ImGui.setConfigFlags(ImGuiConfigFlags.DockingEnable);
-
-        close();
-    }
-
     //-------------------------------
-    //#region Private API
+    //#region Public API
     //-------------------------------
-    override function update(dt : Float) 
-    {
-        super.update(dt);
-
-        if(hxd.Key.isPressed(hxd.Key.F4))
-            enable ? close() : open();
-    }
-
-    override function postUpdate(dt : Float) 
-    {
-        super.postUpdate(dt);
-
-        if(!enable)
-            return;
-
-        draw(dt);
-    }
-
-    function draw(dt : Float)
-    {
-        drawable.update(dt);
-
-        ImGui.newFrame();
-
-        //ImGui.showDemoWindow();
+    public override function draw(dt : Float)
+    {        
+        super.draw(dt);
 
         //Hierarchy window
         ImGui.begin("Hierarchy");
@@ -153,26 +109,11 @@ class Inspector extends Process
         }
 
         ImGui.end();
-        ImGui.render();
-        ImGui.endFrame();
-    }
-    //#endregion
-
-    //-------------------------------
-    //#region Public API
-    //-------------------------------
-    public function open()
-    {
-        enable = true;
-
-        drawable.alpha = 1;
     }
 
-    public function close()
+    public override function close()
     {
-        enable = false;
-
-        drawable.alpha = 0;
+        super.close();
 
         currentInspectable = null;
     }
