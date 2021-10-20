@@ -31,7 +31,7 @@ class Inspector extends Process
     
     static var rtti : haxe.rtti.CType.Classdef;
 
-    var drawable : ImGuiDrawable;
+    static var drawable : ImGuiDrawable;
 
     static var textures : Map<h3d.mat.Texture, Int> = [];
 
@@ -403,16 +403,12 @@ class Inspector extends Process
         ImGui.labelText('$label###$label$id', text);
     }
 
+    static var off : Int = 226;
     public static function image(label : String, tile : Tile) @:privateAccess
     {
-        var tex = tile.getTexture();
-        var id = textures[tex];
-
-        // if (id == null)
-        //     textures[tex] = id = avenyrh.imgui.ImGuiDrawable.ImGuiDrawableBuffers.instance.registerTexture(tex);
-
+        ImGui.image(tile.getTexture(), {x : tile.width, y : tile.height}, {x : tile.u, y : tile.v}, {x : tile.u2, y : tile.v2});
+        ImGui.sameLine(off);
         ImGui.text('$label');
-        ImGui.image(id, {x : tile.width, y : tile.height}, {x : tile.u, y : tile.v}, {x : tile.u2, y : tile.v2});
     }
     //#endregion
 }
