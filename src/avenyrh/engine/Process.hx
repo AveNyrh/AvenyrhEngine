@@ -1,5 +1,6 @@
 package avenyrh.engine;
 
+import haxe.Int64;
 import avenyrh.editor.Inspector;
 import avenyrh.editor.IInspectable;
 import avenyrh.imgui.ImGui;
@@ -61,10 +62,11 @@ class Process extends Uniq implements IInspectable
 
     var children : Array<Process>;
     
-    public function new(name : String, ?parent : Process) 
+    public function new(name : String, ?parent : Process, ?id : Null<Int64>) 
     {
+        super(id);
+
         this.name = name;
-        uID = Uniq.UNIQ_ID++;
         paused = false;
         destroyed = false;
         children = [];

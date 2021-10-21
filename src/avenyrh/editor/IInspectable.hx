@@ -1,11 +1,13 @@
 package avenyrh.editor;
 
+import haxe.Int64;
+
 interface IInspectable 
 {
     /**
      * Unique identifier
      */
-    var uID (default, null) : Int;
+    var uID (default, null) : Int64;
 
     /**
      * Name that will appear in the header

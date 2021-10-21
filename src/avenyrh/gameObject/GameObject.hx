@@ -1,5 +1,6 @@
 package avenyrh.gameObject;
 
+import haxe.Int64;
 import avenyrh.engine.SceneManager;
 using Lambda;
 import avenyrh.engine.Uniq;
@@ -79,9 +80,10 @@ class GameObject extends Uniq implements IInspectable
 
     var components : Array<Component>;
 
-    public function new(name : String = "", parent : GameObject = null) 
+    public function new(name : String = "", parent : GameObject = null, ?id : Null<Int64>) 
     {
-        uID = Uniq.UNIQ_ID++;
+        super(id);
+
         scene = SceneManager.CurrentScene;
         
         destroyed = false;

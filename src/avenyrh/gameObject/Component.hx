@@ -1,5 +1,6 @@
 package avenyrh.gameObject;
 
+import haxe.Int64;
 import avenyrh.editor.Inspector;
 import avenyrh.engine.Uniq;
 import avenyrh.imgui.ImGui;
@@ -30,10 +31,11 @@ class Component extends Uniq
 
     private var started : Bool;
 
-    public function new(?name : String) 
+    public function new(?name : String, ?id : Null<Int64>) 
     {
+        super(id);
+
         destroyed = false;
-        uID = Uniq.UNIQ_ID++;
 
         this.name = name;
 

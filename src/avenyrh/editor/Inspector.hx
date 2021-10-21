@@ -1,5 +1,6 @@
 package avenyrh.editor;
 
+import haxe.Int64;
 using Lambda;
 import haxe.EnumTools;
 import avenyrh.imgui.ImGui;
@@ -226,7 +227,7 @@ class Inspector extends EditorWidget
     /**
      * Returns true if one of the values has changed
      */
-    public static function dragFloats(label : String, id : Int, data : Array<Float>, step : Float = 1, format : String = "%.3f") : Bool
+    public static function dragFloats(label : String, id : Int64, data : Array<Float>, step : Float = 1, format : String = "%.3f") : Bool
     {
         var na = new hl.NativeArray<Single>(data.length);
         var changed : Bool = false;
@@ -247,7 +248,7 @@ class Inspector extends EditorWidget
     /**
      * Returns true if one of the values has changed
      */
-    public static function sliderFloats(label : String, id : Int, data : Array<Float>, min : Float, max : Float, format : String = "%.3f") : Bool
+    public static function sliderFloats(label : String, id : Int64, data : Array<Float>, min : Float, max : Float, format : String = "%.3f") : Bool
     {
         var na = new hl.NativeArray<Single>(data.length);
         var changed : Bool = false;
@@ -268,7 +269,7 @@ class Inspector extends EditorWidget
     /**
      * Returns true if one of the values has changed
      */
-    public static function dragInts(label : String, id : Int, data : Array<Int>, step : Float = 1) : Bool
+    public static function dragInts(label : String, id : Int64, data : Array<Int>, step : Float = 1) : Bool
     {
         var na = new hl.NativeArray<Int>(data.length);
         var changed : Bool = false;
@@ -289,7 +290,7 @@ class Inspector extends EditorWidget
     /**
      * Returns true if one of the values has changed
      */
-    public static function sliderInts(label : String, id : Int, data : Array<Int>, min : Int, max : Int) : Bool
+    public static function sliderInts(label : String, id : Int64, data : Array<Int>, min : Int, max : Int) : Bool
     {
         var na = new hl.NativeArray<Int>(data.length);
         var changed : Bool = false;
@@ -310,7 +311,7 @@ class Inspector extends EditorWidget
     /**
      * Returns the index of the selected enum value
      */
-    public static function enumDropdown<T>(label : String, id : Int, e : Enum<T>, index : Int, maxItemShown : Int = 4) : Int
+    public static function enumDropdown<T>(label : String, id : Int64, e : Enum<T>, index : Int, maxItemShown : Int = 4) : Int
     {
         var changed : Bool = false;
         var ea : Array<T> = haxe.EnumTools.createAll(e);
@@ -338,7 +339,7 @@ class Inspector extends EditorWidget
         return index;
     }
 
-    public static function button(label : String, id : Int) : Bool
+    public static function button(label : String, id : Int64) : Bool
     {
         return ImGui.button('$label###$label$id', {x : 200, y : 20});
     }
@@ -346,7 +347,7 @@ class Inspector extends EditorWidget
     /**
      * Returns the value of the checkbox
      */
-    public static function checkbox(label : String, id : Int, value : Bool)  : Bool
+    public static function checkbox(label : String, id : Int64, value : Bool)  : Bool
     {
         var v : hl.Ref<Bool> = cast value;
         ImGui.checkbox("", v);
@@ -355,7 +356,7 @@ class Inspector extends EditorWidget
         return v.get();
     }
 
-    public static function labelText(label : String, id : Int, text : String) 
+    public static function labelText(label : String, id : Int64, text : String) 
     {
         ImGui.labelText('$label###$label$id', text);
     }

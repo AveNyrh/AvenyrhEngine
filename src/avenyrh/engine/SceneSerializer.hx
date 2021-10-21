@@ -1,5 +1,6 @@
 package avenyrh.engine;
 
+import haxe.Int64;
 import avenyrh.gameObject.Component;
 import avenyrh.gameObject.GameObject;
 using Lambda;
@@ -38,6 +39,7 @@ class SceneSerializer
         //- process children
 
         addValue("Name", scene.name);
+        addValue("uID", scene.uID.toString());
         //addObject("Camera", scene.camera);
 
         for(f in rtti.fields)
@@ -110,11 +112,11 @@ class SceneSerializer
 
             case TClass(GameObject) :
                 var go : GameObject = cast value;
-                name == null ? buf.add('${go.uID}$lb') : buf.add('"$name" : ${go.uID}$lb');
+                name == null ? buf.add('${go.uID.toString()}$lb') : buf.add('"$name" : ${go.uID.toString()}$lb');
 
             case TClass(Component) :
                 var comp : Component = cast value;
-                name == null ? buf.add('${comp.uID}$lb') : buf.add('"$name" : ${comp.uID}$lb');
+                name == null ? buf.add('${comp.uID.toString()}$lb') : buf.add('"$name" : ${comp.uID.toString()}$lb');
 
             case TClass(Array) :
                 addArray(name, value);
