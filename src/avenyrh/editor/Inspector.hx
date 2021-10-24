@@ -42,17 +42,17 @@ class Inspector extends EditorWidget
 
         var scene : Scene = SceneManager.CurrentScene;
 
+        //Json
         if(ImGui.button("Serialize",  {x : 100, y : 20}))
-        {
             SceneSerializer.serialize(scene);
-        }
 
         ImGui.sameLine(110);
 
         if(ImGui.button("Deserialize",  {x : 100, y : 20}))
-        {
             SceneSerializer.deserialize(scene.name);
-        }
+
+        //Change this when having another (de)serialize button placement
+        scene = SceneManager.CurrentScene;
 
         var flags : ImGuiTreeNodeFlags = DefaultOpen;
 

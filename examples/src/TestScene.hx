@@ -19,6 +19,8 @@ class TestScene extends Scene
 
     public var testGo : GameObject;
 
+    var privateInt = -1;
+
     public override function new() 
     {
         super("Test Scene");

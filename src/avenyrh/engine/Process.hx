@@ -60,7 +60,7 @@ class Process extends Uniq implements IInspectable
 
     var parent : Process;
 
-    var children : Array<Process>;
+    var children : Array<Process> = [];
     
     public function new(name : String, ?parent : Process, ?id : Null<Int64>) 
     {

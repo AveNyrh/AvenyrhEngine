@@ -1,6 +1,11 @@
 package avenyrh.utils;
 
+import haxe.ds.StringMap;
+import haxe.DynamicAccess;
+import avenyrh.engine.Uniq;
 import sys.io.File;
+import avenyrh.gameObject.Component;
+import avenyrh.gameObject.GameObject;
 
 /**
  * Copied from DeepnightLibs
@@ -85,7 +90,7 @@ class JsonUtils
      * 
      * enumSupport defines how to behave when encountering Enum values (UnsupportedEnums, UseEnumName, UseEnumIndex). Parametered enums are not supported.
 	 */
-	public static function stringify(o : Dynamic, prettyLevel = Compact, ?headerObject : Dynamic, inlineHeader = false, enumSupport = UnsupportedEnums) : String
+	public static function stringify(o : Dynamic, prettyLevel = Compact, ?headerObject : Dynamic, inlineHeader = false, enumSupport = UseEnumName) : String
     {
 		level = prettyLevel;
 		indent = 0;
@@ -139,6 +144,16 @@ class JsonUtils
 		trace("Path : " + path);
 		trace("Data : \n" + data);
     }
+
+	public static function parseToStringMap(dyn : DynamicAccess<Dynamic>) : StringMap<Dynamic>
+	{
+		var sm : StringMap<Dynamic> = new StringMap<Dynamic>();
+
+		for(key => value in dyn)
+            sm.set(key, value);
+
+		return sm;
+	}
     //#endregion
 
     //-------------------------------
@@ -217,6 +232,10 @@ class JsonUtils
 							throw 'Unsupported parametered enum $name : ${e.getName()}';
 						addValue(name, ev.getIndex());
 				}
+
+			case TClass(GameObject), TClass(Component):
+				var id : String = haxe.Int64.toStr(cast(v, Uniq).uID);
+				name == null ? buf.add(Std.string(id)) : buf.add('"$name"$preSpace:$postSpace$id');
 
 			case _:
 				throw 'Unknown value type $name=$v (' + Type.typeof(v) + ')';

@@ -1,11 +1,10 @@
 package avenyrh.engine;
 
-import haxe.Int64;
-import avenyrh.gameObject.Component;
-import avenyrh.gameObject.GameObject;
 using Lambda;
 import avenyrh.utils.JsonUtils;
-import haxe.Unserializer;
+import sys.io.FileInput;
+import haxe.ds.StringMap;
+import sys.io.FileOutput;
 import sys.io.File;
 
 class SceneSerializer 
@@ -18,66 +17,100 @@ class SceneSerializer
 
     public static var path : String = "examples/res/scenes/";
 
-    static var buf : StringBuf;
-
-    static var indent : Int;
+    static var fi : FileInput;
     
     //-------------------------------
     //#region Public static API
     //-------------------------------
     public static function serialize(scene : Scene) @:privateAccess
     {
-        buf = new StringBuf();
-        indent = 0;
         
-        //var data : StringMap<Dynamic> = new StringMap();
+        var data : StringMap<Dynamic> = new StringMap();
         var rtti : haxe.rtti.CType.Classdef = haxe.rtti.Rtti.getRtti(Type.getClass(scene));
 
-        //Scene header
-        //To add manualy
-        //- camera
-        //- process children
+        var currentObject : StringMap<Dynamic> = new StringMap();
 
-        addValue("Name", scene.name);
-        addValue("uID", scene.uID.toString());
-        //addObject("Camera", scene.camera);
+        //Scene
+        currentObject.set("Name", scene.name);
+        currentObject.set("Class path", getClassPath(scene));
+        currentObject.set("uID", scene.uID.toString());
 
         for(f in rtti.fields)
         {
             if((f.isPublic || f.meta.exists(m -> m.name == "serializable")) && f.type.getName() != "CFunction")
             {
-                addValue(f.name, Reflect.getProperty(scene, f.name));
+                currentObject.set(f.name, Reflect.getProperty(scene, f.name));
             }
         }
 
-        // for(go in @:privateAccess scene.allGO)
-        // {
-        //     rtti = haxe.rtti.Rtti.getRtti(Type.getClass(go));
-        //     trace(rtti);
+        data.set("Scene", currentObject);
 
-        //     for(f in rtti.fields)
-        //     {
-        //         if(f.isPublic || f.meta.exists(m -> m.name == "serializable"))
-        //         {
-        //             data.set(f.name, Reflect.getProperty(go, f.name));
-        //         }
-        //     }
-        // }
+        //Add gameobjects, components ...
 
+        //Write data
         var p : String = path + scene.name + ".scene";
-
-        var fo = File.write(p, false);
-        fo.writeString(buf.toString());
+        var fo : FileOutput = File.write(p, false);
+        fo.writeString(JsonUtils.stringify(data, Full));
         fo.close();
-		
-		trace("Saved scene");
-		trace("Path : " + p);
-		trace("Data : \n" + buf.toString());
+
+        trace('${scene.name} serialized');
     }
 
     public static function deserialize(name : String) : Bool
     {
-        var obj : Dynamic = Unserializer.run(hxd.Res.sav.particles.entry.getBytes().toString());
+        //Retrieve content
+        var p : String = path + name + ".scene";
+        var s : String = File.getContent(p);
+        var dyn : haxe.DynamicAccess<Dynamic> = haxe.Json.parse(s);
+        var data : StringMap<haxe.DynamicAccess<Dynamic>> = JsonUtils.parseToStringMap(dyn);
+
+        var sceneData : StringMap<Dynamic> = JsonUtils.parseToStringMap(data.get("Scene"));
+
+        var c = Type.resolveClass(sceneData.get("Class path"));
+
+        //To build a class from string
+        var instance : Class<Dynamic> = Type.createInstance(c, [sceneData.get("Name")]);
+        var rtti : haxe.rtti.CType.Classdef = haxe.rtti.Rtti.getRtti(Type.getClass(instance));
+        var fields : Array<String> = Type.getClassFields(instance);
+
+        for(f in rtti.fields)
+        {
+            if((f.isPublic || f.meta.exists(m -> m.name == "serializable")) && f.type.getName() != "CFunction" && sceneData.exists(f.name))
+            {
+                var n : String = f.name;
+                switch (f.type)
+                {
+                    case CAbstract("Float", []) : //Float
+                        Reflect.setField(instance, f.name, sceneData.get(f.name));
+
+                    case CAbstract("Int", []) : //Int
+                        var sd = sceneData.get(f.name);
+                        Reflect.setField(instance, f.name, sceneData.get(f.name));
+
+                    case CAbstract("Bool", []) : //Bool
+                        Reflect.setField(instance, f.name, sceneData.get(f.name) == "true");
+
+                    case CClass("String", []) : //String
+                        Reflect.setField(instance, f.name, sceneData.get(f.name));
+
+                    case CEnum(_, []) : //Enum
+                        var ev : EnumValue = cast Reflect.getProperty(instance, f.name);
+                        var e : Enum<Dynamic> = Type.getEnum(ev);
+                        Reflect.setField(instance, f.name, Type.createEnumIndex(e, ev.getIndex()));
+
+                    case CClass("GameObject", []) : //GameObject
+                        trace('GameObject ${f.name}');
+    
+                    case _:
+                        trace('Not supported deserialization for ${f.name}');
+                }
+            }
+        }
+
+        SceneManager.addScene(cast instance);
+
+        trace('${sceneData.get("Name")} deserialized');
+
         return false;
     }
     //#endregion
@@ -94,79 +127,61 @@ class SceneSerializer
         }
     }
 
-    static function addValue(name : Null<String>, value : Dynamic, autoLineBreak : Bool = true) @:privateAccess
+    static function getClassPath(c : Dynamic) : String
     {
-        var lb : String = autoLineBreak ? lineBreak : "";
+        var path : String = "";
+        var s : String = Std.string(Type.getClass(c));
 
-        switch Type.typeof(value) 
+        var len : Int = s.length;
+        var i : Int = 0;
+        var ichar : String = "";
+
+        while (true)
         {
-            case TNull, TInt, TBool :
-				name == null ? buf.add('$value$lb') : buf.add('"$name" : $value$lb');
+            if(i >= len)
+                break;
 
-			case TFloat :
-				var strFloat = value == Std.int(value) ? value + ".0" : Std.string(value);
-				name == null ? buf.add('$strFloat$lb') : buf.add('"$name" : $strFloat$lb');
-            
-            case TClass(String) :
-                name == null ? buf.add('$value$lb') : buf.add('"$name" : $value$lb');
+            ichar = s.charAt(i);
 
-            case TClass(GameObject) :
-                var go : GameObject = cast value;
-                name == null ? buf.add('${go.uID.toString()}$lb') : buf.add('"$name" : ${go.uID.toString()}$lb');
+            if (ichar == "$")
+                ichar = "";
 
-            case TClass(Component) :
-                var comp : Component = cast value;
-                name == null ? buf.add('${comp.uID.toString()}$lb') : buf.add('"$name" : ${comp.uID.toString()}$lb');
-
-            case TClass(Array) :
-                addArray(name, value);
-
-            case TEnum(e) :
-                var ev : EnumValue = cast value;
-                if(ev.getParameters().length > 0)
-                    throw 'Unsupported parametered enum $name : ${e.getName()}';
-                name == null ? buf.add('${ev.getName()}$lb') : buf.add('"$name" : ${ev.getName()}$lb');
-
-            //TO DO : Maps
-
-			case _:
-				throw 'Unknown value type $name = $value (' + Type.typeof(value) + ')';
+            path += ichar;
+            i++;
         }
+        return path;
     }
 
-    static function addArray(name : Null<String>, arr : Array<Dynamic>)
+    static function getNameAndData(str : String) : NameAndData
     {
-        if(arr.length == 0)
+        var len : Int = str.length;
+        var s : String = "";
+        var i : Int = 0;
+        var ichar : String = "";
+
+        while (true)
         {
-            name == null ? buf.add('[]$lineBreak') : buf.add('"$name" : []$lineBreak');
+            if(i >= len)
+                break;
+
+            ichar = str.charAt(i);
+
+            if(ichar == ".")
+                ichar = "/";
+            else if (ichar == "$")
+                ichar = "";
+
+            s += ichar;
+            i++;
         }
 
-        if(name!=null)
-            buf.add('"$name" :$lineBreak');
-        buf.add('[$lineBreak');
-
-        indent++;
-        for(i in 0 ... arr.length) 
-        {
-            addIndent();
-            addValue(null, arr[i], false);
-            if(i < arr.length - 1)
-                buf.add(',$lineBreak');
-        }
-        indent--;
-
-        buf.add(lineBreak);
-        addIndent();
-        buf.add(']$lineBreak');
-    }
-
-    /**
-     * Adds the indentation to the StrinBuf : indent * tab
-     */
-    static function addIndent()
-    {
-		for(i in 0 ... indent)
-			buf.add(tab);
+        return {name : "", data : ""};
     }
     //#endregion
+}
+
+typedef NameAndData =
+{
+    var name : String;
+    var data : Dynamic;
 }
