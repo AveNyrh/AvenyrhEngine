@@ -1,6 +1,8 @@
 {
 	"Scene": {
-		"testIntArray": [
+		"s_Name": "Test Scene",
+		"s_testString": "This is a test string",
+		"a_testIntArray": [
 			0,
 			1,
 			2,
@@ -9,14 +11,12 @@
 			5,
 			6
 		],
-		"testFloat": 2.6,
-		"testGo": 999033330624,
-		"testInt": 16,
-		"uID": "300408726411",
-		"testBool": true,
-		"testEnum": "Value1",
-		"testString": "This is a test string",
-		"Name": "Test Scene",
-		"Class path": "examples.src.TestScene"
+		"s_Class path": "examples.src.TestScene",
+		"g_testGo": "979823494708",
+		"b_testBool": true,
+		"e_testEnum": "Value1",
+		"s_uID": "288856835187",
+		"i_testInt": 4,
+		"f_testFloat": 2.6
 	}
 }
