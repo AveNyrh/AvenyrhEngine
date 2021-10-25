@@ -5,17 +5,18 @@ import avenyrh.editor.Inspector;
 import avenyrh.editor.IInspectable;
 import avenyrh.imgui.ImGui;
 
-@:rtti
 class Process extends Uniq implements IInspectable
 {
     /**
      * All process at the root
      */
+    @noSerial
     static var ROOTS : Array<Process> = [];
 
     /**
      * Scene s2d
      */
+    @noSerial
     public static var S2D : h2d.Scene;
 
     /**
@@ -33,29 +34,34 @@ class Process extends Uniq implements IInspectable
     /**
      * Is the process destroyed
      */
+    @noSerial
     @hideInInspector
     public var destroyed (default, null) : Bool;
 
     /**
      * Root of the graphic layer
      */
+    @noSerial
     public var root : Null<h2d.Layers>;
 
     /**
      * Width of the Window
      */
+    @noSerial
     @hideInInspector
     public var width (get, never) : Int;
 
     /**
      * Height of the Window
      */
+    @noSerial
     @hideInInspector
     public var height (get, never) : Int;
 
     /**
      * Time elapsed since the start of the Engine
      */
+    @noSerial
     public static var time (default, null) : Float;
 
     var parent : Process;

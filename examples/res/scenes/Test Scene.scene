@@ -1,4 +1,17 @@
 {
+	"Camera": {
+		"i_shakePower": 1,
+		"i_smooth": 1,
+		"i_deadzone": 6,
+		"s_name": "Camera",
+		"u_uID": "821709968284",
+		"i_zoom": 1,
+		"i_x": 0,
+		"i_y": 0,
+		"i_shakeSpeed": 1,
+		"b_paused": false,
+		"b_snap": false
+	},
 	"Scene": {
 		"s_Name": "Test Scene",
 		"s_testString": "This is a test string",
@@ -11,11 +24,13 @@
 			5,
 			6
 		],
+		"s_name": "Test Scene",
 		"s_Class path": "examples.src.TestScene",
-		"g_testGo": "979823494708",
+		"u_uID": "151449406567",
+		"b_paused": false,
+		"g_testGo": "585484535854",
 		"b_testBool": true,
 		"e_testEnum": "Value1",
-		"s_uID": "288856835187",
 		"i_testInt": 4,
 		"f_testFloat": 2.6
 	}

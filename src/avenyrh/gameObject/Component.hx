@@ -5,7 +5,6 @@ import avenyrh.editor.Inspector;
 import avenyrh.engine.Uniq;
 import avenyrh.imgui.ImGui;
 
-@:rtti
 @:allow(avenyrh.gameObject.GameObject)
 class Component extends Uniq
 {
@@ -27,9 +26,10 @@ class Component extends Uniq
     /**
      * Is the component destroyed
      */
+    @noSerial
     public var destroyed (default, null) : Bool;
 
-    private var started : Bool;
+    var started : Bool;
 
     public function new(?name : String, ?id : Null<Int64>) 
     {

@@ -10,19 +10,20 @@ import avenyrh.editor.IInspectable;
 import avenyrh.engine.Scene;
 import avenyrh.engine.Engine;
 
-@:rtti
 @:allow(avenyrh.engine.Scene, avenyrh.gameObject.Transform)
 class GameObject extends Uniq implements IInspectable
 {
     /**
      * Scene the gameObject is on
      */
+    @noSerial
     @hideInInspector
     public var scene : Scene;
 
     /**
      * Is the gameObject destroyed
      */
+    @noSerial
     @hideInInspector
     public var destroyed (default, null) : Bool;
 

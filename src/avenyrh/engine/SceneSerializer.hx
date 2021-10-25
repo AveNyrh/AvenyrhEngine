@@ -1,6 +1,8 @@
 package avenyrh.engine;
 
 using Lambda;
+import haxe.Int64;
+import avenyrh.engine.Uniq;
 import avenyrh.gameObject.Component;
 import avenyrh.gameObject.GameObject;
 import avenyrh.utils.JsonUtils;
@@ -22,30 +24,24 @@ class SceneSerializer
 
     static var map : StringMap<Dynamic>;
 
+    static var rtti : haxe.rtti.CType.Classdef;
+
     //-------------------------------
     //#region Public static API
     //-------------------------------
     public static function serialize(scene : Scene) @:privateAccess
     {
         var data : StringMap<Dynamic> = new StringMap();
-        var rtti : haxe.rtti.CType.Classdef = haxe.rtti.Rtti.getRtti(Type.getClass(scene));
-
-        map = new StringMap();
 
         //Scene
+        addObject(scene);
         addValue("Name", scene.name);
         addValue("Class path", getClassPath(scene));
-        addValue("uID", scene.uID.toString());
-
-        for(f in rtti.fields)
-        {
-            if((f.isPublic || f.meta.exists(m -> m.name == "serializable")) && f.type.getName() != "CFunction")
-            {
-                addValue(f.name, Reflect.getProperty(scene, f.name));
-            }
-        }
-
+        //addValue("uID", scene.uID.toString());
         data.set("Scene", map);
+
+        //Camera
+        data.set("Camera", addObject(scene.camera));
 
         //Add gameobjects, components ...
 
@@ -89,13 +85,55 @@ class SceneSerializer
     //-------------------------------
     //#region Private static API
     //-------------------------------
-    static function addObject(name : String, object : Dynamic)
+    static function addObject(object : Dynamic, ?newObject : Bool = true, ?currentClass : Null<Class<Dynamic>> = null) : StringMap<Dynamic> @:privateAccess
     {
-        switch Type.typeof(object)
+        if(newObject)
+            map = new StringMap<Dynamic>();
+
+        if(currentClass != null)
+            rtti = haxe.rtti.Rtti.getRtti(currentClass);
+        else
+            rtti = haxe.rtti.Rtti.getRtti(Type.getClass(object));
+
+        //Add class specific fields
+        // if(Std.isOfType(object, GameObject))
+        // {
+        //     //GameObject data
+        //     var go : GameObject = cast(object, GameObject);
+        //     addValue("name", go.name);
+        //     addValue("uID", go.uID.toString());
+        //     addValue("enable", go.enable);
+        //     addValue("x", go.x);
+        //     addValue("y", go.y);
+        // }
+        // else if (Std.isOfType(object, Component))
+        // {
+        //     //Component data
+        //     var comp : Component = cast(object, Component);
+        // }
+        // else if (Std.isOfType(object, Process))
+        // {
+        //     //Process data
+        //     var process : Process = cast(object, Process);
+        //     addValue("name", process.name);
+        //     addValue("uID", process.uID.toString());
+        //     addValue("paused", process.paused);
+        // }
+
+        //Add additional fields
+        for(f in rtti.fields)
         {
-			case _:
-				throw 'Unknown object type $name = $object (' + Type.typeof(object) + ')';
+            if((f.isPublic || f.meta.exists(m -> m.name == "serializable")) && !f.meta.exists(m -> m.name == "noSerial") && f.type.getName() != "CFunction")
+            {
+                addValue(f.name, Reflect.getProperty(object, f.name));
+            }
         }
+
+        //Add superClass info
+        if(rtti.superClass.path != null && Std.string(currentClass) != Std.string(Uniq))
+            addObject(object, false, Type.resolveClass(rtti.superClass.path));
+
+        return map;
     }
 
     /**
@@ -108,9 +146,17 @@ class SceneSerializer
      * g : gameObject
      * i : int
      * s : string
+     * u : uID
      */
     static function addValue(name : String, value : Dynamic) @:privateAccess
     {
+        //Handle uID here, problem with Int64 class type in the switch
+        if(name == "uID")
+        {
+            map.set('u_$name', Int64.toStr(value));
+            return;
+        }
+
         switch Type.typeof(value) 
         {
             case TInt :
@@ -148,7 +194,7 @@ class SceneSerializer
 
     static function setInstanceFields(inst : Dynamic, dataMap : StringMap<Dynamic>)
     {
-        var fields : Array<String> = Type.getClassFields(inst);
+        var fields : Array<String> = Type.getInstanceFields(inst);
 
         for(key => value in dataMap)
         {

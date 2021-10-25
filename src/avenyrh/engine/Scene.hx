@@ -10,18 +10,22 @@ class Scene extends Process
     /**
      * Parent for the scene graphs
      */
+    @noSerial
     public var scroller : h2d.Layers;
 
     /**
      * UI container
      */
+    @noSerial
     public var ui : Flow;
     
     /**
      * Current active camera in the scene
      */
+    @noSerial
     public var camera : Camera;
 
+    @noSerial
     public var miscInspectable : Array<IInspectable>;
 
     var allGO : Array<GameObject> = [];

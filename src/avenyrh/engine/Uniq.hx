@@ -2,6 +2,7 @@ package avenyrh.engine;
 
 import haxe.Int64;
 
+@:rtti
 class Uniq extends hl.BaseType.Class
 {
     public var uID (default, null) : Int64;
