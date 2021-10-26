@@ -88,4 +88,10 @@ class StringUtils
           default : null;
        }
     }
+
+    public static inline function getClass(o : Dynamic) : String
+    {
+        var arr = Std.string(Type.getClass(o)).split("$");
+        return arr[1];
+    }
 }
