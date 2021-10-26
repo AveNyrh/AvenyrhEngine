@@ -21,16 +21,12 @@ class TestScene extends Scene
 
     var privateInt = -1;
 
-    public override function new() 
-    {
-        super("Test Scene");
-    }
-
     override function added() 
     {
         super.added();
 
         testGo = new GameObject("TestGo", null);
+        testGo.addComponent(new TestComponent());
     }
 }
 

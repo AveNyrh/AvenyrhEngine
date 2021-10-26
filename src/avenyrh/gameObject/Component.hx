@@ -1,5 +1,6 @@
 package avenyrh.gameObject;
 
+import avenyrh.utils.StringUtils;
 import haxe.Int64;
 import avenyrh.editor.Inspector;
 import avenyrh.engine.Uniq;
@@ -11,7 +12,7 @@ class Component extends Uniq
     /**
      * Name of the component
      */
-    public var name (default, null) : Null<String>;
+    public var name (default, null) : String;
 
     /**
      * Is the component enable or not
@@ -37,7 +38,10 @@ class Component extends Uniq
 
         destroyed = false;
 
-        this.name = name;
+        if(name == null)
+            this.name = StringUtils.getClass(this);
+        else 
+            this.name = name;
 
         started = false;
         enable = true;

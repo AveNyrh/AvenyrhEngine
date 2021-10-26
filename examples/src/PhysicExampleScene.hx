@@ -8,11 +8,6 @@ class PhysicExampleScene extends PhysicScene
     var po2 : PhysicObject;
     var so : StaticObject;
 
-    override public function new() 
-    {
-        super("PhysicScene");
-    }
-
     override function added() 
     {
         super.added();

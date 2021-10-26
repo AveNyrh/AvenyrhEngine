@@ -12,11 +12,6 @@ class GameObjectScene extends Scene
     var go : GameObject;
     var go2 : GameObject;
 
-    public override function new() 
-    {
-        super("Game Object Scene");
-    }
-
     override function added() 
     {
         super.added();

@@ -45,12 +45,7 @@ class UIScene extends Scene
     var dropdown : Dropdown;
 
     var fold : Fold;
-
-    public override function new() 
-    {
-        super("TestScene");
-    }
-
+    
     override function added() 
     {
         super.added();

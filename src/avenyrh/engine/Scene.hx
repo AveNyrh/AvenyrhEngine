@@ -1,5 +1,6 @@
 package avenyrh.engine;
 
+import avenyrh.utils.StringUtils;
 import h2d.Flow;
 import avenyrh.gameObject.GameObject;
 import avenyrh.editor.IInspectable;
@@ -30,13 +31,15 @@ class Scene extends Process
 
     var allGO : Array<GameObject> = [];
 
-    var rootGO : GameObject;
+    @serializable
+    @hideInInspector
+    var rootGo : GameObject;
 
     var goToRemove : Array<GameObject> = [];
 
-    override public function new(name : String) 
+    override public function new() 
     {
-        super(name);
+        super(StringUtils.getClass(this));
         paused = true;
 
         createRoot(Process.S2D);
@@ -54,15 +57,22 @@ class Scene extends Process
     @:noCompletion
     function _added() 
     {
-        ui = new Flow();
-        root.add(ui, 1);
-        ui.minWidth = ui.maxWidth = width;
-        ui.minHeight = ui.maxHeight = height;
+        if(ui == null)
+        {
+            ui = new Flow();
+            root.add(ui, 1);
+            ui.minWidth = ui.maxWidth = width;
+            ui.minHeight = ui.maxHeight = height;
+        }
 
-        scroller = new h2d.Layers();
-        root.add(scroller, 0);
+        if(scroller == null)
+        {
+            scroller = new h2d.Layers();
+            root.add(scroller, 0);
+        }
 
-        rootGO = new GameObject("Root");
+        if(rootGo == null)
+            rootGo = new GameObject("Root");
         
         paused = false;
 
@@ -146,13 +156,13 @@ class Scene extends Process
      */
     public function addGameObject(gameObject : GameObject) 
     {
-        if(rootGO == null)
+        if(rootGo == null)
             return;
 
         allGO.push(gameObject);
         
         if(gameObject.parent == null)
-            gameObject.parent = rootGO;
+            gameObject.parent = rootGo;
     }
 
     /**
