@@ -1,9 +1,9 @@
 package avenyrh.utils;
 
-import haxe.ds.StringMap;
-import haxe.DynamicAccess;
-import avenyrh.engine.Uniq;
 import sys.io.File;
+import haxe.DynamicAccess;
+import haxe.ds.StringMap;
+import avenyrh.engine.Uniq;
 import avenyrh.gameObject.Component;
 import avenyrh.gameObject.GameObject;
 
@@ -140,11 +140,14 @@ class JsonUtils
         fo.writeString(data);
         fo.close();
 		
-		trace("Saved Json");
-		trace("Path : " + path);
-		trace("Data : \n" + data);
+		trace('Json saved at $path');
     }
 
+	/**
+	 * Parse Json retrieved data to StringMap format
+	 * 
+	 * haxe.Json.parse gives DynamicAccess type
+	 */
 	public static function parseToStringMap(dyn : DynamicAccess<Dynamic>) : StringMap<Dynamic>
 	{
 		var sm : StringMap<Dynamic> = new StringMap<Dynamic>();
@@ -234,6 +237,7 @@ class JsonUtils
 				}
 
 			case TClass(GameObject), TClass(Component):
+				//When storing gameObjects or components, store their uID to reference them
 				var id : String = haxe.Int64.toStr(cast(v, Uniq).uID);
 				name == null ? buf.add(Std.string(id)) : buf.add('"$name"$preSpace:$postSpace$id');
 
