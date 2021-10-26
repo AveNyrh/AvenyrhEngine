@@ -69,10 +69,10 @@ class Inspector extends EditorWidget
         ImGui.separator();
         if(ImGui.treeNodeEx("Game", flags))
         {
-            for(i in 0 ... @:privateAccess scene.rootGO.children.length)
+            for(i in 0 ... @:privateAccess scene.rootGo.children.length)
             {
                 ImGui.spacing();
-                var insp : IInspectable = @:privateAccess scene.rootGO.children[i].drawHierarchy();
+                var insp : IInspectable = @:privateAccess scene.rootGo.children[i].drawHierarchy();
 
                 if(insp != null)
                     currentInspectable = insp;

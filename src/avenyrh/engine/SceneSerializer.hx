@@ -7,7 +7,6 @@ import avenyrh.gameObject.Component;
 import avenyrh.gameObject.GameObject;
 import avenyrh.utils.JsonUtils;
 import haxe.ds.StringMap;
-import sys.io.FileOutput;
 import sys.io.File;
 
 class SceneSerializer 
@@ -34,9 +33,7 @@ class SceneSerializer
         var data : StringMap<Dynamic> = new StringMap();
 
         //Scene
-        addObject(scene);
-        addValue("Class path", getClassPath(scene));
-        data.set("Scene", map);
+        data.set("Scene", addObject(scene));
 
         //Camera
         data.set("Camera", addObject(scene.camera));
@@ -60,16 +57,15 @@ class SceneSerializer
         data.set("Components", components);
 
         //Write data
-        var p : String = path + scene.name + ".scene";
-        var fo : FileOutput = File.write(p, false);
-        fo.writeString(JsonUtils.stringify(data, Full));
-        fo.close();
-
-        trace('${scene.name} serialized');
+        var p : String = path + scene.name + ".scene";        
+        JsonUtils.saveJson(p, JsonUtils.stringify(data, Full));
     }
 
     public static function deserialize(name : String) : Bool
     {
+        map = new StringMap<Dynamic>();
+        var uniqMap : StringMap<Uniq> = new StringMap<Uniq>();
+
         //Retrieve content
         var p : String = path + name + ".scene";
         var s : String = File.getContent(p);
@@ -81,29 +77,35 @@ class SceneSerializer
         var sceneData : StringMap<Dynamic> = JsonUtils.parseToStringMap(data.get("Scene"));
 
         //Build a scene class from string
-        var c = Type.resolveClass(sceneData.get("s_class path"));
+        var c = Type.resolveClass(sceneData.get("s_classPath"));
         var instance : Class<Dynamic> = Type.createInstance(c, [sceneData.get("s_name")]);
 
         //Set scene data
         setInstanceFields(instance, sceneData);
+        uniqMap.set(sceneData.get("u_uID"), cast instance);
 
         //Cast instance to Scene to instantiate gameObject
         var scene : Scene = cast instance;
+
+        //------ RootGo ------
+        var rootGo : GameObject = new GameObject("Root", null, Int64.parseString(sceneData.get("g_rootGo")));
+        uniqMap.set(sceneData.get("g_rootGo"), cast rootGo);
+        @:privateAccess scene.rootGo = rootGo;
 
         //------ Camera ------
         //Retrieve camera specific data
         var cameraData : StringMap<Dynamic> = JsonUtils.parseToStringMap(data.get("Camera"));
 
         //Build a camera class from string
-        var c = Type.resolveClass(cameraData.get("s_class path"));
+        var c = Type.resolveClass(cameraData.get("s_classPath"));
         var instance : Class<Dynamic> = Type.createInstance(c, [cameraData.get("s_name")]);
 
         //Set camera data
         setInstanceFields(instance, cameraData);
         scene.camera = cast instance;
+        @:privateAccess scene.camera.scene = scene;
 
         //------ Game Objects ------
-        var uniqMap : StringMap<Uniq> = new StringMap<Uniq>();
         var goData : Array<Dynamic> = cast data.get("GameObjects");
 
         if(goData != null && goData.length > 0)
@@ -112,14 +114,14 @@ class SceneSerializer
             {
                 //Create instance
                 var d : StringMap<Dynamic> = JsonUtils.parseToStringMap(go);
-                var c = Type.resolveClass(d.get("s_class path"));
+                var c = Type.resolveClass(d.get("s_classPath"));
                 var inst : Class<Dynamic> = Type.createInstance(c, [d.get("s_name")]);
 
                 //Set gameObject data
                 setInstanceFields(inst, d);
 
                 //Store gameObject for later
-                uniqMap.set(d.get("s_uID"), cast inst);
+                uniqMap.set(d.get("u_uID"), cast inst);
             }
         }
 
@@ -132,14 +134,35 @@ class SceneSerializer
             {
                 //Create instance
                 var d : StringMap<Dynamic> = JsonUtils.parseToStringMap(comp);
-                var c = Type.resolveClass(d.get("s_class path"));
+                var c = Type.resolveClass(d.get("s_classPath"));
                 var inst : Class<Dynamic> = Type.createInstance(c, [d.get("s_name")]);
 
                 //Set gameObject data
                 setInstanceFields(inst, d);
 
                 //Store gameObject for later
-                uniqMap.set(d.get("s_uID"), cast inst);
+                uniqMap.set(d.get("u_uID"), cast inst);
+            }
+        }
+
+        //Restore gameObject and component fields refs
+        for(uid => inst in uniqMap)
+        {
+            //For each uniq that has been referenced somewhere
+            var arr : Array<String> = map.get(uid);
+
+            //Null check just in case, should never happen
+            if(arr == null)
+                continue;
+
+            for(a in arr)
+            {
+                //Get reference infos
+                var value : Array<String> = a.split(underscore);
+                var fieldName : String = value[0];
+                var objUID : String = value[1];
+
+                Reflect.setField(inst, fieldName, cast uniqMap.get(objUID));
             }
         }
 
@@ -154,12 +177,12 @@ class SceneSerializer
     //-------------------------------
     //#region Private static API
     //-------------------------------
-    static function addObject(object : Dynamic, ?newObject : Bool = true, ?currentClass : Null<Class<Dynamic>> = null) : StringMap<Dynamic> @:privateAccess
+    static function addObject(object : Dynamic, ?newObject : Bool = true, ?currentClass : Null<Class<Dynamic>> = null) : StringMap<Dynamic>
     {
         if(newObject)
         {
             map = new StringMap<Dynamic>();
-            addValue("class path", getClassPath(object));
+            addValue("classPath", getClassPath(object));
         }
 
         if(currentClass != null)
@@ -197,7 +220,7 @@ class SceneSerializer
      * s : string
      * u : uID
      */
-    static function addValue(name : String, value : Dynamic) @:privateAccess
+    static function addValue(name : String, value : Dynamic)
     {
         //Handle uID here, problem with Int64 class type in the switch
         if(name == "uID")
@@ -222,11 +245,11 @@ class SceneSerializer
 
             case TClass(GameObject) :
                 var go : GameObject = cast value;
-                map.set('g_$name', go.uID.toString());
+                map.set('g_$name', Int64.toStr(go.uID));
 
             case TClass(Component) :
                 var comp : Component = cast value;
-                map.set('c_$name', comp.uID.toString());
+                map.set('c_$name', Int64.toStr(comp.uID));
 
             case TClass(Array) :
                 map.set('a_$name', value);
@@ -243,26 +266,25 @@ class SceneSerializer
 
     static function setInstanceFields(inst : Dynamic, dataMap : StringMap<Dynamic>)
     {
-        var fields : Array<String> = Type.getInstanceFields(inst);
+        var uID : String = dataMap.get("u_uID");
+        var fields : Array<String> = Type.getClassFields(inst);
 
         for(key => value in dataMap)
         {
-            if(!fields.contains(key))
-                continue;
-
             var arr : Array<String> = key.split(underscore);
             var type : String = arr[0];
             var fieldName : String = arr[1];
 
-            trace ('$type - $fieldName = $value');
+            if(!fields.contains(fieldName))
+                continue;
 
             switch (type)
             {
                 case "f", "i", "s" : //float, int, string
-                    Reflect.setField(inst, fieldName, dataMap.get(fieldName));
+                    Reflect.setField(inst, fieldName, dataMap.get(key));
 
                 case "b" : //Bool
-                    Reflect.setField(inst, fieldName, dataMap.get(fieldName) == "true");
+                    Reflect.setField(inst, fieldName, dataMap.get(key) == "true");
 
                 case "e": //Enum
                     var ev : EnumValue = cast Reflect.getProperty(inst, fieldName);
@@ -270,13 +292,32 @@ class SceneSerializer
                     Reflect.setField(inst, fieldName, Type.createEnumIndex(e, ev.getIndex()));
 
                 case "g" : //GameObject
-                    trace('GameObject ${fieldName}');
+                    var arr : Array<String> = map.get(uID);
+
+                    //Create array if first time
+                    if(arr == null)
+                        arr = [];
+
+                    //Push data to this format : myGameObjectField_uID
+                    arr.push('${fieldName}_${value}');
+                    map.set(uID, arr);
 
                 case "c" : //Component
-                    trace('GameObject ${fieldName}');
+                    var arr : Array<String> = map.get(uID);
+
+                    //Create array if first time
+                    if(arr == null)
+                        arr = [];
+
+                    //Push data to this format : myComponentField_uID
+                    arr.push('${fieldName}_${value}');
+                    map.set(uID, arr);
+                
+                case "u" : //UID
+                    Reflect.setField(inst, fieldName, Int64.parseString(dataMap.get(key)));
 
                 case _:
-                    trace('Not supported deserialization for ${fieldName}');
+                    trace('Deserialization not supported for ${fieldName}');
             }
         }
     }
