@@ -35,15 +35,29 @@ class SceneSerializer
 
         //Scene
         addObject(scene);
-        addValue("Name", scene.name);
         addValue("Class path", getClassPath(scene));
-        //addValue("uID", scene.uID.toString());
         data.set("Scene", map);
 
         //Camera
         data.set("Camera", addObject(scene.camera));
 
         //Add gameobjects, components ...
+        var gameObjects : Array<StringMap<Dynamic>> = [];
+        var components : Array<StringMap<Dynamic>> = [];
+
+        for(go in scene.allGO)
+        {
+            //Add gameObject
+            gameObjects.push(addObject(go));
+
+            //Add each component of this gameObject
+            for(c in go.components)
+                components.push(addObject(c));
+        }
+
+        //Add gameObjects and components data
+        data.set("GameObjects", gameObjects);
+        data.set("Components", components);
 
         //Write data
         var p : String = path + scene.name + ".scene";
@@ -62,19 +76,74 @@ class SceneSerializer
         var dyn : haxe.DynamicAccess<Dynamic> = haxe.Json.parse(s);
         var data : StringMap<haxe.DynamicAccess<Dynamic>> = JsonUtils.parseToStringMap(dyn);
 
+        //------ Scene ------
         //Retrieve scene specific data
         var sceneData : StringMap<Dynamic> = JsonUtils.parseToStringMap(data.get("Scene"));
 
-        //Build a class from string
-        var c = Type.resolveClass(sceneData.get("s_Class path"));
-        var instance : Class<Dynamic> = Type.createInstance(c, [sceneData.get("s_Name")]);
+        //Build a scene class from string
+        var c = Type.resolveClass(sceneData.get("s_class path"));
+        var instance : Class<Dynamic> = Type.createInstance(c, [sceneData.get("s_name")]);
 
         //Set scene data
         setInstanceFields(instance, sceneData);
 
-        //Add GameObject, Components ...
+        //Cast instance to Scene to instantiate gameObject
+        var scene : Scene = cast instance;
 
-        SceneManager.addScene(cast instance);
+        //------ Camera ------
+        //Retrieve camera specific data
+        var cameraData : StringMap<Dynamic> = JsonUtils.parseToStringMap(data.get("Camera"));
+
+        //Build a camera class from string
+        var c = Type.resolveClass(cameraData.get("s_class path"));
+        var instance : Class<Dynamic> = Type.createInstance(c, [cameraData.get("s_name")]);
+
+        //Set camera data
+        setInstanceFields(instance, cameraData);
+        scene.camera = cast instance;
+
+        //------ Game Objects ------
+        var uniqMap : StringMap<Uniq> = new StringMap<Uniq>();
+        var goData : Array<Dynamic> = cast data.get("GameObjects");
+
+        if(goData != null && goData.length > 0)
+        {
+            for(go in goData)
+            {
+                //Create instance
+                var d : StringMap<Dynamic> = JsonUtils.parseToStringMap(go);
+                var c = Type.resolveClass(d.get("s_class path"));
+                var inst : Class<Dynamic> = Type.createInstance(c, [d.get("s_name")]);
+
+                //Set gameObject data
+                setInstanceFields(inst, d);
+
+                //Store gameObject for later
+                uniqMap.set(d.get("s_uID"), cast inst);
+            }
+        }
+
+        //------ Components ------
+        var compData : Array<Dynamic> = cast data.get("Components");
+
+        if(compData != null && compData.length > 0)
+        {
+            for(comp in compData)
+            {
+                //Create instance
+                var d : StringMap<Dynamic> = JsonUtils.parseToStringMap(comp);
+                var c = Type.resolveClass(d.get("s_class path"));
+                var inst : Class<Dynamic> = Type.createInstance(c, [d.get("s_name")]);
+
+                //Set gameObject data
+                setInstanceFields(inst, d);
+
+                //Store gameObject for later
+                uniqMap.set(d.get("s_uID"), cast inst);
+            }
+        }
+
+        SceneManager.addScene(scene);
 
         trace('${sceneData.get("s_Name")} deserialized');
 
@@ -88,37 +157,15 @@ class SceneSerializer
     static function addObject(object : Dynamic, ?newObject : Bool = true, ?currentClass : Null<Class<Dynamic>> = null) : StringMap<Dynamic> @:privateAccess
     {
         if(newObject)
+        {
             map = new StringMap<Dynamic>();
+            addValue("class path", getClassPath(object));
+        }
 
         if(currentClass != null)
             rtti = haxe.rtti.Rtti.getRtti(currentClass);
         else
             rtti = haxe.rtti.Rtti.getRtti(Type.getClass(object));
-
-        //Add class specific fields
-        // if(Std.isOfType(object, GameObject))
-        // {
-        //     //GameObject data
-        //     var go : GameObject = cast(object, GameObject);
-        //     addValue("name", go.name);
-        //     addValue("uID", go.uID.toString());
-        //     addValue("enable", go.enable);
-        //     addValue("x", go.x);
-        //     addValue("y", go.y);
-        // }
-        // else if (Std.isOfType(object, Component))
-        // {
-        //     //Component data
-        //     var comp : Component = cast(object, Component);
-        // }
-        // else if (Std.isOfType(object, Process))
-        // {
-        //     //Process data
-        //     var process : Process = cast(object, Process);
-        //     addValue("name", process.name);
-        //     addValue("uID", process.uID.toString());
-        //     addValue("paused", process.paused);
-        // }
 
         //Add additional fields
         for(f in rtti.fields)
@@ -137,6 +184,8 @@ class SceneSerializer
     }
 
     /**
+     * Adds a value to the map to insert into the Json
+     * Value is like this -> prefix_name : value
      * Prefixes :
      * a : array
      * b : bool
