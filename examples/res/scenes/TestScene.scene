@@ -4,7 +4,7 @@
 		"i_smooth": 1,
 		"i_deadzone": 6,
 		"s_name": "Camera",
-		"u_uID": "454631590333",
+		"u_uID": "376988653356",
 		"i_zoom": 1,
 		"i_x": 0,
 		"i_y": 0,
@@ -17,7 +17,7 @@
 		{
 			"a_children": [],
 			"s_name": "TestGo",
-			"u_uID": "202567652196",
+			"u_uID": "153252673449",
 			"i_scaleX": 1,
 			"i_scaleY": 1,
 			"i_x": 0,
@@ -25,7 +25,7 @@
 			"b_enable": true,
 			"i_rotation": 0,
 			"s_classPath": "avenyrh.gameObject.GameObject",
-			"g_parent": "322772073880"
+			"g_parent": "274442238840"
 		}
 	],
 	"Scene": {
@@ -40,12 +40,12 @@
 			6
 		],
 		"s_name": "TestScene",
-		"u_uID": "503849665767",
+		"u_uID": "578561952692",
 		"b_paused": false,
-		"g_testGo": "202567652196",
+		"g_testGo": "153252673449",
 		"b_testBool": true,
-		"e_testEnum": "Value1",
-		"g_rootGo": "322772073880",
+		"e_testEnum": "Value2",
+		"g_rootGo": "274442238840",
 		"i_testInt": 4,
 		"s_classPath": "examples.src.TestScene",
 		"f_testFloat": 2.6
@@ -54,11 +54,11 @@
 		{
 			"s_testString": "This is a test string",
 			"s_name": "TestComponent",
-			"u_uID": "198087546339",
-			"g_gameObject": "202567652196",
+			"u_uID": "149737713932",
+			"g_gameObject": "153252673449",
 			"b_testBool": true,
 			"b_enable": true,
-			"i_testInt": 4,
+			"i_testInt": -10,
 			"s_classPath": "examples.src.TestComponent",
 			"f_testFloat": 2.6
 		}
