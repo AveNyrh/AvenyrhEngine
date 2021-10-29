@@ -64,9 +64,9 @@ class Camera extends Process
 
     var timer : Timer;
 
-    override public function new(name : String, ?parent : Process, scene : Scene) 
+    override public function new(name : String, scene : Scene) 
     {
-        super(name, parent);
+        super(name, scene);
 
         x = 0;
         y = 0;
