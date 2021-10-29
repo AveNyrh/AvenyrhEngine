@@ -85,11 +85,11 @@ class SceneManager
     /**
      * Scene on top of the list, should be the main scene
      */
-    public static var CurrentScene (get, never) : Scene; static inline function get_CurrentScene() return activeScenes[0];
+    public static var currentScene (get, never) : Scene; static inline function get_currentScene() return activeScenes[0];
 
     /**
      * Number of active scenes
      */
-    public static var SceneCount (get, never) : Int; static inline function get_SceneCount() return activeScenes.length;
+    public static var sceneCount (get, never) : Int; static inline function get_sceneCount() return activeScenes.length;
     //#endregion
 }
