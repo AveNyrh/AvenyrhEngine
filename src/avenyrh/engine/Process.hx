@@ -250,7 +250,7 @@ class Process extends Uniq implements IInspectable
 
     public function toString() : String
     {
-        return name + " : " + uID;
+        return '$name : ${Int64.toStr(uID)}';
     }
     //#endregion
     
