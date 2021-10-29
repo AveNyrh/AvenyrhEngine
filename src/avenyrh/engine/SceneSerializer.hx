@@ -204,9 +204,11 @@ class SceneSerializer
      * f : float
      * g : gameObject
      * i : int
+     * n : null
      * p : process
      * s : string
      * u : uID
+     * v2 : Vector2
      */
     static function addValue(name : String, value : Dynamic, map : StringMap<Dynamic>)
     {
@@ -219,6 +221,9 @@ class SceneSerializer
 
         switch Type.typeof(value) 
         {
+            case TNull :
+                map.set('n_$name', null);
+
             case TInt :
                 map.set('i_$name', value);
 
@@ -248,20 +253,25 @@ class SceneSerializer
             case _:
                 //Forced to test via Std.isOfType because the Type.typeOf returns the top class, 
                 //which might not be simply TClass(GameObject) or else
-                if(Std.isOfType(value, GameObject))
+                if(Std.isOfType(value, GameObject)) //GameObject
                 {
                     var go : GameObject = cast value;
                     map.set('g_$name', Int64.toStr(go.uID));
                 }
-                else if(Std.isOfType(value, Component))
+                else if(Std.isOfType(value, Component)) //Component
                 {
                     var comp : Component = cast value;
                     map.set('c_$name', Int64.toStr(comp.uID));
                 }
-                else if(Std.isOfType(value, Process))
+                else if(Std.isOfType(value, Process)) //Process
                 {
                     var proc : Process = cast value;
                     map.set('p_$name', Int64.toStr(proc.uID));
+                }
+                else if(rtti.fields.find(f -> f.name == name).type.match(CAbstract("avenyrh.Vector2", []))) //Vector2
+                {
+                    var v : Vector2 = cast value;
+                    map.set('v2_$name', [v.x, v.y]);
                 }
                 else 
                     trace('Unknown value type $name = $value (' + Type.typeof(value) + ')');
@@ -340,6 +350,9 @@ class SceneSerializer
 
             switch (type)
             {
+                case "n" : //Null
+                    Reflect.setField(inst, fieldName, null);
+
                 case "f", "i", "s", "b" : //Float, int, string, bool
                     Reflect.setField(inst, fieldName, dataMap.get(key));
 
@@ -362,6 +375,10 @@ class SceneSerializer
 
                 case "a" : //Array
                     Reflect.setField(inst, fieldName, getArray(key, value));
+
+                case "v2" : //Vector2
+                    var v : Array<Float> = cast value;
+                    Reflect.setField(inst, fieldName, new Vector2(v[0], v[1]));
 
                 case _ :
                     trace('Deserialization not supported for ${fieldName}');
