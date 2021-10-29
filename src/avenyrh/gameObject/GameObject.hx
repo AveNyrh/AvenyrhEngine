@@ -8,7 +8,6 @@ import avenyrh.imgui.ImGui;
 import avenyrh.editor.Inspector;
 import avenyrh.editor.IInspectable;
 import avenyrh.engine.Scene;
-import avenyrh.engine.Engine;
 
 @:allow(avenyrh.engine.Scene, avenyrh.gameObject.Transform)
 class GameObject extends Uniq implements IInspectable
@@ -68,7 +67,8 @@ class GameObject extends Uniq implements IInspectable
      */
     @hideInInspector
     public var scaleY (default, set) : Float = 1;
-
+    
+    @noSerial
     @hideInInspector
     public var parent (default, set) : Null<GameObject>;
 
@@ -79,13 +79,17 @@ class GameObject extends Uniq implements IInspectable
 
     var transformChanged : Bool = false;
 
+    @serializable
     var components : Array<Component>;
 
-    public function new(name : String = "", parent : GameObject = null, ?id : Null<Int64>) 
+    public function new(name : String = "", parent : GameObject = null, ?scene : Scene, ?id : Null<Int64>) 
     {
         super(id);
 
-        scene = SceneManager.CurrentScene;
+        if(scene == null)
+            this.scene = SceneManager.currentScene;
+        else
+            this.scene = scene;
         
         destroyed = false;
         components = [];
@@ -95,7 +99,7 @@ class GameObject extends Uniq implements IInspectable
         this.parent = parent;
         enable = true;
 
-        scene.addGameObject(this);
+        this.scene.addGameObject(this);
         
         init();
     }
@@ -343,8 +347,20 @@ class GameObject extends Uniq implements IInspectable
     //#region Children
     public function addChild(go : GameObject)
     {
-        children.push(go);
-        go.parent = this;
+        if(!children.contains(go))
+        {
+            children.push(go);
+            go.parent = this;
+        }
+    }
+
+    public function removeChild(go : GameObject)
+    {
+        if(children.contains(go))
+        {
+            children.remove(go);
+            go.parent = null;
+        }
     }
 
     /**
@@ -385,7 +401,7 @@ class GameObject extends Uniq implements IInspectable
 
     public function toString() : String 
     {
-        return '[$uID]$name';
+        return '[${Int64.toStr(uID)}]$name';
     }
     //#endregion
 
@@ -581,7 +597,9 @@ class GameObject extends Uniq implements IInspectable
         if(p != null)
         {
             parent = p;
-            parent.children.push(this);
+
+            if(!parent.children.contains(this))
+                parent.children.push(this);
         }
         else
             parent = null;

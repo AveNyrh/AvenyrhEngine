@@ -2,6 +2,7 @@ package examples.src;
 
 import avenyrh.gameObject.GameObject;
 import avenyrh.engine.Scene;
+import examples.src.TestComponent;
 
 class TestScene extends Scene
 {
@@ -19,14 +20,22 @@ class TestScene extends Scene
 
     public var testGo : GameObject;
 
+    public var testComp : TestComponent;
+
     var privateInt = -1;
 
     override function added() 
     {
         super.added();
 
-        testGo = new GameObject("TestGo", null);
-        testGo.addComponent(new TestComponent());
+        // testGo = new GameObject("TestGo", null);
+        // testComp = new TestComponent();
+        // testGo.addComponent(testComp);
+    }
+
+    override function update(dt : Float) 
+    {
+        super.update(dt);
     }
 }
 

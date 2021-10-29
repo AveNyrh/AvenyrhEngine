@@ -40,7 +40,7 @@ class Inspector extends EditorWidget
         //Hierarchy window
         ImGui.begin("Hierarchy");
 
-        var scene : Scene = SceneManager.CurrentScene;
+        var scene : Scene = SceneManager.currentScene;
 
         //Json
         if(ImGui.button("Serialize",  {x : 100, y : 20}))
@@ -52,7 +52,7 @@ class Inspector extends EditorWidget
             SceneSerializer.deserialize(scene.name);
 
         //Change this when having another (de)serialize button placement
-        scene = SceneManager.CurrentScene;
+        scene = SceneManager.currentScene;
 
         var flags : ImGuiTreeNodeFlags = DefaultOpen;
 

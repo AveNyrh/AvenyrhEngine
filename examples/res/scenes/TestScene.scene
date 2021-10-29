@@ -1,10 +1,10 @@
 {
 	"Camera": {
 		"i_shakePower": 1,
-		"i_smooth": 1,
+		"i_smooth": 2,
 		"i_deadzone": 6,
 		"s_name": "Camera",
-		"u_uID": "376988653356",
+		"u_uID": "103260641768",
 		"i_zoom": 1,
 		"i_x": 0,
 		"i_y": 0,
@@ -13,39 +13,56 @@
 		"b_snap": false,
 		"s_classPath": "avenyrh.Camera"
 	},
+	"RootGo": {
+		"a_children": {
+			"g_0": "366555165971"
+		},
+		"s_name": "Root",
+		"u_uID": "237011357690",
+		"i_scaleX": 1,
+		"i_scaleY": 1,
+		"i_x": 0,
+		"i_y": 0,
+		"b_enable": true,
+		"i_rotation": 0,
+		"a_components" : {},
+		"s_classPath": "avenyrh.gameObject.GameObject"
+	},
 	"GameObjects": [
 		{
-			"a_children": [],
+			"a_children" : {},
 			"s_name": "TestGo",
-			"u_uID": "153252673449",
+			"u_uID": "366555165971",
 			"i_scaleX": 1,
 			"i_scaleY": 1,
 			"i_x": 0,
 			"i_y": 0,
 			"b_enable": true,
 			"i_rotation": 0,
-			"s_classPath": "avenyrh.gameObject.GameObject",
-			"g_parent": "274442238840"
+			"a_components": {
+				"c_0": "362185239366"
+			},
+			"s_classPath": "avenyrh.gameObject.GameObject"
 		}
 	],
 	"Scene": {
 		"s_testString": "This is a test string",
-		"a_testIntArray": [
-			0,
-			1,
-			2,
-			3,
-			4,
-			5,
-			6
-		],
+		"a_testIntArray": {
+			"i_0": 0,
+			"i_1": 1,
+			"i_2": 2,
+			"i_3": 3,
+			"i_4": 4,
+			"i_5": 5,
+			"i_6": 6
+		},
+		"c_testComp": "362185239366",
 		"s_name": "TestScene",
-		"u_uID": "578561952692",
+		"u_uID": "933376125988",
 		"b_paused": false,
-		"g_testGo": "153252673449",
+		"g_testGo": "366555165971",
 		"b_testBool": true,
 		"e_testEnum": "Value2",
-		"g_rootGo": "274442238840",
 		"i_testInt": 4,
 		"s_classPath": "examples.src.TestScene",
 		"f_testFloat": 2.6
@@ -54,8 +71,8 @@
 		{
 			"s_testString": "This is a test string",
 			"s_name": "TestComponent",
-			"u_uID": "149737713932",
-			"g_gameObject": "153252673449",
+			"u_uID": "362185239366",
+			"g_gameObject": "366555165971",
 			"b_testBool": true,
 			"b_enable": true,
 			"i_testInt": -10,

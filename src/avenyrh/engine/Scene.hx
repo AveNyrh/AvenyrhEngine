@@ -24,15 +24,13 @@ class Scene extends Process
      * Current active camera in the scene
      */
     @noSerial
-    public var camera : Camera;
+    public var camera : Camera = null;
 
     @noSerial
     public var miscInspectable : Array<IInspectable>;
 
     var allGO : Array<GameObject> = [];
 
-    @serializable
-    @hideInInspector
     var rootGo : GameObject;
 
     var goToRemove : Array<GameObject> = [];
@@ -45,7 +43,9 @@ class Scene extends Process
         createRoot(Process.S2D);
 
         miscInspectable = [];
-        camera = new Camera("Camera", this, this);
+
+        if(camera == null)
+            camera = new Camera("Camera", this);
     }
 
     //-------------------------------
@@ -213,7 +213,7 @@ class Scene extends Process
 
     public override function toString() : String 
     { 
-        return "Scene " + name;
+        return 'Scene $name';
     }
     //#endregion
 }
