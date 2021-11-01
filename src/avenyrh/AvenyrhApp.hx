@@ -2,12 +2,15 @@ package avenyrh;
 
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
+import avenyrh.scene.ISceneManagerData;
 
 class AvenyrhApp extends hxd.App
 {
     public static var instance (default, null) : AvenyrhApp;
     
     public static var avenyrhEngine (default, null) : Engine;
+
+    public var sceneManagerData : ISceneManagerData = null;
 
     /**
      * Initialize the engine
@@ -18,7 +21,7 @@ class AvenyrhApp extends hxd.App
 
         instance = this;
 
-        avenyrhEngine = new Engine(s2d, engine);
+        avenyrhEngine = new Engine(s2d, engine, sceneManagerData);
     }
 
     /**

@@ -1,8 +1,9 @@
-package avenyrh.engine;
+package avenyrh.scene;
 
 using Lambda;
 import haxe.Int64;
 import avenyrh.engine.Uniq;
+import avenyrh.engine.Process;
 import avenyrh.gameObject.Component;
 import avenyrh.gameObject.GameObject;
 import avenyrh.utils.JsonUtils;
@@ -72,7 +73,7 @@ class SceneSerializer
      * To do :
      *  - Deserialize process children
      */
-    public static function deserialize(name : String) : Bool
+    public static function deserialize(name : String) : Scene
     {
         map = new StringMap<Dynamic>();
 
@@ -152,11 +153,9 @@ class SceneSerializer
             setInstanceFields(instAndData.inst, instAndData.data);
         }
 
-        SceneManager.addScene(scene);
-
         trace('${scene.name} deserialized');
 
-        return false;
+        return scene;
     }
     //#endregion
 

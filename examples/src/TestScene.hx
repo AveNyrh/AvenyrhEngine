@@ -1,7 +1,7 @@
 package examples.src;
 
 import avenyrh.gameObject.GameObject;
-import avenyrh.engine.Scene;
+import avenyrh.scene.Scene;
 import examples.src.TestComponent;
 
 class TestScene extends Scene

@@ -1,4 +1,7 @@
-package avenyrh.engine;
+package avenyrh.scene;
+
+import sys.io.File;
+import avenyrh.engine.Engine;
 
 class SceneManager
 {
@@ -16,6 +19,8 @@ class SceneManager
 
     static var activeScenes : Array<Scene> = [];
 
+    static var data : ISceneManagerData = null;
+
     //-------------------------------
     //#region Static API
     //-------------------------------
@@ -25,22 +30,56 @@ class SceneManager
      * @param engine 
      * @param initScene 
      */
-    static function init(engine : Engine, ?initScene : Scene)
+    static function init(engine : Engine, data : ISceneManagerData)
     {
         avenyrhEngine = engine;
+        SceneManager.data = data;
+        SceneSerializer.path = data.scenesFolderPath;
         activeScenes = [];
 
-        if(initScene != null)
-            addScene(initScene);
+        if(data.scenes.length > 0)
+            addScene(data.scenes[0]);
     }
 
     /**
     * Adds a new scene to be loaded by the engine
-    * @param scene The new scene to be loaded
+    * @param sceneName The new scene's name to be loaded
     * @param removeCurrent Remove the first scene and take its place, set it to false to add to the currentScene
     * @return The scene that was loaded
     */
-	public static function addScene(scene : Scene, ?removeCurrent : Bool = true) : Scene
+	public static function addScene(sceneName : String, ?removeCurrent : Bool = true) : Scene
+    {
+        if(data.scenes.contains(sceneName))
+        {
+            var s : Scene = _addScene(SceneSerializer.deserialize(sceneName), removeCurrent);
+            return s;
+        }
+
+        return null;
+    }
+
+    /**
+     * Removes a scene from the screen
+     * @param scene Scene to remove
+     */
+    public static function removeScene(scene : Scene) 
+    {
+        if(!activeScenes.contains(scene))
+            return;
+
+        activeScenes.remove(scene);
+        avenyrhEngine.removeChild(scene);
+        scene.removed();
+
+        if(OnSceneRemoved != null)
+            OnSceneRemoved(scene);
+    }
+    //#endregion
+
+    //-------------------------------
+    //#region Private static API
+    //-------------------------------
+	public static function _addScene(scene : Scene, ?removeCurrent : Bool = true) : Scene
     {
         if (activeScenes.length != 0 && removeCurrent)
         {
@@ -59,23 +98,6 @@ class SceneManager
             OnSceneAdded(scene);
 
         return scene;
-    }
-
-    /**
-     * Removes a scene from the screen
-     * @param scene Scene to remove
-     */
-    public static function removeScene(scene : Scene) 
-    {
-        if(!activeScenes.contains(scene))
-            return;
-
-        activeScenes.remove(scene);
-        avenyrhEngine.removeChild(scene);
-        scene.removed();
-
-        if(OnSceneRemoved != null)
-            OnSceneRemoved(scene);
     }
     //#endregion
 

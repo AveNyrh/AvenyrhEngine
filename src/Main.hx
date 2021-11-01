@@ -1,7 +1,8 @@
-import avenyrh.engine.SceneSerializer;
-import avenyrh.engine.SceneManager;
+import avenyrh.scene.SceneSerializer;
+import avenyrh.scene.SceneManager;
 import avenyrh.AvenyrhApp;
 import examples.src.*;
+import examples.src.TestScene;
 
 
 class Main extends AvenyrhApp
@@ -19,10 +20,9 @@ class Main extends AvenyrhApp
      */
     override function init() 
     {
-        super.init();
+        sceneManagerData = new SceneManagerData();
 
-        SceneSerializer.path = "examples/res/scenes/";
-        SceneManager.addScene(new TestScene());
+        super.init();
         //SceneManager.addScene(new GameObjectScene());
         //SceneManager.addScene(new UIScene());
         //SceneManager.addScene(new PFScene());

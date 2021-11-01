@@ -1,10 +1,12 @@
 package avenyrh.engine;
 
+import avenyrh.scene.ISceneManagerData;
+import h2d.Console;
+import avenyrh.scene.SceneManager;
+import avenyrh.editor.Editor;
+import avenyrh.InputManager;
 import avenyrh.physic.PhysicGameObject;
 import avenyrh.gameObject.ParticleComponent;
-import avenyrh.editor.Editor;
-import h2d.Console;
-import avenyrh.InputManager;
 
 class Engine extends Process
 {
@@ -16,7 +18,7 @@ class Engine extends Process
 
     var currentTime : Float = 0;
 
-    public function new(s : h2d.Scene, engine : h3d.Engine, ?initScene : Scene) 
+    public function new(s : h2d.Scene, engine : h3d.Engine, sceneManagerData : ISceneManagerData) 
     {
         super("Engine");
 
@@ -32,7 +34,7 @@ class Engine extends Process
         Process.S2D = s;
 
         //Scene manager
-        @:privateAccess SceneManager.init(this, initScene);
+        @:privateAccess SceneManager.init(this, sceneManagerData);
 
         //Resources
 		#if debug

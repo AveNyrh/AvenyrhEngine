@@ -4,9 +4,9 @@ import haxe.Int64;
 using Lambda;
 import haxe.EnumTools;
 import avenyrh.imgui.ImGui;
-import avenyrh.engine.Scene;
-import avenyrh.engine.SceneManager;
-import avenyrh.engine.SceneSerializer;
+import avenyrh.scene.Scene;
+import avenyrh.scene.SceneManager;
+import avenyrh.scene.SceneSerializer;
 import avenyrh.engine.Uniq;
 import h2d.Tile;
 
@@ -49,10 +49,16 @@ class Inspector extends EditorWidget
         ImGui.sameLine(110);
 
         if(ImGui.button("Deserialize",  {x : 100, y : 20}))
-            SceneSerializer.deserialize(scene.name);
+            SceneManager.addScene("TestScene");
 
         //Change this when having another (de)serialize button placement
         scene = SceneManager.currentScene;
+
+        if(scene == null)
+        {
+            ImGui.end();
+            return;
+        }
 
         var flags : ImGuiTreeNodeFlags = DefaultOpen;
 

@@ -1,15 +1,15 @@
 package avenyrh.gameObject;
 
-import haxe.Int64;
-import avenyrh.engine.SceneManager;
 using Lambda;
+import haxe.Int64;
 import avenyrh.engine.Uniq;
 import avenyrh.imgui.ImGui;
 import avenyrh.editor.Inspector;
 import avenyrh.editor.IInspectable;
-import avenyrh.engine.Scene;
+import avenyrh.scene.SceneManager;
+import avenyrh.scene.Scene;
 
-@:allow(avenyrh.engine.Scene, avenyrh.gameObject.Transform)
+@:allow(avenyrh.scene.Scene, avenyrh.gameObject.Transform)
 class GameObject extends Uniq implements IInspectable
 {
     /**

@@ -1,7 +1,7 @@
 package avenyrh;
 
 import avenyrh.utils.Timer;
-import avenyrh.engine.Scene;
+import avenyrh.scene.Scene;
 import avenyrh.gameObject.GameObject;
 import avenyrh.engine.Process;
 
