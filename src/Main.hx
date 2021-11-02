@@ -1,11 +1,7 @@
-import avenyrh.scene.SceneSerializer;
-import avenyrh.scene.SceneManager;
-import avenyrh.AvenyrhApp;
-import examples.src.*;
-import examples.src.TestScene;
+import avenyrh.EntryPoint;
+import examples.src.SceneManagerData;
 
-
-class Main extends AvenyrhApp
+class Main extends EntryPoint
 {
     /**
      * Main
@@ -16,16 +12,10 @@ class Main extends AvenyrhApp
     }
 
     /**
-     * Initialize the engine
+     * Initialize custom sceneManagerData
      */
-    override function init() 
+    function init() 
     {
         sceneManagerData = new SceneManagerData();
-
-        super.init();
-        //SceneManager.addScene(new GameObjectScene());
-        //SceneManager.addScene(new UIScene());
-        //SceneManager.addScene(new PFScene());
-        //SceneManager.addScene(new PhysicExampleScene());
     }
 }

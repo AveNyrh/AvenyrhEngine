@@ -1,14 +1,18 @@
 package avenyrh;
 
+import h2d.Console;
+import avenyrh.editor.Editor;
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
 import avenyrh.scene.ISceneManagerData;
 
-class AvenyrhApp extends hxd.App
+class EditorApp extends hxd.App
 {
-    public static var instance (default, null) : AvenyrhApp;
+    public static var instance (default, null) : EditorApp;
     
     public static var avenyrhEngine (default, null) : Engine;
+
+    public static var console (default, null) : Console;
 
     public var sceneManagerData : ISceneManagerData = null;
 
@@ -29,6 +33,13 @@ class AvenyrhApp extends hxd.App
         instance = this;
 
         avenyrhEngine = new Engine(s2d, engine, sceneManagerData);
+
+        //Console
+        console = new h2d.Console(hxd.res.DefaultFont.get(), s2d);
+        console.shortKeyChar = "²".code;
+
+        //Editor
+        new Editor();
     }
 
     /**

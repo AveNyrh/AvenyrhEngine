@@ -1,9 +1,7 @@
 package avenyrh.engine;
 
 import avenyrh.scene.ISceneManagerData;
-import h2d.Console;
 import avenyrh.scene.SceneManager;
-import avenyrh.editor.Editor;
 import avenyrh.InputManager;
 import avenyrh.physic.PhysicGameObject;
 import avenyrh.gameObject.ParticleComponent;
@@ -11,8 +9,6 @@ import avenyrh.gameObject.ParticleComponent;
 class Engine extends Process
 {
     public static var instance (default, null) : Engine;
-
-    public static var console (default, null) : Console;
 
     public var fixedFPS : Int = 30;
 
@@ -42,15 +38,6 @@ class Engine extends Process
 
         //Scene manager
         @:privateAccess SceneManager.init(this, sceneManagerData);
-
-        //Console
-        console = new h2d.Console(hxd.res.DefaultFont.get(), s);
-        console.shortKeyChar = "²".code;
-
-        //Editor
-        #if avenyrhEditor
-        new Editor();
-        #end
 
         //Init options
         InputManager.init();
