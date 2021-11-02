@@ -33,15 +33,15 @@ class Engine extends Process
         createRoot(s);
         Process.S2D = s;
 
-        //Scene manager
-        @:privateAccess SceneManager.init(this, sceneManagerData);
-
         //Resources
 		#if debug
 		hxd.Res.initLocal();
         #else
         hxd.Res.initEmbed();
         #end
+
+        //Scene manager
+        @:privateAccess SceneManager.init(this, sceneManagerData);
 
         //Console
         console = new h2d.Console(hxd.res.DefaultFont.get(), s);
