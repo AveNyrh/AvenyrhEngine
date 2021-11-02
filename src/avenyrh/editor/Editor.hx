@@ -6,7 +6,7 @@ import avenyrh.engine.Process;
 
 class Editor extends Process
 {
-    var enable : Bool;
+    var enable : Bool = true;
 
     var drawable : ImGuiDrawable;
 
@@ -14,11 +14,13 @@ class Editor extends Process
 
     var inspector : EditorWidget;
 
+    var sceneWindow : EditorWidget;
+
+    var contentWindow : EditorWidget;
+
     override public function new() 
     {
         super("Editor");
-
-        enable = true;
 
         createRoot(Process.S2D, 10);
         drawable = new ImGuiDrawable(root);
@@ -28,6 +30,8 @@ class Editor extends Process
 
         menuBar = new EditorMenuBar();
         inspector = new Inspector();
+        sceneWindow = new SceneWindow();
+        contentWindow = new ContentWindow();
     }
 
     //-------------------------------
@@ -61,6 +65,8 @@ class Editor extends Process
 
         menuBar.draw(dt);
         inspector.draw(dt);
+        sceneWindow.draw(dt);
+        contentWindow.draw(dt);
 
         ImGui.render();
         ImGui.endFrame();

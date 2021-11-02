@@ -14,7 +14,7 @@ class EditorApp extends hxd.App
 
     public static var console (default, null) : Console;
 
-    public var sceneManagerData : ISceneManagerData = null;
+    var sceneManagerData : ISceneManagerData = null;
 
     override public function new(sceneManagerData : ISceneManagerData) 
     {
@@ -33,6 +33,10 @@ class EditorApp extends hxd.App
         instance = this;
 
         avenyrhEngine = new Engine(s2d, engine, sceneManagerData);
+        
+        var win = hxd.Window.getInstance();
+        win.title = "Avenyrh Editor";
+        @:privateAccess win.window.maximize();
 
         //Console
         console = new h2d.Console(hxd.res.DefaultFont.get(), s2d);
