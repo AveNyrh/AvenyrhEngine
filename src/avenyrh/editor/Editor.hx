@@ -61,6 +61,13 @@ class Editor extends Process
 
         ImGui.newFrame();
 
+        var windowFlags : ImGuiWindowFlags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoBackground;
+        windowFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
+        ImGui.begin("Dockspace window", null, windowFlags);
+        var id : Int = ImGui.getID("Dockspace");
+        var dockFlags : ImGuiDockNodeFlags = ImGuiDockNodeFlags.None;
+        ImGui.dockSpace(id, {x : 0, y : 0}, dockFlags);
+
         //ImGui.showDemoWindow();
 
         menuBar.draw(dt);
@@ -68,6 +75,7 @@ class Editor extends Process
         sceneWindow.draw(dt);
         contentWindow.draw(dt);
 
+        ImGui.end();
         ImGui.render();
         ImGui.endFrame();
     }
