@@ -103,6 +103,19 @@ class Camera extends Process
             timer.stop();
     }
 
+    /**
+     * Moves by the specified amount, takes in count the rotation
+     */
+    public function move(dx : Float, dy : Float)
+    {
+        x += dx;
+		y += dy;
+    }
+    //#endregion
+
+    //--------------------
+    //#region Private API
+    //--------------------  
     override function update(dt:Float) 
     {
         super.update(dt);

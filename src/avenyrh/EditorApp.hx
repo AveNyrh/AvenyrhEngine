@@ -1,5 +1,6 @@
 package avenyrh;
 
+import avenyrh.scene.SceneManager;
 import h2d.Console;
 import avenyrh.editor.Editor;
 import avenyrh.engine.Engine;
@@ -15,6 +16,8 @@ class EditorApp extends hxd.App
     public static var console (default, null) : Console;
 
     var sceneManagerData : ISceneManagerData = null;
+
+    var editor : Editor;
 
     override public function new(sceneManagerData : ISceneManagerData) 
     {
@@ -43,7 +46,7 @@ class EditorApp extends hxd.App
         console.shortKeyChar = "²".code;
 
         //Editor
-        new Editor();
+        editor = new Editor();
     }
 
     /**
@@ -53,13 +56,23 @@ class EditorApp extends hxd.App
     override function update(dt : Float) 
     {
         super.update(dt);
-        Process.updateAll(dt);
+
+        @:privateAccess Process.updateAll(dt);
+        
+        if(SceneManager.currentScene != null)
+            @:privateAccess SceneManager.currentScene._updateInEditor(dt);
     }
 
     override function onResize() 
     {
         super.onResize();
 
-        Process.resizeAll();
+        @:privateAccess Process.resizeAll();
+    }
+
+    override function render(e : h3d.Engine) 
+    {
+        if(SceneManager.currentScene != null)
+            @:privateAccess SceneManager.currentScene._renderInEditor(e, editor.sceneWindow);
     }
 }

@@ -10,13 +10,13 @@ class Editor extends Process
 
     var drawable : ImGuiDrawable;
 
-    var menuBar : EditorWidget;
+    public var menuBar : EditorMenuBar;
 
-    var inspector : EditorWidget;
+    public var inspector : Inspector;
 
-    var sceneWindow : EditorWidget;
+    public var sceneWindow : SceneWindow;
 
-    var contentWindow : EditorWidget;
+    public var contentWindow : ContentWindow;
 
     override public function new() 
     {

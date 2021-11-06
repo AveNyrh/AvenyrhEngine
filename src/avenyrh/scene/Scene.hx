@@ -87,6 +87,86 @@ class Scene extends Process
         for (go in allGO)
             go.onResize();
     }
+
+    #if avenyrhEditor
+    var left : Int = hxd.Key.Q;
+    var right : Int = hxd.Key.D;
+    var up : Int = hxd.Key.Z;
+    var down : Int = hxd.Key.S;
+    var mvt : avenyrh.Vector2 = avenyrh.Vector2.ZERO;
+    var mvtSpeed : Float = 2;
+    var zoomSpeed : Float = 0.1;
+
+    @:noCompletion
+    function _updateInEditor(dt : Float) 
+    {
+        mvt = avenyrh.Vector2.ZERO;
+
+        if(hxd.Key.isDown(left))
+            mvt.x = 1;
+        if(hxd.Key.isDown(right))
+            mvt.x = -1;
+        if(hxd.Key.isDown(up))
+            mvt.y = 1;
+        if(hxd.Key.isDown(down))
+            mvt.y = -1;
+
+        if(hxd.Key.isPressed(hxd.Key.MOUSE_WHEEL_UP))
+            camera.zoom += zoomSpeed;
+        else if(hxd.Key.isPressed(hxd.Key.MOUSE_WHEEL_DOWN))
+            camera.zoom -= zoomSpeed;
+
+        mvt = mvt.normalize();
+        camera.move(mvt.x * mvtSpeed / camera.zoom, mvt.y * mvtSpeed / camera.zoom);
+        @:privateAccess camera.update(dt);
+    }
+
+    var renderTarget : h3d.mat.Texture = null;
+    var renderS2d : h2d.Scene = null;
+
+    @:noCompletion
+    function _renderInEditor(engine : h3d.Engine, sceneWindow : avenyrh.editor.SceneWindow) 
+    {
+        //Create new scene to render
+        if(renderS2d == null)
+            renderS2d = new h2d.Scene();
+
+        //Create target texture
+        if(renderTarget == null)
+            renderTarget = new h3d.mat.Texture(sceneWindow.width, sceneWindow.height, [Target]);
+
+        //Resize render target if necessary
+        if(sceneWindow.width != renderTarget.width || sceneWindow.height != renderTarget.height)
+        {
+            renderTarget.resize(sceneWindow.width, sceneWindow.height);
+            renderS2d.scaleMode = Stretch(sceneWindow.width, sceneWindow.height);
+        }
+
+        //Clear the render target
+        renderTarget.dispose();
+
+        //Add the root to the render scene
+        renderS2d.addChild(root);
+
+        //Push new render targe
+        engine.pushTarget(renderTarget);
+
+        //Render the scene
+        renderS2d.render(engine);
+
+        //Set the scene texture of the windowScene
+        sceneWindow.sceneTex = renderTarget;
+        
+        //Pop the render target
+        engine.popTarget();
+
+        //Render scene for ImGui
+        Process.S2D.render(engine);
+
+        //Add the root back to the correct scene
+        Process.S2D.addChild(root);
+    }
+    #end
     //#endregion
 
     //-------------------------------

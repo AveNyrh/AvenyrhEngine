@@ -9,7 +9,7 @@ class ContentWindow extends EditorWidget
         super.draw(dt);
 
         //Content window
-        ImGui.begin("Content");
+        ImGui.begin("Content", null, flags);
         
         ImGui.end();
     }

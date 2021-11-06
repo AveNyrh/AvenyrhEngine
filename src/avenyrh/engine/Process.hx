@@ -262,7 +262,7 @@ class Process extends Uniq implements IInspectable
      * @param dt Delta time
      */
     @:noCompletion
-    public static function updateAll(dt : Float) 
+    static function updateAll(dt : Float) 
     {
         //Update all
 		for (p in ROOTS)
@@ -281,7 +281,7 @@ class Process extends Uniq implements IInspectable
     /**
      * Resizes all process
      */
-    public static function resizeAll() 
+    static function resizeAll() 
     {
 		for (p in ROOTS)
 			_resize(p);

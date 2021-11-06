@@ -1,5 +1,8 @@
 package examples.src;
 
+import avenyrh.Color;
+import avenyrh.gameObject.SpriteComponent;
+import h2d.Tile;
 import avenyrh.gameObject.GameObject;
 import avenyrh.scene.Scene;
 import examples.src.TestComponent;
@@ -24,11 +27,17 @@ class TestScene extends Scene
 
     var privateInt = -1;
 
+    //public var testTile : Tile;
+
     override function added() 
     {
         super.added();
 
-        // testGo = new GameObject("TestGo", null);
+        //testTile = hxd.Res.CarreBleu.toTile();
+        //trace(hxd.Res.CarreBleu.getInfo());
+
+        testGo = new GameObject("SpriteGo", null);
+        testGo.addComponent(new SpriteComponent(null, null, Tile.fromColor(Color.iWHITE, 25, 25)));
         // testComp = new TestComponent();
         // testGo.addComponent(testComp);
     }

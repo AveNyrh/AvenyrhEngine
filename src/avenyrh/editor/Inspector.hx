@@ -38,7 +38,7 @@ class Inspector extends EditorWidget
         super.draw(dt);
 
         //Hierarchy window
-        ImGui.begin("Hierarchy");
+        ImGui.begin("Hierarchy", null, flags);
 
         var scene : Scene = SceneManager.currentScene;
 
@@ -108,7 +108,7 @@ class Inspector extends EditorWidget
         ImGui.end();
 
         //Inspector Window
-        ImGui.begin("Inspector");
+        ImGui.begin("Inspector", null, this.flags);
 
         if(currentInspectable != null)
         {

@@ -63,7 +63,10 @@ private typedef Vector2Impl = {x : Float, y : Float}
 
     public function normalize() : Vector2
     {
-        return self / magnitude;
+        if(magnitude != 0)
+            return self / magnitude;
+        else 
+            return Vector2.ZERO;
     }
 
     public inline function dot(other : Vector2) : Float 

@@ -1,11 +1,15 @@
 package avenyrh.editor;
 
+import avenyrh.imgui.ImGui.ImGuiWindowFlags;
+
 class EditorWidget 
 {
     /**
      * Is the widget running
      */
     public var enable (default, null) : Bool;
+
+    var flags : ImGuiWindowFlags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove;// | ImGuiWindowFlags.NoNav;
 
     //-------------------------------
     //#region Public API

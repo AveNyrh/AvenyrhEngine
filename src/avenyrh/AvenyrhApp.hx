@@ -38,13 +38,14 @@ class AvenyrhApp extends hxd.App
     override function update(dt : Float) 
     {
         super.update(dt);
-        Process.updateAll(dt);
+        
+        @:privateAccess Process.updateAll(dt);
     }
 
     override function onResize() 
     {
         super.onResize();
 
-        Process.resizeAll();
+        @:privateAccess Process.resizeAll();
     }
 }
