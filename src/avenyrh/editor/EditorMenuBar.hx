@@ -19,11 +19,15 @@ class EditorMenuBar extends EditorWidget
         if(ImGui.beginMenu("Test1"))
         {
             currentItem = "TestItem1";
+
+            ImGui.endMenu();
         }
 
         if(ImGui.beginMenu("Test2"))
         {
             currentItem = "TestItem2";
+
+            ImGui.endMenu();
         }
 
         ImGui.endMainMenuBar();
