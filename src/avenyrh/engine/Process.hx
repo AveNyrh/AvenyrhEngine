@@ -229,19 +229,32 @@ class Process extends Uniq implements IInspectable
 
         ImGui.indent(Inspector.indentSpace);
 
-        if(ImGui.selectable('$name###$name$uID', this == Inspector.currentInspectable))
-            inspec = this;
+        var flags : ImGuiTreeNodeFlags = OpenOnArrow | DefaultOpen;
+        if(Inspector.currentInspectable == this)
+            flags |= Selected;
 
-        for(c in children)
+        var open : Bool = ImGui.treeNodeEx('$name###$name$uID', flags);
+
+        if(ImGui.isItemClicked())
         {
-            var ci : IInspectable = c.drawHierarchy();
-
-            if(ci != null && i == null)
-                i = ci;
+            inspec = this;
         }
 
-        if(i != null && inspec == null)
-            inspec = i;
+        if(open)
+        {   
+            for(c in children)
+            {
+                var ci : IInspectable = c.drawHierarchy();
+    
+                if(ci != null && i == null)
+                    i = ci;
+            }
+    
+            if(i != null && inspec == null)
+                inspec = i;
+
+            ImGui.treePop();
+        }
 
         ImGui.unindent(Inspector.indentSpace);
 
