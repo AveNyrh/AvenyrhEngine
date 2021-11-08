@@ -15,7 +15,7 @@ class SceneWindow extends EditorWidget
     {        
         super.draw(dt);
 
-        flags |= ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoBackground;
+        flags |= MenuBar;
 
         //Scene window
         ImGui.begin("Scene", null, flags);

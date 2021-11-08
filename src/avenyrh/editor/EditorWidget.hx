@@ -9,7 +9,7 @@ class EditorWidget
      */
     public var enable (default, null) : Bool;
 
-    var flags : ImGuiWindowFlags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove;// | ImGuiWindowFlags.NoNav;
+    var flags : ImGuiWindowFlags = NoCollapse | NoMove;
 
     //-------------------------------
     //#region Public API
@@ -17,6 +17,8 @@ class EditorWidget
     public function new()
     {
         enable = true;
+
+        init();
     }
 
     public function draw(dt : Float)
@@ -34,5 +36,11 @@ class EditorWidget
     {
         enable = false;
     }
+    //#endregion
+
+    //-------------------------------
+    //#region Overridable functions
+    //-------------------------------
+    function init() { }
     //#endregion
 }
