@@ -20,7 +20,7 @@ class Engine extends Process
 
         instance = this;
 
-        engine.backgroundColor = Color.iDARKBLUE;
+        engine.backgroundColor = Color.rgbaToInt({r : 20, g : 20, b : 20, a : 255});
 
         //Engine settings
         hxd.Timer.wantedFPS = EngineConst.FPS;
