@@ -1,5 +1,7 @@
 package avenyrh.editor;
 
+import avenyrh.scene.SceneManager;
+import avenyrh.scene.SceneSerializer;
 import avenyrh.imgui.ImGui;
 
 class EditorMenuBar extends EditorPanel
@@ -13,54 +15,34 @@ class EditorMenuBar extends EditorPanel
     {
         super.draw(dt);
 
-        ///*
         ImGui.beginMainMenuBar();
 
-        if(ImGui.beginMenu("Test1"))
+        if(ImGui.beginMenu("File"))
         {
-            currentItem = "TestItem1";
+            if(ImGui.menuItem("Save scene", "Ctrl + S"))
+            {
+                SceneSerializer.serialize(SceneManager.currentScene);
+            }
 
-            ImGui.endMenu();
-        }
-
-        if(ImGui.beginMenu("Test2"))
-        {
-            currentItem = "TestItem2";
+            if(ImGui.menuItem("Exit", "F4"))
+            {
+                hxd.System.exit();
+            }
 
             ImGui.endMenu();
         }
 
         ImGui.endMainMenuBar();
-        //*/
-    }
 
-    override function close() 
-    {
-        super.close();
+        //Shortcuts
+        if(hxd.Key.isPressed(hxd.Key.S))
+        {
+            if(hxd.Key.isDown(hxd.Key.CTRL))
+                SceneSerializer.serialize(SceneManager.currentScene);
+        }
 
-        currentItem = "";
-    }
-    //#endregion
-
-    //-------------------------------
-    //#region Public API
-    //-------------------------------
-    function showTest1()
-    {
-        if(ImGui.menuItem("Test1 item1"))
-            trace("Test1 item1");
-
-        if(ImGui.menuItem("Test1 item2"))
-            trace("Test1 item2");
-    }
-
-    function showTest2()
-    {
-        if(ImGui.menuItem("Test2 item1"))
-            trace("Test2 item1");
-
-        if(ImGui.menuItem("Test2 item2"))
-            trace("Test2 item2");
+        if(hxd.Key.isDown(hxd.Key.F4))
+            hxd.System.exit();
     }
     //#endregion
 }
