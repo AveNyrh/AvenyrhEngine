@@ -1,5 +1,7 @@
 package avenyrh.editor;
 
+import avenyrh.engine.Process;
+import avenyrh.gameObject.GameObject;
 import haxe.Int64;
 using Lambda;
 import haxe.EnumTools;
@@ -60,25 +62,25 @@ class Inspector extends EditorPanel
             return;
         }
 
-        var flags : ImGuiTreeNodeFlags = DefaultOpen;
+        var treeNodeFlags : ImGuiTreeNodeFlags = DefaultOpen;
 
         ImGui.separator();
-        if(ImGui.treeNodeEx("Process", flags))
+        if(ImGui.treeNodeEx("Process", treeNodeFlags))
         {
             ImGui.spacing();
-            var i : IInspectable = scene.drawHierarchy();
+            var i : IInspectable = drawHierarchy(scene);
             if(i != null)
                 currentInspectable = i;
             ImGui.treePop();
         }
 
         ImGui.separator();
-        if(ImGui.treeNodeEx("Game", flags))
+        if(ImGui.treeNodeEx("Game", treeNodeFlags))
         {
             for(i in 0 ... @:privateAccess scene.rootGo.children.length)
             {
                 ImGui.spacing();
-                var insp : IInspectable = @:privateAccess scene.rootGo.children[i].drawHierarchy();
+                var insp : IInspectable = drawHierarchy(@:privateAccess scene.rootGo.children[i]);
 
                 if(insp != null)
                     currentInspectable = insp;
@@ -89,13 +91,13 @@ class Inspector extends EditorPanel
         }
 
         ImGui.separator();
-        if(ImGui.treeNodeEx("Misc", flags))
+        if(ImGui.treeNodeEx("Misc", treeNodeFlags))
         {
             for(i in scene.miscInspectable)
             {
                 ImGui.spacing();
 
-                var insp : IInspectable = i.drawHierarchy();
+                var insp : IInspectable = drawHierarchy(i);
 
                 if(insp != null)
                     currentInspectable = insp;
@@ -108,7 +110,7 @@ class Inspector extends EditorPanel
         ImGui.end();
 
         //Inspector Window
-        ImGui.begin("Inspector", null, this.flags);
+        ImGui.begin("Inspector", null, flags);
 
         if(currentInspectable != null)
         {
@@ -128,6 +130,62 @@ class Inspector extends EditorPanel
         currentInspectable = null;
     }
     //#endregion
+
+    function drawHierarchy(inspectable : IInspectable) : Null<IInspectable>
+    {
+        var inspec : Null<IInspectable> = null;
+        var i : Null<IInspectable> = null;
+
+        var name : String = "";
+        var uID : String = "";
+        var children : Array<Dynamic> = [];
+
+        if(Std.isOfType(inspectable, GameObject))
+        {
+            var go : GameObject = cast inspectable;
+            name = go.name;
+            uID = Int64.toStr(go.uID);
+        }
+        else if(Std.isOfType(inspectable, Process))
+        {
+            var proc : Process = cast inspectable;
+            name = proc.name;
+            uID = Int64.toStr(proc.uID);
+        }
+
+        ImGui.indent(Inspector.indentSpace);
+
+        var treeNodeFlags : ImGuiTreeNodeFlags = OpenOnArrow | DefaultOpen;
+        if(Inspector.currentInspectable == inspectable)
+            treeNodeFlags |= Selected;
+
+        var open : Bool = ImGui.treeNodeEx('$name###$name$uID', treeNodeFlags);
+
+        if(ImGui.isItemClicked())
+        {
+            inspec = inspectable;
+        }
+
+        if(open)
+        {   
+            for(c in children)
+            {
+                var ci : IInspectable = drawHierarchy(cast c);
+    
+                if(ci != null && i == null)
+                    i = ci;
+            }
+    
+            if(i != null && inspec == null)
+                inspec = i;
+
+            ImGui.treePop();
+        }
+
+        ImGui.unindent(Inspector.indentSpace);
+
+        return inspec;
+    }
 
     //-------------------------------
     //#region Static API
@@ -357,7 +415,7 @@ class Inspector extends EditorPanel
     {
         var v : hl.Ref<Bool> = cast value;
         ImGui.checkbox("", v);
-        ImGui.sameLine(off);
+        ImGui.sameLine(off + 75);
         ImGui.text('$label');
         return v.get();
     }

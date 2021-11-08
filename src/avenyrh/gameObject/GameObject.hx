@@ -500,46 +500,6 @@ class GameObject extends Uniq implements IInspectable
             c.drawInspector();
         }
     }
-
-    @:noCompletion
-    public function drawHierarchy() : Null<IInspectable>
-    {
-        var inspec : Null<IInspectable> = null;
-        var i : Null<IInspectable> = null;
-
-        ImGui.indent(Inspector.indentSpace);
-
-        var flags : ImGuiTreeNodeFlags = OpenOnArrow | DefaultOpen;
-        if(Inspector.currentInspectable == this)
-            flags |= Selected;
-
-        var open : Bool = ImGui.treeNodeEx('$name###$name$uID', flags);
-
-        if(ImGui.isItemClicked())
-        {
-            inspec = this;
-        }
-
-        if(open)
-        {   
-            for(c in children)
-            {
-                var ci : IInspectable = c.drawHierarchy();
-    
-                if(ci != null && i == null)
-                    i = ci;
-            }
-    
-            if(i != null && inspec == null)
-                inspec = i;
-
-            ImGui.treePop();
-        }
-
-        ImGui.unindent(Inspector.indentSpace);
-
-        return inspec;
-    }
     //#endregion
 
     //-------------------------------

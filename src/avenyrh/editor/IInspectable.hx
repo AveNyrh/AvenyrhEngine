@@ -18,9 +18,4 @@ interface IInspectable
      * Draws the Inspector windows
      */
     function drawInspector() : Void;
-
-    /**
-     * Draw all children in the hierarchy
-     */
-    function drawHierarchy() : Null<IInspectable>;
 }
