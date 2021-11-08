@@ -2,7 +2,7 @@ package avenyrh.editor;
 
 import avenyrh.imgui.ImGui;
 
-class EditorMenuBar extends EditorWidget
+class EditorMenuBar extends EditorPanel
 {
     var currentItem : String = "";
 

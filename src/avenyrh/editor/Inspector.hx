@@ -10,7 +10,7 @@ import avenyrh.scene.SceneSerializer;
 import avenyrh.engine.Uniq;
 import h2d.Tile;
 
-class Inspector extends EditorWidget
+class Inspector extends EditorPanel
 {
     /**
      * Current object being inspected

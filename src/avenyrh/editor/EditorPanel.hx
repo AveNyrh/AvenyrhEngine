@@ -2,7 +2,7 @@ package avenyrh.editor;
 
 import avenyrh.imgui.ImGui.ImGuiWindowFlags;
 
-class EditorWidget 
+class EditorPanel
 {
     /**
      * Is the widget running

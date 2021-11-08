@@ -3,7 +3,7 @@ package avenyrh.editor;
 import avenyrh.imgui.ImGui;
 import h3d.mat.Texture;
 
-class SceneWindow extends EditorWidget
+class SceneWindow extends EditorPanel
 {
     public var width (default, null) : Int = 0;
 

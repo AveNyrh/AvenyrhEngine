@@ -5,7 +5,7 @@ import sys.FileSystem;
 import haxe.io.Path;
 import avenyrh.imgui.ImGui;
 
-class ContentWindow extends EditorWidget
+class ContentWindow extends EditorPanel
 {
     var currentDir : String = "";
 
