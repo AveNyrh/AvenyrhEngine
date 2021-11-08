@@ -64,9 +64,9 @@ class Process extends Uniq implements IInspectable
     @noSerial
     public static var time (default, null) : Float;
 
-    var parent : Process;
+    public var parent (default, null) : Process;
 
-    var children : Array<Process> = [];
+    public var children (default, null) : Array<Process> = [];
     
     public function new(name : String, ?parent : Process, ?id : Null<Int64>) 
     {

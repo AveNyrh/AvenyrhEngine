@@ -145,12 +145,14 @@ class Inspector extends EditorPanel
             var go : GameObject = cast inspectable;
             name = go.name;
             uID = Int64.toStr(go.uID);
+            children = cast go.children;
         }
         else if(Std.isOfType(inspectable, Process))
         {
             var proc : Process = cast inspectable;
             name = proc.name;
             uID = Int64.toStr(proc.uID);
+            children = cast proc.children;
         }
 
         ImGui.indent(Inspector.indentSpace);

@@ -1,5 +1,7 @@
 package avenyrh.scene;
 
+import h2d.Bitmap;
+import h2d.Tile;
 using Lambda;
 import haxe.Int64;
 import avenyrh.engine.Uniq;
@@ -206,7 +208,9 @@ class SceneSerializer
      * n : null
      * p : process
      * s : string
+     * t : tile
      * u : uID
+     * bm : bitmap
      * v2 : Vector2
      */
     static function addValue(name : String, value : Dynamic, map : StringMap<Dynamic>)
@@ -220,22 +224,22 @@ class SceneSerializer
 
         switch Type.typeof(value) 
         {
-            case TNull :
+            case TNull :                        //All null value
                 map.set('n_$name', null);
 
-            case TInt :
+            case TInt :                         //Int
                 map.set('i_$name', value);
 
-            case TBool :
+            case TBool :                        //Bool
                 map.set('b_$name', value);
 
-            case TFloat :
+            case TFloat :                       //Float
                 map.set('f_$name', value);
 
-            case TClass(String) :
+            case TClass(String) :               //String
                 map.set('s_$name', value);
 
-            case TClass(Array) :
+            case TClass(Array) :                //Array
                 var m : StringMap<Dynamic> = new StringMap<Dynamic>();
                 var arr : Array<Dynamic> = cast value;
 
@@ -244,25 +248,36 @@ class SceneSerializer
 
                 map.set('a_$name', m);
 
-            case TEnum(e) :
+            case TEnum(e) :                     //Enum
                 map.set('e_$name', value);
+
+            case TClass(h2d.Tile) :             //h2d.Tile
+                var tile : Tile = cast value;
+                var m : StringMap<Dynamic> = new StringMap<Dynamic>();
+                //Set tile specific data
+                m.set("f_dx", tile.dx);
+                m.set("f_dy", tile.dy);
+                m.set("f_width", tile.width);
+                m.set("f_height", tile.height);
+                m.set("f_xFlip", tile.xFlip);
+                m.set("f_yFlip", tile.yFlip);             
 
             //TO DO : Maps
 
             case _:
                 //Forced to test via Std.isOfType because the Type.typeOf returns the top class, 
                 //which might not be simply TClass(GameObject) or else
-                if(Std.isOfType(value, GameObject)) //GameObject
+                if(Std.isOfType(value, GameObject))         //GameObject
                 {
                     var go : GameObject = cast value;
                     map.set('g_$name', Int64.toStr(go.uID));
                 }
-                else if(Std.isOfType(value, Component)) //Component
+                else if(Std.isOfType(value, Component))     //Component
                 {
                     var comp : Component = cast value;
                     map.set('c_$name', Int64.toStr(comp.uID));
                 }
-                else if(Std.isOfType(value, Process)) //Process
+                else if(Std.isOfType(value, Process))       //Process
                 {
                     var proc : Process = cast value;
                     map.set('p_$name', Int64.toStr(proc.uID));

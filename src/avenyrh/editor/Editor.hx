@@ -87,7 +87,7 @@ class Editor extends Process
         var style : ImGuiStyle = ImGui.getStyle();
         var colors : hl.NativeArray<ImVec4> = style.Colors;
 
-        colors[Text]                   = cast {x : 1.000, y : 1.000, z : 1.000, w : 1.000};
+        colors[Text]                   = cast {x : 0.900, y : 0.900, z : 0.900, w : 1.000};
 	    colors[TextDisabled]           = cast {x : 0.500, y : 0.500, z : 0.500, w : 1.000};
 	    colors[WindowBg]               = cast {x : 0.180, y : 0.180, z : 0.180, w : 1.000};
 	    colors[ChildBg]                = cast {x : 0.280, y : 0.280, z : 0.280, w : 0.000};
@@ -104,10 +104,10 @@ class Editor extends Process
 	    colors[ScrollbarBg]            = cast {x : 0.160, y : 0.160, z : 0.160, w : 1.000};
 	    colors[ScrollbarGrab]          = cast {x : 0.277, y : 0.277, z : 0.277, w : 1.000};
 	    colors[ScrollbarGrabHovered]   = cast {x : 0.300, y : 0.300, z : 0.300, w : 1.000};
-	    colors[ScrollbarGrabActive]    = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
+	    colors[ScrollbarGrabActive]    = cast {x : 0.212, y : 0.658, z : 0.990, w : 1.000};
 	    colors[CheckMark]              = cast {x : 1.000, y : 1.000, z : 1.000, w : 1.000};
 	    colors[SliderGrab]             = cast {x : 0.391, y : 0.391, z : 0.391, w : 1.000};
-	    colors[SliderGrabActive]       = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
+	    colors[SliderGrabActive]       = cast {x : 0.212, y : 0.658, z : 0.990, w : 1.000};
 	    colors[Button]                 = cast {x : 1.000, y : 1.000, z : 1.000, w : 0.000};
     	colors[ButtonHovered]          = cast {x : 1.000, y : 1.000, z : 1.000, w : 0.156};
 	    colors[ButtonActive]           = cast {x : 1.000, y : 1.000, z : 1.000, w : 0.391};
@@ -116,7 +116,7 @@ class Editor extends Process
 	    colors[HeaderActive]           = cast {x : 0.469, y : 0.469, z : 0.469, w : 1.000};
 	    colors[Separator]              = colors[Border];
 	    colors[SeparatorHovered]       = cast {x : 0.391, y : 0.391, z : 0.391, w : 1.000};
-	    colors[SeparatorActive]        = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
+	    colors[SeparatorActive]        = cast {x : 0.212, y : 0.658, z : 0.990, w : 1.000};
 	    colors[ResizeGrip]             = cast {x : 1.000, y : 1.000, z : 1.000, w : 0.250};
 	    colors[ResizeGripHovered]      = cast {x : 1.000, y : 1.000, z : 1.000, w : 0.670};
 	    colors[ResizeGripActive]       = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
@@ -128,13 +128,13 @@ class Editor extends Process
 	    //colors[DockingPreview]         = cast {x : 1.000, y : 0.391, z : 0.000, w : 0.781};
 	    //colors[DockingEmptyBg]         = cast {x : 0.180, y : 0.180, z : 0.180, w : 1.000};
 	    colors[PlotLines]              = cast {x : 0.469, y : 0.469, z : 0.469, w : 1.000};
-	    colors[PlotLinesHovered]       = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
+	    colors[PlotLinesHovered]       = cast {x : 0.212, y : 0.658, z : 0.990, w : 1.000};
 	    colors[PlotHistogram]          = cast {x : 0.586, y : 0.586, z : 0.586, w : 1.000};
-	    colors[PlotHistogramHovered]   = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
+	    colors[PlotHistogramHovered]   = cast {x : 0.212, y : 0.658, z : 0.990, w : 1.000};
 	    colors[TextSelectedBg]         = cast {x : 1.000, y : 1.000, z : 1.000, w : 0.156};
-	    colors[DragDropTarget]         = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
-	    colors[NavHighlight]           = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
-	    colors[NavWindowingHighlight]  = cast {x : 1.000, y : 0.391, z : 0.000, w : 1.000};
+	    colors[DragDropTarget]         = cast {x : 0.212, y : 0.658, z : 0.990, w : 1.000};
+	    colors[NavHighlight]           = cast {x : 0.212, y : 0.658, z : 0.990, w : 1.000};
+	    colors[NavWindowingHighlight]  = cast {x : 0.212, y : 0.658, z : 0.990, w : 1.000};
 	    colors[NavWindowingDimBg]      = cast {x : 0.000, y : 0.000, z : 0.000, w : 0.586};
 	    colors[ModalWindowDimBg]       = cast {x : 0.000, y : 0.000, z : 0.000, w : 0.586};
 
