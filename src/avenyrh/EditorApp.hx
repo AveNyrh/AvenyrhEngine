@@ -5,6 +5,7 @@ import h2d.Console;
 import avenyrh.editor.Editor;
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
+import avenyrh.editor.IEditorData;
 import avenyrh.scene.ISceneManagerData;
 
 class EditorApp extends hxd.App
@@ -19,9 +20,12 @@ class EditorApp extends hxd.App
 
     var editor : Editor;
 
-    override public function new(sceneManagerData : ISceneManagerData) 
+    var editorData : IEditorData = null;
+
+    override public function new(sceneManagerData : ISceneManagerData, editorData : IEditorData) 
     {
         this.sceneManagerData = sceneManagerData;
+        this.editorData = editorData;
 
         super();   
     }
@@ -46,7 +50,7 @@ class EditorApp extends hxd.App
         console.shortKeyChar = "²".code;
 
         //Editor
-        editor = new Editor();
+        editor = new Editor(editorData);
     }
 
     /**

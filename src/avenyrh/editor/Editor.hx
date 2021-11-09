@@ -6,10 +6,6 @@ import avenyrh.engine.Process;
 
 class Editor extends Process
 {
-    var enable : Bool = true;
-
-    var drawable : ImGuiDrawable;
-
     public var menuBar : EditorMenuBar;
 
     public var inspector : Inspector;
@@ -18,15 +14,24 @@ class Editor extends Process
 
     public var contentWindow : ContentWindow;
 
-    override public function new() 
+    var enable : Bool = true;
+
+    var drawable : ImGuiDrawable;
+
+    var data : IEditorData;
+
+    override public function new(data : IEditorData) 
     {
         super("Editor");
 
         createRoot(Process.S2D, 10);
         drawable = new ImGuiDrawable(root);
+        this.data = data;
 
         ImGui.loadIniSettingsFromDisk("default.ini");
         ImGui.setConfigFlags(ImGuiConfigFlags.DockingEnable);
+
+        @:privateAccess EditorPanel.editor = this;
 
         menuBar = new EditorMenuBar();
         inspector = new Inspector();

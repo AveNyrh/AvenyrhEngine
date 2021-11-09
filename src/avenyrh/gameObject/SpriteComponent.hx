@@ -15,7 +15,7 @@ class SpriteComponent extends GraphicComponent
     /**
      * Simplified way to set the pivot
      */
-    public var pivot (default, set) : Vector2;
+    public var pivot (default, set) : Pivot;
 
     /**
      * Delta position on the X axis
@@ -52,16 +52,16 @@ class SpriteComponent extends GraphicComponent
     public var visible (get, set) : Bool;
 
     @hideInInspector
-    public var layer (default, null) : Int;
+    public var layer (default, null) : Int; //Change this to set this in the inspector
 
     public var tile (get, set) : Tile;
 
-    override public function new(?name : String, ?parent : Object, ?tile : Tile, ?layer : Int = 0, ?pivot : Vector2) 
+    override public function new(?name : String, ?parent : Object) 
     {
-        super(name == null ? "Sprite" : name);
-
-        this.layer = layer;
-        bitmap = new Bitmap(tile, parent);
+        super(name == null ? "SpriteComponent" : name);
+        var t = Tile.fromColor(Color.iWHITE, 10, 10, 1);
+        bitmap = new Bitmap(t, parent);
+        pivot = CENTER;
     }
 
     override function postUpdate(dt : Float) 
@@ -87,14 +87,30 @@ class SpriteComponent extends GraphicComponent
     //-------------------------------
     //#region Getters & Setters
     //-------------------------------
-    inline function set_pivot(p : Vector2) : Vector2
+    public function getPivot() : Vector2
+    {
+        return switch (pivot)
+        {
+            case CENTER     : Vector2.ONE / -2;
+            case UP         : Vector2.LEFT / 2;
+            case DOWN       : Vector2.DOWN + Vector2.LEFT / 2;
+            case LEFT       : Vector2.DOWN / 2;
+            case RIGHT      : Vector2.LEFT + Vector2.DOWN / 2;
+            case UP_LEFT    : Vector2.ZERO;
+            case UP_RIGHT   : Vector2.LEFT;
+            case DOWN_LEFT  : Vector2.DOWN;
+            case DOWN_RIGHT : -1 * Vector2.ONE;
+        }
+    }
+
+    inline function set_pivot(p : Pivot) : Pivot
     {
         pivot = p;
 
         if(bitmap.tile != null)
         {
-            bitmap.tile.dx = pivot.x * bitmap.tile.width;
-            bitmap.tile.dy = pivot.y * bitmap.tile.width;
+            bitmap.tile.dx = getPivot().x * bitmap.tile.width;
+            bitmap.tile.dy = getPivot().y * bitmap.tile.width;
         }
 
         return pivot;
@@ -180,95 +196,42 @@ class SpriteComponent extends GraphicComponent
     //#endregion
 }
 
-class Pivot
+enum Pivot  
 {
     /**
      * Sets the pivot to the center of the tile
      */
-    public static var CENTER (get, never) : Vector2;
-
-    private static function get_CENTER() : Vector2 
-    {
-        return Vector2.ONE / -2;
-    }
-
-    /**
-     * Sets the pivot to the up left of the tile
-     */
-    public static var UP_LEFT (get, never) : Vector2;
-
-    private static function get_UP_LEFT() : Vector2 
-    {
-        return Vector2.ZERO;
-    }
-
-    /**
-     * Sets the pivot to the up right of the tile
-     */
-    public static var UP_RIGHT (get, never) : Vector2;
-
-    private static function get_UP_RIGHT() : Vector2 
-    {
-        return Vector2.LEFT;
-    }
-
-    /**
-     * Sets the pivot to the down left of the tile
-     */
-    public static var DOWN_LEFT (get, never) : Vector2;
-
-    private static function get_DOWN_LEFT() : Vector2 
-    {
-        return Vector2.DOWN;
-    }
-
-    /**
-     * Sets the pivot to the down right of the tile
-     */
-    public static var DOWN_RIGHT (get, never) : Vector2;
-
-    private static function get_DOWN_RIGHT() : Vector2 
-    {
-        return -1 * Vector2.ONE;
-    }
-
+    CENTER;
     /**
      * Sets the pivot to the up center of the tile
      */
-    public static var UP (get, never) : Vector2;
-
-    private static function get_UP() : Vector2 
-    {
-        return Vector2.LEFT / 2;
-    }
-
+    UP;
     /**
      * Sets the pivot to the down center of the tile
      */
-    public static var DOWN (get, never) : Vector2;
-
-    private static function get_DOWN() : Vector2 
-    {
-        return Vector2.DOWN + Vector2.LEFT / 2;
-    }
-
+    DOWN;
     /**
      * Sets the pivot to the left center of the tile
      */
-    public static var LEFT (get, never) : Vector2;
-
-    private static function get_LEFT() : Vector2 
-    {
-        return Vector2.DOWN / 2;
-    }
-
+    LEFT;
     /**
      * Sets the pivot to the right center of the tile
      */
-    public static var RIGHT (get, never) : Vector2;
-
-    private static function get_RIGHT() : Vector2 
-    {
-        return Vector2.LEFT + Vector2.DOWN / 2;
-    }
+    RIGHT;
+    /**
+     * Sets the pivot to the up left of the tile
+     */
+    UP_LEFT;
+    /**
+     * Sets the pivot to the up right of the tile
+     */
+    UP_RIGHT;
+    /**
+     * Sets the pivot to the down left of the tile
+     */
+    DOWN_LEFT;
+    /**
+     * Sets the pivot to the down right of the tile
+     */
+    DOWN_RIGHT;
 }

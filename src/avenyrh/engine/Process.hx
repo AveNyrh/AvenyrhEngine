@@ -218,6 +218,16 @@ class Process extends Uniq implements IInspectable
     @:noCompletion
     public function drawInspector()
     {
+        //Name
+        ImGui.spacing();
+        ImGui.spacing();
+        ImGui.text(name);
+        ImGui.spacing();
+        ImGui.spacing();
+        ImGui.separator();
+        ImGui.spacing();
+        ImGui.spacing();
+
         drawInfo();
     }
 

@@ -36,8 +36,8 @@ class TestScene extends Scene
         //testTile = hxd.Res.CarreBleu.toTile();
         //trace(hxd.Res.CarreBleu.getInfo());
 
-        testGo = new GameObject("SpriteGo", null);
-        testGo.addComponent(new SpriteComponent(null, null, Tile.fromColor(Color.iWHITE, 25, 25)));
+        // testGo = new GameObject("SpriteGo", null);
+        // testGo.addComponent(new SpriteComponent(null, null, Tile.fromColor(Color.iWHITE, 25, 25)));
         // testComp = new TestComponent();
         // testGo.addComponent(testComp);
     }

@@ -12,8 +12,9 @@ class FixedGameObject extends GameObject
     {
         super.init();
 
-        var t = hxd.Res.CarreBleu.toTile();
-        addComponent(new SpriteComponent(t));
+        var sc = new SpriteComponent();
+        sc.tile = hxd.Res.CarreBleu.toTile();
+        addComponent(sc);
 
         part = cast addComponent(new ParticleComponent("TestParticle", hxd.Res.CarreBlanc.toTexture(), 1));
         part.loop = false;

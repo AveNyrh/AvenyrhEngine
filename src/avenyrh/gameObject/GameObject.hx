@@ -162,6 +162,22 @@ class GameObject extends Uniq implements IInspectable
      */
     function drawInfo() 
     { 
+        //Name
+        ImGui.spacing();
+        ImGui.spacing();
+        var input_text_buffer = new hl.Bytes(128);
+        input_text_buffer = @:privateAccess name.toUtf8();
+        if (ImGui.inputText("", input_text_buffer, 128)) 
+        {
+            var st = @:privateAccess String.fromUTF8(input_text_buffer);
+            name = st;
+        }
+        ImGui.spacing();
+        ImGui.spacing();
+        ImGui.separator();
+        ImGui.spacing();
+        ImGui.spacing();
+
         //Enable
         var e : Bool = Inspector.checkbox("Enable", uID, enable);
         enable = e;
@@ -183,7 +199,7 @@ class GameObject extends Uniq implements IInspectable
         scaleX = scale[0];
         scaleY = scale[1];
 
-        ImGui.separator();
+        ImGui.spacing();
 
         Inspector.drawInInspector(this);
     }

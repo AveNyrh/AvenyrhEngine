@@ -1,3 +1,4 @@
+import examples.src.EditorData;
 import avenyrh.EntryPoint;
 import examples.src.SceneManagerData;
 
@@ -17,5 +18,6 @@ class Main extends EntryPoint
     function init() 
     {
         sceneManagerData = new SceneManagerData();
+        editorData = new EditorData();
     }
 }

@@ -4,6 +4,8 @@ import avenyrh.imgui.ImGui.ImGuiWindowFlags;
 
 class EditorPanel
 {
+    static var editor : Editor;
+
     /**
      * Is the widget running
      */

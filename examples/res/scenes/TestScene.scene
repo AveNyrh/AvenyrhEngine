@@ -1,7 +1,12 @@
 {
 	"Camera": {
 		"i_shakePower": 1,
+		"n_target": null,
 		"i_smooth": 2,
+		"v2_targetOffset": [
+			0,
+			0
+		],
 		"i_deadzone": 6,
 		"s_name": "Camera",
 		"u_uID": "103260641768",

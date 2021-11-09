@@ -19,8 +19,9 @@ class ControllableGameObject extends GameObject
     {
         super.init();
 
-        var t = hxd.Res.CarreRouge.toTile();
-        addComponent(new SpriteComponent(t));
+        var sc = new SpriteComponent();
+        sc.tile = hxd.Res.CarreRouge.toTile();
+        addComponent(sc);
 
         setPosition(100, 100);
         scale(2);

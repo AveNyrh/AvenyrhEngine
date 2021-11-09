@@ -1,5 +1,6 @@
 package avenyrh.editor;
 
+import avenyrh.gameObject.SpriteComponent;
 import avenyrh.engine.Process;
 import avenyrh.gameObject.GameObject;
 import haxe.Int64;
@@ -80,7 +81,6 @@ class Inspector extends EditorPanel
             {
                 ImGui.spacing();
                 drawHierarchy(@:privateAccess scene.rootGo.children[i]);
-                ImGui.spacing();
             }
             ImGui.treePop();
         }
@@ -92,9 +92,25 @@ class Inspector extends EditorPanel
             {
                 ImGui.spacing();
                 drawHierarchy(i);
-                ImGui.spacing();
             }
             ImGui.treePop();
+        }
+
+        //Right click on blank space
+        if(ImGui.beginPopupContextWindow("Blank space hierarchy context", 1, false))
+        {
+            if(ImGui.menuItem("Create Empty GameObject"))
+                scene.addGameObject(new GameObject("New GameObject", null, scene));
+
+            ImGui.separator();
+
+            for(key => value in @:privateAccess EditorPanel.editor.data.gameObjects) //key = menu item, value = class
+            {
+                if(ImGui.menuItem(key))
+                    scene.addGameObject(cast Type.createInstance(value, [key, null, scene]));
+            }
+
+            ImGui.endPopup();
         }
 
         ImGui.end();
@@ -104,9 +120,21 @@ class Inspector extends EditorPanel
 
         if(currentInspectable != null)
         {
-            if(ImGui.collapsingHeader('${currentInspectable.name}###${currentInspectable.name}${currentInspectable.uID}', DefaultOpen))
+            currentInspectable.drawInspector();
+
+            if(Std.isOfType(currentInspectable, GameObject))
             {
-                currentInspectable.drawInspector();
+                //Right click on blank space
+                if(ImGui.beginPopupContextWindow("Blank space inspector context", 1, false))
+                {
+                    if(ImGui.menuItem("Add SpriteComponent"))
+                    {
+                        var go : GameObject = cast currentInspectable;
+                        go.addComponent(new SpriteComponent("SpriteComponent"));
+                    }
+
+                    ImGui.endPopup();
+                }
             }
         }
 
@@ -151,9 +179,7 @@ class Inspector extends EditorPanel
         var open : Bool = ImGui.treeNodeEx('$name###$name$uID', treeNodeFlags);
 
         if(ImGui.isItemClicked())
-        {
             currentInspectable = inspectable;
-        }
 
         if(open)
         {   

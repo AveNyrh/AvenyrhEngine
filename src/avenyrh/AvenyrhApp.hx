@@ -3,6 +3,7 @@ package avenyrh;
 import avenyrh.engine.Engine;
 import avenyrh.engine.Process;
 import avenyrh.scene.ISceneManagerData;
+import avenyrh.editor.IEditorData;
 
 class AvenyrhApp extends hxd.App
 {
@@ -10,11 +11,14 @@ class AvenyrhApp extends hxd.App
     
     public static var avenyrhEngine (default, null) : Engine;
 
-    public var sceneManagerData : ISceneManagerData = null;
+    var sceneManagerData : ISceneManagerData = null;
 
-    override public function new(sceneManagerData : ISceneManagerData) 
+    var editorData : IEditorData = null;
+
+    override public function new(sceneManagerData : ISceneManagerData,editorData : IEditorData) 
     {
         this.sceneManagerData = sceneManagerData;
+        this.editorData = editorData;
 
         super();   
     }
