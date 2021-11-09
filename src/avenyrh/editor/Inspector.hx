@@ -68,9 +68,8 @@ class Inspector extends EditorPanel
         if(ImGui.treeNodeEx("Process", treeNodeFlags))
         {
             ImGui.spacing();
-            var i : IInspectable = drawHierarchy(scene);
-            if(i != null)
-                currentInspectable = i;
+            drawHierarchy(scene);
+            
             ImGui.treePop();
         }
 
@@ -80,11 +79,7 @@ class Inspector extends EditorPanel
             for(i in 0 ... @:privateAccess scene.rootGo.children.length)
             {
                 ImGui.spacing();
-                var insp : IInspectable = drawHierarchy(@:privateAccess scene.rootGo.children[i]);
-
-                if(insp != null)
-                    currentInspectable = insp;
-
+                drawHierarchy(@:privateAccess scene.rootGo.children[i]);
                 ImGui.spacing();
             }
             ImGui.treePop();
@@ -96,12 +91,7 @@ class Inspector extends EditorPanel
             for(i in scene.miscInspectable)
             {
                 ImGui.spacing();
-
-                var insp : IInspectable = drawHierarchy(i);
-
-                if(insp != null)
-                    currentInspectable = insp;
-
+                drawHierarchy(i);
                 ImGui.spacing();
             }
             ImGui.treePop();
@@ -131,11 +121,8 @@ class Inspector extends EditorPanel
     }
     //#endregion
 
-    function drawHierarchy(inspectable : IInspectable) : Null<IInspectable>
+    function drawHierarchy(inspectable : IInspectable)
     {
-        var inspec : Null<IInspectable> = null;
-        var i : Null<IInspectable> = null;
-
         var name : String = "";
         var uID : String = "";
         var children : Array<Dynamic> = [];
@@ -165,28 +152,18 @@ class Inspector extends EditorPanel
 
         if(ImGui.isItemClicked())
         {
-            inspec = inspectable;
+            currentInspectable = inspectable;
         }
 
         if(open)
         {   
             for(c in children)
-            {
-                var ci : IInspectable = drawHierarchy(cast c);
-    
-                if(ci != null && i == null)
-                    i = ci;
-            }
-    
-            if(i != null && inspec == null)
-                inspec = i;
+                drawHierarchy(cast c);
 
             ImGui.treePop();
         }
 
         ImGui.unindent(Inspector.indentSpace);
-
-        return inspec;
     }
 
     //-------------------------------
