@@ -62,9 +62,6 @@ class EditorApp extends hxd.App
         super.update(dt);
 
         @:privateAccess Process.updateAll(dt);
-        
-        if(SceneManager.currentScene != null)
-            @:privateAccess SceneManager.currentScene._updateInEditor(dt);
     }
 
     override function onResize() 

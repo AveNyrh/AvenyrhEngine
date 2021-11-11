@@ -24,7 +24,7 @@ class Inspector extends EditorPanel
     /**
      * Indent space for the hierarchy
      */
-    public static inline var indentSpace : Float = 10;
+    public static inline var indentSpace : Float = 6;
 
     static var fields : Array<String>;
     
@@ -64,9 +64,24 @@ class Inspector extends EditorPanel
             return;
         }
 
-        var treeNodeFlags : ImGuiTreeNodeFlags = DefaultOpen | SpanAvailWidth;
-
         ImGui.separator();
+        ImGui.spacing();
+
+        var treeNodeFlags : ImGuiTreeNodeFlags = DefaultOpen | SpanAvailWidth | OpenOnArrow;
+
+        //Editor camera
+        var editorCam : Camera = EditorPanel.editor.sceneWindow.camera;
+        var camFlags : ImGuiTreeNodeFlags = treeNodeFlags;
+        camFlags |= currentInspectable == editorCam ? Selected : 0;
+
+        if(ImGui.treeNodeEx("Editor camera", treeNodeFlags))
+            ImGui.treePop();
+        
+
+        if(ImGui.isItemClicked())
+            currentInspectable = editorCam;
+
+        //Process
         if(ImGui.treeNodeEx("Process", treeNodeFlags))
         {
             ImGui.spacing();
@@ -75,7 +90,9 @@ class Inspector extends EditorPanel
             ImGui.treePop();
         }
 
+        ImGui.spacing();
         ImGui.separator();
+        ImGui.spacing();
         if(ImGui.treeNodeEx("Game", treeNodeFlags))
         {
             for(i in 0 ... @:privateAccess scene.rootGo.children.length)
@@ -86,15 +103,18 @@ class Inspector extends EditorPanel
             ImGui.treePop();
         }
 
-        ImGui.separator();
-        if(ImGui.treeNodeEx("Misc", treeNodeFlags))
+        if(scene.miscInspectable.length > 0)
         {
-            for(i in scene.miscInspectable)
+            ImGui.separator();
+            if(ImGui.treeNodeEx("Misc", treeNodeFlags))
             {
-                ImGui.spacing();
-                drawHierarchy(i);
+                for(i in scene.miscInspectable)
+                {
+                    ImGui.spacing();
+                    drawHierarchy(i);
+                }
+                ImGui.treePop();
             }
-            ImGui.treePop();
         }
 
         //Right click on blank space

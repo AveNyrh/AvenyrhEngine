@@ -116,7 +116,7 @@ class Camera extends Process
     //--------------------
     //#region Private API
     //--------------------  
-    override function update(dt:Float) 
+    override function update(dt : Float) 
     {
         super.update(dt);
 
@@ -206,6 +206,13 @@ class Camera extends Process
         super.onDispose();
 
         timer.dispose();
+    }
+
+    @:noCompletion
+    function forcePosition(x : Float, y : Float)
+    {
+        this.x = x;
+        this.y = y;
     }
     //#endregion
 

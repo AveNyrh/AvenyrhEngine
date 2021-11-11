@@ -89,38 +89,6 @@ class Scene extends Process
     }
 
     #if avenyrhEditor
-    var left : Int = hxd.Key.Q;
-    var right : Int = hxd.Key.D;
-    var up : Int = hxd.Key.Z;
-    var down : Int = hxd.Key.S;
-    var mvt : avenyrh.Vector2 = avenyrh.Vector2.ZERO;
-    var mvtSpeed : Float = 2;
-    var zoomSpeed : Float = 0.1;
-
-    @:noCompletion
-    function _updateInEditor(dt : Float) 
-    {
-        mvt = avenyrh.Vector2.ZERO;
-
-        if(hxd.Key.isDown(left))
-            mvt.x = 1;
-        if(hxd.Key.isDown(right))
-            mvt.x = -1;
-        if(hxd.Key.isDown(up))
-            mvt.y = 1;
-        if(hxd.Key.isDown(down))
-            mvt.y = -1;
-
-        if(hxd.Key.isPressed(hxd.Key.MOUSE_WHEEL_UP))
-            camera.zoom += zoomSpeed;
-        else if(hxd.Key.isPressed(hxd.Key.MOUSE_WHEEL_DOWN))
-            camera.zoom -= zoomSpeed;
-
-        mvt = mvt.normalize();
-        camera.move(mvt.x * mvtSpeed / camera.zoom, mvt.y * mvtSpeed / camera.zoom);
-        @:privateAccess camera.update(dt);
-    }
-
     var renderTarget : h3d.mat.Texture = null;
     var renderS2d : h2d.Scene = null;
 
