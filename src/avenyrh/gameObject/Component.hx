@@ -142,6 +142,7 @@ class Component extends Uniq
     //-------------------------------
     //#region Private API
     //-------------------------------
+    @:noCompletion
     function removed()
     {
         enable = false;
@@ -150,12 +151,10 @@ class Component extends Uniq
         onDestroy();
     }
 
+    @:noCompletion
     function drawInspector() 
     {
-        if(ImGui.collapsingHeader('$name###$name$uID', DefaultOpen))
-        {
-            drawInfo();
-        }
+        Inspector.drawComponent(this);
     }
     //#endregion
 

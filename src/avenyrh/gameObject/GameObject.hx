@@ -165,6 +165,7 @@ class GameObject extends Uniq implements IInspectable
         //Name
         ImGui.spacing();
         ImGui.spacing();
+        var availableSpace : ImVec2 = ImGui.getContentRegionAvail();
         var input_text_buffer = new hl.Bytes(128);
         input_text_buffer = @:privateAccess name.toUtf8();
         if (ImGui.inputText("", input_text_buffer, 128)) 
@@ -172,11 +173,31 @@ class GameObject extends Uniq implements IInspectable
             var st = @:privateAccess String.fromUTF8(input_text_buffer);
             name = st;
         }
+        var buttonSize : Int = 19;
+        ImGui.sameLine(availableSpace.x - buttonSize / 2);
+        if(ImGui.button('+##${uID}', {x : buttonSize, y : buttonSize}))
+            ImGui.openPopup('GameObjectSettings##${uID}');
+
         ImGui.spacing();
         ImGui.spacing();
         ImGui.separator();
         ImGui.spacing();
         ImGui.spacing();
+
+        //Pop up for the "+" button
+        if(ImGui.beginPopup('GameObjectSettings##${uID}'))
+        {
+            if(ImGui.menuItem("Reset transform"))
+            {
+                x = 0;
+                y = 0;
+                rotation = 0;
+                scaleX = 1;
+                scaleY = 1;
+            }
+
+            ImGui.endPopup();
+        }
 
         //Enable
         var e : Bool = Inspector.checkbox("Enable", uID, enable);
@@ -370,6 +391,11 @@ class GameObject extends Uniq implements IInspectable
         }
     }
 
+    /**
+     * Removes specified child
+     * 
+     * Same as calling child.destroy()
+     */
     public function removeChild(go : GameObject)
     {
         if(children.contains(go))
@@ -414,6 +440,17 @@ class GameObject extends Uniq implements IInspectable
         return false;
     }
     //#endregion
+
+    /**
+     * Destroys this gameObject, its children and its components
+     */
+    public function destroy()
+    {
+        if(parent != null)
+            parent.removeChild(this);
+        else
+            removed();
+    }
 
     public function toString() : String 
     {

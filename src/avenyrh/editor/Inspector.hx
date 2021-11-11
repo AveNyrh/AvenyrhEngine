@@ -1,5 +1,6 @@
 package avenyrh.editor;
 
+import avenyrh.gameObject.Component;
 import avenyrh.gameObject.SpriteComponent;
 import avenyrh.engine.Process;
 import avenyrh.gameObject.GameObject;
@@ -63,7 +64,7 @@ class Inspector extends EditorPanel
             return;
         }
 
-        var treeNodeFlags : ImGuiTreeNodeFlags = DefaultOpen;
+        var treeNodeFlags : ImGuiTreeNodeFlags = DefaultOpen | SpanAvailWidth;
 
         ImGui.separator();
         if(ImGui.treeNodeEx("Process", treeNodeFlags))
@@ -133,6 +134,8 @@ class Inspector extends EditorPanel
                         go.addComponent(new SpriteComponent("SpriteComponent"));
                     }
 
+                    //Add all component dynamicaly
+
                     ImGui.endPopup();
                 }
             }
@@ -172,7 +175,7 @@ class Inspector extends EditorPanel
 
         ImGui.indent(Inspector.indentSpace);
 
-        var treeNodeFlags : ImGuiTreeNodeFlags = OpenOnArrow | DefaultOpen;
+        var treeNodeFlags : ImGuiTreeNodeFlags = OpenOnArrow | DefaultOpen | SpanAvailWidth;
         if(Inspector.currentInspectable == inspectable)
             treeNodeFlags |= Selected;
 
@@ -180,6 +183,31 @@ class Inspector extends EditorPanel
 
         if(ImGui.isItemClicked())
             currentInspectable = inspectable;
+
+        if(ImGui.beginPopupContextWindow('HierarchyItemSettings##$uID'))
+        {
+            if(Std.isOfType(inspectable, GameObject))
+            {
+                var go : GameObject = cast inspectable;
+
+                if(ImGui.menuItem("Destroy gameObject"))
+                {
+                    go.destroy();
+                    ImGui.separator();
+                    addChildGameObjectMenu();
+                }
+            }
+            else if(Std.isOfType(inspectable, Process))
+            {
+                var proc : Process = cast inspectable;
+
+                if(ImGui.menuItem("Destroy process"))
+                {
+                    proc.destroy();
+                }
+            }
+            ImGui.endPopup();
+        }
 
         if(open)
         {   
@@ -190,6 +218,11 @@ class Inspector extends EditorPanel
         }
 
         ImGui.unindent(Inspector.indentSpace);
+    }
+
+    function addChildGameObjectMenu()
+    {
+
     }
 
     //-------------------------------
@@ -216,6 +249,35 @@ class Inspector extends EditorPanel
                 }
             }
         }
+    }
+
+    public static function drawComponent(component : Component)
+    {
+        var availableSpace : ImVec2 = ImGui.getContentRegionAvail();
+        var flags : ImGuiTreeNodeFlags = DefaultOpen | SpanAvailWidth | AllowItemOverlap;
+        var open : Bool = ImGui.collapsingHeader('${component.name}###${component.name}${component.uID}', flags);
+
+        var buttonSize : Int = 19; 
+        ImGui.sameLine(availableSpace.x - buttonSize / 2 + 4);
+        if(ImGui.button('+##${component.uID}', {x : buttonSize, y : buttonSize}))
+            ImGui.openPopup('ComponentSettings##${component.uID}');
+
+        ImGui.spacing();
+        if(open)
+            @:privateAccess component.drawInfo();
+
+        //Pop up for the "+" button
+        var removeComponent : Bool = false;
+        if(ImGui.beginPopup('ComponentSettings##${component.uID}'))
+        {
+            if(ImGui.menuItem("Remove component"))
+                removeComponent = true;
+
+            ImGui.endPopup();
+        }
+
+        if(removeComponent)
+            component.gameObject.removeComponent(component);
     }
 
     static var fv : Array<Float>;
