@@ -168,10 +168,10 @@ class GameObject extends Uniq implements IInspectable
         var availableSpace : ImVec2 = ImGui.getContentRegionAvail();
         var input_text_buffer = new hl.Bytes(128);
         input_text_buffer = @:privateAccess name.toUtf8();
-        if (ImGui.inputText("", input_text_buffer, 128)) 
+        if (ImGui.inputText('##name$uID', input_text_buffer, 128)) 
         {
             var st = @:privateAccess String.fromUTF8(input_text_buffer);
-            name = st;
+            //name = st;
         }
         var buttonSize : Int = 19;
         ImGui.sameLine(availableSpace.x - buttonSize / 2);
@@ -619,9 +619,12 @@ class GameObject extends Uniq implements IInspectable
     }
 
     function set_parent(p : Null<GameObject>) : Null<GameObject>
-    {
+    {  
         if(p != null)
         {
+            if(parent != null)
+                parent.children.remove(this);
+
             parent = p;
 
             if(!parent.children.contains(this))

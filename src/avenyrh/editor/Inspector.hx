@@ -120,17 +120,7 @@ class Inspector extends EditorPanel
         //Right click on blank space
         if(ImGui.beginPopupContextWindow("Blank space hierarchy context", 1, false))
         {
-            if(ImGui.menuItem("Create Empty GameObject"))
-                scene.addGameObject(new GameObject("New GameObject", null, scene));
-
-            ImGui.separator();
-
-            for(key => value in @:privateAccess editor.data.gameObjects) //key = menu item, value = class
-            {
-                if(ImGui.menuItem(key))
-                    scene.addGameObject(cast Type.createInstance(value, [key, null, scene]));
-            }
-
+            addChildGameObjectMenu(scene);
             ImGui.endPopup();
         }
 
@@ -142,8 +132,10 @@ class Inspector extends EditorPanel
 
         if(currentInspectable != null)
         {
+            ImGui.separator();
             currentInspectable.drawInspector();
 
+            //Handle gameObject specific inspector
             if(Std.isOfType(currentInspectable, GameObject))
             {
                 //Right click on blank space
@@ -222,12 +214,14 @@ class Inspector extends EditorPanel
             {
                 var go : GameObject = cast inspectable;
 
-                if(ImGui.menuItem("Destroy gameObject"))
-                {
+                if(ImGui.menuItem("Destroy GameObject"))
                     go.destroy();
-                    ImGui.separator();
-                    addChildGameObjectMenu();
-                }
+
+                
+                ImGui.separator();
+                var child = addChildGameObjectMenu(SceneManager.currentScene);
+                if(child != null)
+                    go.addChild(child);
             }
             else if(Std.isOfType(inspectable, Process))
             {
@@ -252,9 +246,24 @@ class Inspector extends EditorPanel
         ImGui.unindent(Inspector.indentSpace);
     }
 
-    function addChildGameObjectMenu()
+    function addChildGameObjectMenu(scene : Scene) : Null<GameObject>
     {
+        var go : GameObject = null;
+        if(ImGui.menuItem("New Empty GameObject"))
+            go = new GameObject("New GameObject", null, scene);
 
+        ImGui.separator();
+
+        for(key => value in @:privateAccess editor.data.gameObjects) //key = menu item, value = class
+        {
+            if(ImGui.menuItem('New $key'))
+                go = cast Type.createInstance(value, [key, null, scene]);
+        }
+
+        if(go != null)
+            scene.addGameObject(go);
+
+        return go;
     }
 
     //-------------------------------
@@ -360,9 +369,7 @@ class Inspector extends EditorPanel
                 return cast Inspector.checkbox(field.name, u.uID, cast value);
 
             case CClass("String", []) : //String
-                //Atm, just draws the string, not possible to change it
-                Inspector.labelText(field.name, u.uID, cast value);
-                return value;
+                return Inspector.inputText(field.name, u.uID, cast value);
 
             case CEnum(_, []) : //Enum
                 ev = cast Reflect.getProperty(u, field.name);
@@ -517,6 +524,20 @@ class Inspector extends EditorPanel
         ImGui.sameLine(off + 75);
         ImGui.text('$label');
         return v.get();
+    }
+
+    public static function inputText(label : String, id : Int64, text : String) : String
+    {
+        var input_text_buffer = new hl.Bytes(128);
+        input_text_buffer = @:privateAccess text.toUtf8();
+
+        if (ImGui.inputText('$label###$label$id', input_text_buffer, 128)) 
+        {
+            var st = @:privateAccess String.fromUTF8(input_text_buffer);
+            text = st;
+        }
+
+        return text;
     }
 
     public static function labelText(label : String, id : Int64, text : String) 
