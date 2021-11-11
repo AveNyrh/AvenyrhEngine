@@ -41,7 +41,7 @@ class Inspector extends EditorPanel
     {        
         super.draw(dt);
 
-        //Hierarchy window
+        //#region Hierarchy window
         ImGui.begin("Hierarchy", null, flags);
 
         var scene : Scene = SceneManager.currentScene;
@@ -70,7 +70,7 @@ class Inspector extends EditorPanel
         var treeNodeFlags : ImGuiTreeNodeFlags = DefaultOpen | SpanAvailWidth | OpenOnArrow;
 
         //Editor camera
-        var editorCam : Camera = EditorPanel.editor.sceneWindow.camera;
+        var editorCam : Camera = editor.sceneWindow.camera;
         var camFlags : ImGuiTreeNodeFlags = treeNodeFlags;
         camFlags |= currentInspectable == editorCam ? Selected : 0;
 
@@ -125,7 +125,7 @@ class Inspector extends EditorPanel
 
             ImGui.separator();
 
-            for(key => value in @:privateAccess EditorPanel.editor.data.gameObjects) //key = menu item, value = class
+            for(key => value in @:privateAccess editor.data.gameObjects) //key = menu item, value = class
             {
                 if(ImGui.menuItem(key))
                     scene.addGameObject(cast Type.createInstance(value, [key, null, scene]));
@@ -135,8 +135,9 @@ class Inspector extends EditorPanel
         }
 
         ImGui.end();
+        //#endregion
 
-        //Inspector Window
+        //#region Inspector Window
         ImGui.begin("Inspector", null, flags);
 
         if(currentInspectable != null)
@@ -148,13 +149,23 @@ class Inspector extends EditorPanel
                 //Right click on blank space
                 if(ImGui.beginPopupContextWindow("Blank space inspector context", 1, false))
                 {
+                    //Components that are always present
                     if(ImGui.menuItem("Add SpriteComponent"))
                     {
                         var go : GameObject = cast currentInspectable;
                         go.addComponent(new SpriteComponent("SpriteComponent"));
                     }
 
-                    //Add all component dynamicaly
+                    //Add all custom components dynamicaly
+                    ImGui.separator();
+                    for(key => value in @:privateAccess editor.data.components) //key = componentName, value = componentClass
+                    {
+                        if(ImGui.menuItem('Add $key'))
+                        {
+                            var go : GameObject = cast currentInspectable;
+                            go.addComponent(cast Type.createInstance(value, [key]));
+                        }
+                    }
 
                     ImGui.endPopup();
                 }
@@ -162,6 +173,7 @@ class Inspector extends EditorPanel
         }
 
         ImGui.end();
+        //#endregion
     }
 
     public override function close()

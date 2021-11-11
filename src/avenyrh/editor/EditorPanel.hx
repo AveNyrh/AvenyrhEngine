@@ -4,12 +4,14 @@ import avenyrh.imgui.ImGui.ImGuiWindowFlags;
 
 class EditorPanel
 {
-    static var editor : Editor;
+    static var Editor : Editor;
 
     /**
      * Is the widget running
      */
     public var enable (default, null) : Bool;
+
+    var editor (get, null) : Editor;
 
     var flags : ImGuiWindowFlags = NoCollapse | NoMove;
 
@@ -44,5 +46,11 @@ class EditorPanel
     //#region Overridable functions
     //-------------------------------
     function init() { }
+    //#endregion
+
+    //-------------------------------
+    //#region Getters & Setters
+    //-------------------------------
+    function get_editor() : Editor {return EditorPanel.Editor;}
     //#endregion
 }

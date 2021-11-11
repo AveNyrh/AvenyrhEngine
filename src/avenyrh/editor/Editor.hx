@@ -31,7 +31,7 @@ class Editor extends Process
         ImGui.loadIniSettingsFromDisk("default.ini");
         ImGui.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 
-        @:privateAccess EditorPanel.editor = this;
+        @:privateAccess EditorPanel.Editor = this;
 
         menuBar = new EditorMenuBar();
         inspector = new Inspector();
