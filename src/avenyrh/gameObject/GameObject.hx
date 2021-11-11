@@ -242,9 +242,20 @@ class GameObject extends Uniq implements IInspectable
     }
 
     /**
-     * Moves by the specified amount, takes in count the rotation
+     * Moves by the specified amount
      */
     public function move(dx : Float, dy : Float)
+    {
+        x += dx;
+		y += dy;
+
+        transformChanged = true;
+    }
+
+    /**
+     * Moves by the specified amount, takes in count the rotation
+     */
+    public function moveWithRotation(dx : Float, dy : Float)
     {
         x += dx * Math.cos(rotation);
 		y += dy * Math.sin(rotation);

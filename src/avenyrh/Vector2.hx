@@ -1,5 +1,7 @@
 package avenyrh;
 
+import avenyrh.imgui.ImGui;
+
 private typedef Vector2Impl = {x : Float, y : Float}
 
 @:forward abstract Vector2 (Vector2Impl) from Vector2Impl to Vector2Impl
@@ -221,6 +223,30 @@ private typedef Vector2Impl = {x : Float, y : Float}
     public inline function isNull() : Bool 
     {
         return this == null;
+    }
+
+    @:from
+    public static inline function fromImVec2(other : ImVec2) : Vector2
+    {
+        return new Vector2(other.x, other.y);
+    }
+
+    @:to
+    public inline function toImVec2() : ImVec2
+    {
+        return {x : self.x, y : self.y};
+    }
+
+    @:from
+    public static inline function fromExtImVec2(other : ExtDynamic<ImVec2>) : Vector2
+    {
+        return fromImVec2(cast other);
+    }
+
+    @:to
+    public inline function toExtImVec2() : ExtDynamic<ImVec2>
+    {
+        return toImVec2();
     }
     
     public inline function toString() : String 
