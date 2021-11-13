@@ -16,6 +16,10 @@ class SceneWindow extends EditorPanel
 
     public var camera : Camera = null;
 
+    public var mode : TransformMode = TRANSLATE;
+
+    public var operation : TransformOperation = NONE;
+
     //Camera movement settings
     var left : Int = hxd.Key.Q;
     var right : Int = hxd.Key.D;
@@ -61,7 +65,15 @@ class SceneWindow extends EditorPanel
         {
             mousePos = ImGui.getMousePos();
 
-            drawTranslationGuizmo(go);
+            switch (mode)
+            {
+                case TRANSLATE :
+                    handleTranslationGuizmo(go);
+                case ROTATE :
+                    handleRotationGuizmo(go);
+                case SCALE :
+                    handleScaleGuizmo(go);
+            }
 
             oldMousePos = mousePos;
         }
@@ -121,13 +133,16 @@ class SceneWindow extends EditorPanel
     var oldMousePos : Vector2 = Vector2.ZERO;
     var mousePos : Vector2 = Vector2.ZERO;
 
-    function drawTranslationGuizmo(go : GameObject)
+    function handleTranslationGuizmo(go : GameObject)
     {
+        var go : GameObject = cast Inspector.currentInspectable;
+
+        //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos();
         var upLeft : Vector2 = new Vector2(2, 40);
         upLeft += windowOrigin;
-        var origin : Vector2 = upLeft + Vector2.ONE * 100;
+        var origin : Vector2 = upLeft + camera.worldToScreen(go.x, go.y);//Vector2.ONE * 100;
         var xEnd : Vector2 = origin + Vector2.RIGHT * axisLength;
         var yEnd : Vector2 = origin + Vector2.DOWN * axisLength;
         var xLineOffset : Vector2 = Vector2.DOWN * -lineThickness / 4;
@@ -140,45 +155,88 @@ class SceneWindow extends EditorPanel
             mousePos.x >= origin.x - lineThickness / 2 && mousePos.x <= origin.x + lineThickness / 2;
         var isInCircle = isInsideCircle(origin, circleRadius);
 
-        //Mouse movement
-        var deltaX : Float = mousePos.x - oldMousePos.x;
-        var deltaY : Float = mousePos.y - oldMousePos.y;
-        if(ImGui.isMouseDown(0))
-        {
-            if(isInX && deltaX != 0)
-                go.move(deltaX, 0);
-            else if(isInY && deltaY != 0)
-                go.move(0, deltaY);
-            else if(isInCircle && deltaX != 0 && deltaY != 0)
-                go.move(deltaX, deltaY);
-        }
-
         //X axis
-        drawList.addLine(origin, xEnd, isInX ? highlightColor : xAxisColor, lineThickness);
+        drawList.addLine(origin, xEnd, operation.equals(TRANSLATE_X) ? highlightColor : xAxisColor, lineThickness);
 
         var p1 : Vector2 = xEnd + xLineOffset + Vector2.DOWN * 5;
         var p2 : Vector2 = xEnd + xLineOffset + Vector2.DOWN * -5;
         var p3 : Vector2 = xEnd + xLineOffset + Vector2.RIGHT * 6;
-        drawList.addTriangleFilled(p1, p2, p3, isInX ? highlightColor : xAxisColor);
+        drawList.addTriangleFilled(p1, p2, p3, operation.equals(TRANSLATE_X) ? highlightColor : xAxisColor);
 
         //Y axis
-        drawList.addLine(origin + yLineOffset, yEnd + yLineOffset, isInY ? highlightColor : yAxisColor, lineThickness);
+        drawList.addLine(origin + yLineOffset, yEnd + yLineOffset, operation.equals(TRANSLATE_Y) ? highlightColor : yAxisColor, lineThickness);
 
         var yTriangleOffset : Vector2 = Vector2.DOWN * -1;
         p1 = yEnd + yTriangleOffset + Vector2.RIGHT * -5;
         p2 = yEnd + yTriangleOffset + Vector2.RIGHT * 5;
         p3 = yEnd + yTriangleOffset + Vector2.DOWN * 6;
-        drawList.addTriangleFilled(p1, p2, p3, isInY ? highlightColor : yAxisColor);
+        drawList.addTriangleFilled(p1, p2, p3, operation.equals(TRANSLATE_Y) ? highlightColor : yAxisColor);
 
         //Center circle
-        drawList.addCircleFilled(origin, circleRadius, isInCircle ? highlightColor : Color.iWHITE, 20);
+        drawList.addCircleFilled(origin, circleRadius, operation.equals(TRANSLATE_XY) ? highlightColor : Color.iWHITE, 20);
+
+        //------ Handle translation ------
+        //Set current operation
+        if(ImGui.isMouseClicked(0))
+        {
+            if(isInX)
+                operation = TRANSLATE_X;
+            else if(isInY)
+                operation = TRANSLATE_Y;
+            else if(isInCircle)
+                operation = TRANSLATE_XY;
+        }
+        else if(ImGui.isMouseReleased(0))
+            operation = NONE;
+
+        //Mouse movement
+        var deltaX : Float = (mousePos.x - oldMousePos.x) / camera.zoom;
+        var deltaY : Float = (mousePos.y - oldMousePos.y) / camera.zoom;
+        if(ImGui.isMouseDown(0))
+        {
+            if(operation.equals(TRANSLATE_X) && deltaX != 0)
+                go.move(deltaX, 0);
+            else if(operation.equals(TRANSLATE_Y) && deltaY != 0)
+                go.move(0, deltaY);
+            else if(operation.equals(TRANSLATE_XY) && (deltaX != 0 || deltaY != 0))
+                go.move(deltaX, deltaY);
+        }
+    }
+
+    function handleRotationGuizmo(go : GameObject)
+    {
+
+    }
+
+    function handleScaleGuizmo(go : GameObject)
+    {
+        
     }
 
     function isInsideCircle(origin : Vector2, radius : Float) : Bool
     {
-
+        var dist : Float = Math.sqrt(AMath.fdistSqr(origin.x, origin.y, mousePos.x, mousePos.y));
         
-        return false;
+        return dist <= radius;
     }
     //#endregion
+}
+
+enum TransformOperation
+{
+    NONE;
+    TRANSLATE_X;
+    TRANSLATE_Y;
+    TRANSLATE_XY;
+    ROTATE;
+    SCALE_X;
+    SCALE_Y;
+    SCALE_XY;
+}
+
+enum TransformMode
+{
+    TRANSLATE;
+    ROTATE;
+    SCALE;
 }

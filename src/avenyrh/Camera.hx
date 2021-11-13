@@ -111,6 +111,16 @@ class Camera extends Process
         x += dx;
 		y += dy;
     }
+
+    public function screenToWorld(x : Float, y : Float) : Vector2
+    {
+        return new Vector2((x - this.x) / zoom, (y - this.y) / zoom);
+    }
+
+    public function worldToScreen(x : Float, y : Float) : Vector2
+    {
+        return new Vector2(x * zoom + this.x , y * zoom + this.y);
+    }
     //#endregion
 
     //--------------------
