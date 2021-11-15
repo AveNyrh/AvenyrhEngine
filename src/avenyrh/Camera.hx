@@ -114,12 +114,12 @@ class Camera extends Process
 
     public function screenToWorld(x : Float, y : Float) : Vector2
     {
-        return new Vector2((x - this.x) / zoom, (y - this.y) / zoom);
+        return new Vector2((x - this.x - Process.S2D.width / 2) / zoom, (y - this.y - Process.S2D.height / 2) / zoom);
     }
 
     public function worldToScreen(x : Float, y : Float) : Vector2
     {
-        return new Vector2(x * zoom + this.x , y * zoom + this.y);
+        return new Vector2(x * zoom + this.x + Process.S2D.width / 2, y * zoom + this.y + Process.S2D.height / 2);
     }
     //#endregion
 

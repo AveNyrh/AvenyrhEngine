@@ -20,6 +20,8 @@ class SceneWindow extends EditorPanel
 
     public var operation : TransformOperation = NONE;
 
+    var windowOffset : Vector2 = new Vector2(8, 46);
+
     //Camera movement settings
     var left : Int = hxd.Key.Q;
     var right : Int = hxd.Key.D;
@@ -60,9 +62,9 @@ class SceneWindow extends EditorPanel
         //Scene image
         ImGui.image(sceneTex, {x : width, y : height});
 
-        var go : Null<GameObject> = cast Inspector.currentInspectable;
-        if(go != null)
+        if(Std.isOfType(Inspector.currentInspectable, GameObject))
         {
+            var go : GameObject = cast Inspector.currentInspectable;
             mousePos = ImGui.getMousePos();
 
             switch (mode)
@@ -90,8 +92,8 @@ class SceneWindow extends EditorPanel
         scene.removeChild(camera);
         scene.camera.pause();
 
-        @:privateAccess camera.forcePosition(260, 120);
-        camera.zoom = 1.6;
+        //@:privateAccess camera.forcePosition(260, 120);
+        //camera.zoom = 1.6;
     }
 
     function updateCamera(dt : Float)
@@ -123,7 +125,7 @@ class SceneWindow extends EditorPanel
     //--------------------
     //Transform guizmo settings
     var lineThickness : Float = 4;
-    var circleRadius : Float = 4;
+    var circleRadius : Float = 5;
     var axisLength : Float = 30;
     var xAxisColor : Int = Color.iBLUE;
     var yAxisColor : Int = Color.iGREEN;
@@ -135,14 +137,10 @@ class SceneWindow extends EditorPanel
 
     function handleTranslationGuizmo(go : GameObject)
     {
-        var go : GameObject = cast Inspector.currentInspectable;
-
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
-        var windowOrigin : Vector2 = ImGui.getWindowPos();
-        var upLeft : Vector2 = new Vector2(2, 40);
-        upLeft += windowOrigin;
-        var origin : Vector2 = upLeft + camera.worldToScreen(go.x, go.y);//Vector2.ONE * 100;
+        var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.x, go.y);
         var xEnd : Vector2 = origin + Vector2.RIGHT * axisLength;
         var yEnd : Vector2 = origin + Vector2.DOWN * axisLength;
         var xLineOffset : Vector2 = Vector2.DOWN * -lineThickness / 4;

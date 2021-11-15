@@ -82,6 +82,7 @@ class Inspector extends EditorPanel
             currentInspectable = editorCam;
 
         //Process
+        ImGui.spacing();
         if(ImGui.treeNodeEx("Process", treeNodeFlags))
         {
             ImGui.spacing();
