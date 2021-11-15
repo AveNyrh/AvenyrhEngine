@@ -31,6 +31,11 @@ class SceneWindow extends EditorPanel
     var mvtSpeed : Float = 2;
     var zoomSpeed : Float = 0.1;
 
+    //Mode inputs
+    var translate : Int = hxd.Key.NUMBER_1;
+    var rotate : Int = hxd.Key.NUMBER_2;
+    var scale : Int = hxd.Key.NUMBER_3;
+
     override function init() 
     {
         var scene : Scene = SceneManager.currentScene;
@@ -41,7 +46,7 @@ class SceneWindow extends EditorPanel
     {        
         super.draw(dt);
 
-        updateCamera(dt);
+        updateControls(dt);
 
         flags |= MenuBar;
 
@@ -55,6 +60,8 @@ class SceneWindow extends EditorPanel
         if(ImGui.beginMenuBar())
         {
             ImGui.text('$width x $height');
+            ImGui.sameLine(100);
+            ImGui.text(Std.string(mode));
         
             ImGui.endMenuBar();
         }
@@ -96,18 +103,19 @@ class SceneWindow extends EditorPanel
         //camera.zoom = 1.6;
     }
 
-    function updateCamera(dt : Float)
+    function updateControls(dt : Float)
     {
+        //Camera
         mvt = avenyrh.Vector2.ZERO;
 
         if(hxd.Key.isDown(left))
-            mvt.x = 1;
-        if(hxd.Key.isDown(right))
             mvt.x = -1;
+        if(hxd.Key.isDown(right))
+            mvt.x = 1;
         if(hxd.Key.isDown(up))
-            mvt.y = 1;
-        if(hxd.Key.isDown(down))
             mvt.y = -1;
+        if(hxd.Key.isDown(down))
+            mvt.y = 1;
 
         if(hxd.Key.isPressed(hxd.Key.MOUSE_WHEEL_UP))
             camera.zoom += zoomSpeed;
@@ -118,6 +126,14 @@ class SceneWindow extends EditorPanel
         camera.move(mvt.x * mvtSpeed / camera.zoom, mvt.y * mvtSpeed / camera.zoom);
         @:privateAccess camera.update(dt);
         @:privateAccess camera.postUpdate(dt);
+
+        //Mode
+        if(hxd.Key.isDown(translate))
+            mode = TRANSLATE;
+        if(hxd.Key.isDown(rotate))
+            mode = ROTATE;
+        if(hxd.Key.isDown(scale))
+            mode = SCALE;
     }
 
     //--------------------
@@ -190,25 +206,123 @@ class SceneWindow extends EditorPanel
         //Mouse movement
         var deltaX : Float = (mousePos.x - oldMousePos.x) / camera.zoom;
         var deltaY : Float = (mousePos.y - oldMousePos.y) / camera.zoom;
+
+        //Move gameObject
+        var pos : Vector2 = origin + new Vector2(deltaX, deltaY);
         if(ImGui.isMouseDown(0))
         {
-            if(operation.equals(TRANSLATE_X) && deltaX != 0)
+            if(operation.equals(TRANSLATE_X) && deltaX != 0 && isInScreenBounds(pos))
                 go.move(deltaX, 0);
-            else if(operation.equals(TRANSLATE_Y) && deltaY != 0)
+            else if(operation.equals(TRANSLATE_Y) && deltaY != 0 && isInScreenBounds(pos))
                 go.move(0, deltaY);
-            else if(operation.equals(TRANSLATE_XY) && (deltaX != 0 || deltaY != 0))
+            else if(operation.equals(TRANSLATE_XY) && (deltaX != 0 || deltaY != 0) && isInScreenBounds(pos))
                 go.move(deltaX, deltaY);
         }
     }
 
     function handleRotationGuizmo(go : GameObject)
     {
+        //------ Draw guizmo ------
+        var drawList : ImDrawList = ImGui.getForegroundDrawList();
+        var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.x, go.y);
+        var radius : Float = 40;
+
+        //Outer circle
+        drawList.addCircle(origin, radius, operation.equals(ROTATE) ? highlightColor : Color.iWHITE, 40, 2);
+
+        //Horizontal line
+        var p2 : Vector2 = origin + Vector2.RIGHT * 40;
+        drawList.addLine(origin, p2, Color.iWHITE, 2);
+
+        //Center circle
+        drawList.addCircleFilled(origin, circleRadius, Color.iWHITE, 20);
+
+        //------ Handle rotation ------
+        var isInOuterCircle : Bool = isInsideCircle(origin, 43) && !isInsideCircle(origin, 37);
+        
+        //Set current operation
+        if(ImGui.isMouseClicked(0))
+        {
+            if(isInOuterCircle)
+                operation = ROTATE;
+        }
+        else if(ImGui.isMouseReleased(0))
+            operation = NONE;
 
     }
 
     function handleScaleGuizmo(go : GameObject)
     {
-        
+        //------ Draw guizmo ------
+        var drawList : ImDrawList = ImGui.getForegroundDrawList();
+        var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.x, go.y);
+        var xEnd : Vector2 = origin + Vector2.RIGHT * axisLength;
+        var yEnd : Vector2 = origin + Vector2.DOWN * axisLength;
+        var xLineOffset : Vector2 = Vector2.DOWN * -lineThickness / 4;
+        var yLineOffset : Vector2 = Vector2.RIGHT * -lineThickness / 4;
+
+        //Mouse inside arrows
+        var isInX : Bool = mousePos.x >= origin.x + 2 && mousePos.x <= xEnd.x + 6 && 
+            mousePos.y >= origin.y - lineThickness / 2 && mousePos.y <= origin.y + lineThickness / 2;
+        var isInY : Bool = mousePos.y <= origin.y - 2 && mousePos.y >= yEnd.y - 6 && 
+            mousePos.x >= origin.x - lineThickness / 2 && mousePos.x <= origin.x + lineThickness / 2;
+        var isInCircle = isInsideCircle(origin, circleRadius);
+
+        //X axis
+        drawList.addLine(origin, xEnd, operation.equals(SCALE_X) ? highlightColor : xAxisColor, lineThickness);
+
+        var p1 : Vector2 = xEnd + xLineOffset + Vector2.DOWN * 4;
+        var p2 : Vector2 = xEnd + xLineOffset + Vector2.DOWN * -4;
+        var p3 : Vector2 = xEnd + xLineOffset + new Vector2(7, 4);
+        var p4 : Vector2 = xEnd + xLineOffset + new Vector2(7, -4);
+        drawList.addQuadFilled(p1, p2, p3, p4, operation.equals(SCALE_X) ? highlightColor : xAxisColor);
+
+        //Y axis
+        drawList.addLine(origin + yLineOffset, yEnd + yLineOffset, operation.equals(SCALE_Y) ? highlightColor : yAxisColor, lineThickness);
+
+        var yTriangleOffset : Vector2 = Vector2.DOWN * -1;
+        p1 = yEnd + yTriangleOffset + Vector2.RIGHT * -4;
+        p2 = yEnd + yTriangleOffset + Vector2.RIGHT * 4;
+        p3 = yEnd + yTriangleOffset + new Vector2(4, -7);
+        p4 = yEnd + yTriangleOffset + new Vector2(-4, -7);
+        drawList.addQuadFilled(p1, p2, p3, p4, operation.equals(SCALE_Y) ? highlightColor : yAxisColor);
+
+        //Center circle
+        drawList.addCircleFilled(origin, circleRadius, operation.equals(SCALE_XY) ? highlightColor : Color.iWHITE, 20);
+
+        //------ Handle scaling ------
+        //Set current operation
+        if(ImGui.isMouseClicked(0))
+        {
+            if(isInX)
+                operation = SCALE_X;
+            else if(isInY)
+                operation = SCALE_Y;
+            else if(isInCircle)
+                operation = SCALE_XY;
+        }
+        else if(ImGui.isMouseReleased(0))
+            operation = NONE;
+
+        //Mouse movement
+        var deltaX : Float = mousePos.x - oldMousePos.x;
+        var deltaY : Float = mousePos.y - oldMousePos.y;
+
+        //Scale gameObject
+        if(ImGui.isMouseDown(0))
+        {
+            if(operation.equals(SCALE_X) && deltaX != 0)
+                go.scaleX += deltaX > 0 ? 0.1 : -0.1;
+            else if(operation.equals(SCALE_Y) && deltaY != 0)
+                go.scaleY += deltaY < 0 ? 0.1 : -0.1;
+            else if(operation.equals(SCALE_XY) && (deltaX != 0 || deltaY != 0))
+            {
+                go.scaleX += deltaX > 0 ? 0.1 : -0.1;
+                go.scaleY += deltaX > 0 ? 0.1 : -0.1;
+            }
+        }
     }
 
     function isInsideCircle(origin : Vector2, radius : Float) : Bool
@@ -216,6 +330,13 @@ class SceneWindow extends EditorPanel
         var dist : Float = Math.sqrt(AMath.fdistSqr(origin.x, origin.y, mousePos.x, mousePos.y));
         
         return dist <= radius;
+    }
+
+    function isInScreenBounds(pos : Vector2) : Bool
+    {
+        var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
+        return pos.x >= windowOrigin.x && pos.x <= windowOrigin.x + sceneTex.width - 10 && 
+            pos.y >= windowOrigin.y && pos.y <= windowOrigin.y + sceneTex.height;
     }
     //#endregion
 }
