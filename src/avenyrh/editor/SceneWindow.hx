@@ -150,6 +150,9 @@ class SceneWindow extends EditorPanel
 
     var oldMousePos : Vector2 = Vector2.ZERO;
     var mousePos : Vector2 = Vector2.ZERO;
+    var mouseClickedPos : Vector2 = Vector2.ZERO;
+    var mouseClickedRot : Float = 0;
+    var oldRotation : Float = 0;
 
     function handleTranslationGuizmo(go : GameObject)
     {
@@ -203,14 +206,14 @@ class SceneWindow extends EditorPanel
         else if(ImGui.isMouseReleased(0))
             operation = NONE;
 
-        //Mouse movement
-        var deltaX : Float = (mousePos.x - oldMousePos.x) / camera.zoom;
-        var deltaY : Float = (mousePos.y - oldMousePos.y) / camera.zoom;
-
         //Move gameObject
-        var pos : Vector2 = origin + new Vector2(deltaX, deltaY);
         if(ImGui.isMouseDown(0))
         {
+            //Mouse movement
+            var deltaX : Float = (mousePos.x - oldMousePos.x) / camera.zoom;
+            var deltaY : Float = (mousePos.y - oldMousePos.y) / camera.zoom;
+            var pos : Vector2 = origin + new Vector2(deltaX, deltaY);
+
             if(operation.equals(TRANSLATE_X) && deltaX != 0 && isInScreenBounds(pos))
                 go.move(deltaX, 0);
             else if(operation.equals(TRANSLATE_Y) && deltaY != 0 && isInScreenBounds(pos))
@@ -232,7 +235,8 @@ class SceneWindow extends EditorPanel
         drawList.addCircle(origin, radius, operation.equals(ROTATE) ? highlightColor : Color.iWHITE, 40, 2);
 
         //Horizontal line
-        var p2 : Vector2 = origin + Vector2.RIGHT * 40;
+        var p2 : Vector2 = !operation.equals(ROTATE) ? origin + Vector2.RIGHT * 40 :
+            origin + new Vector2(40 * Math.cos(mouseClickedRot), -40 * Math.sin(mouseClickedRot));
         drawList.addLine(origin, p2, Color.iWHITE, 2);
 
         //Center circle
@@ -242,14 +246,31 @@ class SceneWindow extends EditorPanel
         var isInOuterCircle : Bool = isInsideCircle(origin, 43) && !isInsideCircle(origin, 37);
         
         //Set current operation
-        if(ImGui.isMouseClicked(0))
+        if(ImGui.isMouseClicked(0) && isInOuterCircle)
         {
-            if(isInOuterCircle)
-                operation = ROTATE;
+            operation = ROTATE;
+            mouseClickedPos = ImGui.getMousePos();
+            mouseClickedRot = AMath.getAngleBetween3Points(origin + Vector2.RIGHT, origin, mousePos);
+            oldRotation = mouseClickedRot;
         }
         else if(ImGui.isMouseReleased(0))
             operation = NONE;
 
+        //Rotate gameObject
+        if(ImGui.isMouseDown(0) && operation.equals(ROTATE))
+        {
+            //Mouse movement
+            var newRotation : Float = AMath.getAngleBetween3Points(origin + Vector2.RIGHT, origin, mousePos);
+            var delta : Float = newRotation - oldRotation;
+
+            if(delta != 0)
+                go.rotate(delta);
+
+            p2 = origin + new Vector2(40 * Math.cos(newRotation), -40 * Math.sin(newRotation));
+            drawList.addLine(origin, p2, highlightColor, 2);
+
+            oldRotation = newRotation;
+        }
     }
 
     function handleScaleGuizmo(go : GameObject)
@@ -306,13 +327,13 @@ class SceneWindow extends EditorPanel
         else if(ImGui.isMouseReleased(0))
             operation = NONE;
 
-        //Mouse movement
-        var deltaX : Float = mousePos.x - oldMousePos.x;
-        var deltaY : Float = mousePos.y - oldMousePos.y;
-
         //Scale gameObject
         if(ImGui.isMouseDown(0))
         {
+            //Mouse movement
+            var deltaX : Float = mousePos.x - oldMousePos.x;
+            var deltaY : Float = mousePos.y - oldMousePos.y;
+            
             if(operation.equals(SCALE_X) && deltaX != 0)
                 go.scaleX += deltaX > 0 ? 0.1 : -0.1;
             else if(operation.equals(SCALE_Y) && deltaY != 0)

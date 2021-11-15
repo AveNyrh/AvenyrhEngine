@@ -272,4 +272,19 @@ class AMath
     {
 		return (ax-bx) * (ax-bx) + (ay-by) * (ay-by);
 	}
+
+	/**
+	 * Get the angle in degrees between the points A, B, C
+	 * @param a First point
+	 * @param b Middle point
+	 * @param c Third point
+	 */
+	public static function getAngleBetween3Points(a : Vector2, b : Vector2, c : Vector2) : Float
+	{
+		var ba : Vector2 = new Vector2(a.x - b.x, a.y - b.y);
+		var bc : Vector2 = new Vector2(c.x - b.x, c.y - b.y);
+		var dot : Float = ba.x * bc.x + ba.y * bc.y;
+		var alpha : Float = Math.acos(dot / (ba.magnitude * bc.magnitude));
+		return a.y > c.y ? alpha : -alpha;
+	}
 }

@@ -71,7 +71,7 @@ class SpriteComponent extends GraphicComponent
         if(@:privateAccess gameObject.transformChanged)
         {
             bitmap.setPosition(gameObject.x + dx, gameObject.y + dy);
-            bitmap.rotation = gameObject.rotation + drot;
+            bitmap.rotation = -gameObject.rotation - drot;
             bitmap.scaleX = gameObject.scaleX * dsx;
             bitmap.scaleY = gameObject.scaleY * dsy;
         }
