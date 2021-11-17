@@ -249,10 +249,12 @@ class Inspector extends EditorPanel
             if(go != null)
             {
                 ImGui.setDragDropPayloadString(EditorPanel.ddGameObjectInspector, uID);
+                ImGui.setTooltip(go.name);
             }
             else if(proc != null)
             {
                 ImGui.setDragDropPayloadString(EditorPanel.ddProcessInspector, uID);
+                ImGui.setTooltip(proc.name);
             }
             ImGui.endDragDropSource();
         }
@@ -449,38 +451,53 @@ class Inspector extends EditorPanel
                 Inspector.image(field.name, tile);
                 return tile;
 
-            case CClass("avenyrh.gameObject.GameObject", []) : //GameObject
-                go = cast(Reflect.getProperty(u, field.name), GameObject);
-                if(go != null)
-                    Inspector.labelText(field.name, go.name);
-                else 
-                    Inspector.labelText(field.name, "Null");
-
-                //Drag drop
-                if(ImGui.beginDragDropTarget())
-                {
-                    var goUID : String = ImGui.acceptDragDropPayloadString(EditorPanel.ddGameObjectInspector);
-                    var g : GameObject = SceneManager.currentScene.getGameObjectFromUID(goUID);
-
-                    if(g != null)
-                    {
-                        go = g;
-                    }
-
-                    ImGui.endDragDropTarget();
-                }
-
-                return go;
-
             default :
                 var f : String = getClassNameFromRttiField(field);
-                if(@:privateAccess EditorPanel.Editor.data.components.exists(f))
+                if(@:privateAccess EditorPanel.Editor.data.gameObjects.exists(f) || field.type.match(CClass("avenyrh.gameObject.GameObject", []))) //GameObjects
+                {
+                    go = cast(Reflect.getProperty(u, field.name), GameObject);
+                    ImGui.pushStyleColor(Button, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+                    ImGui.pushStyleColor(ButtonHovered, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+                    ImGui.pushStyleColor(ButtonActive, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+                    ImGui.pushStyleColor(Border, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+                    if(go != null)
+                        Inspector.labelButton(field.name, go.name, u.uID, cast(ImGui.getWindowContentRegionWidth() - labelWidth - 32));
+                    else 
+                        Inspector.labelButton(field.name, "Null", u.uID, cast(ImGui.getWindowContentRegionWidth() - labelWidth - 32));
+                    ImGui.popStyleColor(4);
+    
+                    //Drag drop
+                    if(ImGui.beginDragDropTarget())
+                    {
+                        var goUID : String = ImGui.acceptDragDropPayloadString(EditorPanel.ddGameObjectInspector);
+                        var g : GameObject = SceneManager.currentScene.getGameObjectFromUID(goUID);
+    
+                        if(g != null)
+                        {
+                            go = g;
+                        }
+    
+                        ImGui.endDragDropTarget();
+                    }
+    
+                    ImGui.sameLine();
+                    if(ImGui.button("X##go", {x : 20, y : 20}))
+                        go = null;
+
+                    Reflect.setProperty(u, field.name, go);
+                }
+                else if(@:privateAccess EditorPanel.Editor.data.components.exists(f)) //Components
                 {
                     comp = cast(Reflect.getProperty(u, field.name), Component);
+                    ImGui.pushStyleColor(Button, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+                    ImGui.pushStyleColor(ButtonHovered, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+                    ImGui.pushStyleColor(ButtonActive, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+                    ImGui.pushStyleColor(Border, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
                     if(comp != null)
-                        Inspector.labelText(field.name, '${comp.gameObject.name}.${comp.name}');
+                        Inspector.labelButton(field.name, '${comp.gameObject.name}.${comp.name}', u.uID, cast(ImGui.getWindowContentRegionWidth() - labelWidth - 32));
                     else 
-                        Inspector.labelText(field.name, "Null");
+                        Inspector.labelButton(field.name, "Null", u.uID, cast(ImGui.getWindowContentRegionWidth() - labelWidth - 32));
+                    ImGui.popStyleColor(4);
     
                     //Drag drop
                     if(ImGui.beginDragDropTarget())
@@ -498,7 +515,11 @@ class Inspector extends EditorPanel
                         ImGui.endDragDropTarget();
                     }
 
-                    return comp;
+                    ImGui.sameLine();
+                    if(ImGui.button("X##comp", {x : 20, y : 20}))
+                        comp = null;
+
+                    Reflect.setProperty(u, field.name, comp);
                 }
                 
                 return null;
@@ -509,7 +530,7 @@ class Inspector extends EditorPanel
     {
         ImGui.columns(2);
         ImGui.setColumnWidth(0, labelWidth);
-        ImGui.text(label);
+        ImGui.labelText('##$label', label);
         ImGui.nextColumn();
         ImGui.pushItemWidth(ImGui.getWindowWidth() - labelWidth - 20);
     }
@@ -696,9 +717,17 @@ class Inspector extends EditorPanel
         return index;
     }
 
-    public static function button(label : String, id : Int64) : Bool
+    public static function button(label : String, id : Int64, width : Int = 200, height : Int = 20) : Bool
     {
-        return ImGui.button('$label##$label$id', {x : 200, y : 20});
+        return ImGui.button('$label##$label$id', {x : width, y : height});
+    }
+
+    public static function labelButton(label : String, textButton : String, id : Int64, width : Int = 200, height : Int = 20) : Bool
+    {
+        drawLabel(label);
+        var b : Bool = ImGui.button('$textButton##$label$id', {x : width, y : height});
+        endField();
+        return b;
     }
 
     /**
@@ -773,7 +802,7 @@ class Inspector extends EditorPanel
 
         var space = ImGui.calcItemWidth();
         var buttonSize = 20;
-        var dragSize = space / 2 - 2 * buttonSize + 8;
+        var dragSize = space / 2 - 2 * buttonSize + 8.5;
         var x = new hl.NativeArray<Single>(1);
         x[0] = vec.x;
         var y = new hl.NativeArray<Single>(1);

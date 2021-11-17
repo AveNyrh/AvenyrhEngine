@@ -84,6 +84,13 @@ class SpriteComponent extends GraphicComponent
         Inspector.image("tile", bitmap.tile);
     }
 
+    override function onDestroy() 
+    {
+        super.onDestroy();
+
+        bitmap.remove();
+    }
+
     //-------------------------------
     //#region Getters & Setters
     //-------------------------------
