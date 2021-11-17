@@ -6,6 +6,10 @@ class EditorPanel
 {
     static var Editor : Editor;
 
+    static var ddGameObjectInspector : String = "DD GameObject Inspector";
+
+    static var ddProcessInspector : String = "DD Process Inspector";
+
     /**
      * Is the widget running
      */

@@ -173,10 +173,27 @@ class GameObject extends Uniq implements IInspectable
             var st = @:privateAccess String.fromUTF8(input_text_buffer);
             //name = st;
         }
-        var buttonSize : Int = 19;
-        ImGui.sameLine(availableSpace.x - buttonSize / 2);
-        if(ImGui.button('+##${uID}', {x : buttonSize, y : buttonSize}))
+        var plusButtonSize : Int = 19;
+        var lockButtonSize : Int = 60;
+        ImGui.sameLine(availableSpace.x - plusButtonSize / 2 - lockButtonSize - 16);
+        if(ImGui.button('+##${uID}', {x : plusButtonSize, y : plusButtonSize}))
             ImGui.openPopup('GameObjectSettings##${uID}');
+        ImGui.sameLine();
+        if(Inspector.locked)
+        {
+            ImGui.pushStyleColor(Text, Color.iBLACK);
+            ImGui.pushStyleColor(Button, Color.iWHITE);
+            ImGui.pushStyleColor(ButtonHovered, Color.iWHITE);
+            ImGui.pushStyleColor(ButtonActive, Color.iWHITE);
+            if(ImGui.button('Unlock##${uID}', {x : lockButtonSize, y : plusButtonSize}))
+                Inspector.locked = false;
+            ImGui.popStyleColor(4);
+        }
+        else 
+        {
+            if(ImGui.button('Lock##${uID}', {x : lockButtonSize, y : plusButtonSize}))
+                Inspector.locked = true;
+        }
 
         ImGui.spacing();
         ImGui.spacing();
@@ -338,15 +355,9 @@ class GameObject extends Uniq implements IInspectable
      * @param name Name of the wanted component
      * @return Component
      */
-    public function getComponentByName(name : String) : Component
+    public inline function getComponentByName(name : String) : Component
     {
-        for(c in components)
-        {
-            if(c.name == name)
-                return c;
-        }
-
-        return null;
+        return components.find((c) -> c.name == name);
     }
 
     /**
@@ -449,6 +460,19 @@ class GameObject extends Uniq implements IInspectable
         }
             
         return false;
+    }
+
+    public function getParentRec() : Array<GameObject>
+    {
+        var arr : Array<GameObject> = [];
+        var p : GameObject = parent;
+        while (p.name != @:privateAccess scene.rootGo.name)
+        {
+            arr.push(p);
+            p = p.parent;
+        }
+
+        return arr;
     }
     //#endregion
 

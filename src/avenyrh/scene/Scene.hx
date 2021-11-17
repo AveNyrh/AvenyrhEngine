@@ -1,5 +1,7 @@
 package avenyrh.scene;
 
+using Lambda;
+import haxe.Int64;
 import h2d.Flow;
 import avenyrh.engine.Process;
 import avenyrh.utils.StringUtils;
@@ -258,6 +260,11 @@ class Scene extends Process
                 return true;
             
         return false;
+    }
+
+    public inline function getGameObjectFromUID(id : String) : GameObject
+    {
+        return allGO.find((go) -> Int64.toStr(go.uID) == id);
     }
 
     public override function toString() : String 

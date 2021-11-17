@@ -1,18 +1,19 @@
 package avenyrh.editor;
 
+import examples.src.EditorData;
+using Lambda;
+import haxe.Int64;
+import haxe.EnumTools;
+import h2d.Tile;
 import avenyrh.gameObject.Component;
 import avenyrh.gameObject.SpriteComponent;
 import avenyrh.engine.Process;
 import avenyrh.gameObject.GameObject;
-import haxe.Int64;
-using Lambda;
-import haxe.EnumTools;
 import avenyrh.imgui.ImGui;
 import avenyrh.scene.Scene;
 import avenyrh.scene.SceneManager;
 import avenyrh.scene.SceneSerializer;
 import avenyrh.engine.Uniq;
-import h2d.Tile;
 
 class Inspector extends EditorPanel
 {
@@ -25,6 +26,8 @@ class Inspector extends EditorPanel
      * Indent space for the hierarchy
      */
     public static inline var indentSpace : Float = 6;
+
+    public static var locked : Bool = false;
 
     static var fields : Array<String>;
     
@@ -78,7 +81,7 @@ class Inspector extends EditorPanel
             ImGui.treePop();
         
 
-        if(ImGui.isItemClicked())
+        if(ImGui.isItemClicked() && !locked)
             currentInspectable = editorCam;
 
         //Process
@@ -177,22 +180,28 @@ class Inspector extends EditorPanel
     }
     //#endregion
 
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
     function drawHierarchy(inspectable : IInspectable)
     {
         var name : String = "";
         var uID : String = "";
         var children : Array<Dynamic> = [];
 
+        var go : Null<GameObject> = null;
+        var proc : Null<Process> = null;
+
         if(Std.isOfType(inspectable, GameObject))
         {
-            var go : GameObject = cast inspectable;
+            go = cast inspectable;
             name = go.name;
             uID = Int64.toStr(go.uID);
             children = cast go.children;
         }
         else if(Std.isOfType(inspectable, Process))
         {
-            var proc : Process = cast inspectable;
+            proc = cast inspectable;
             name = proc.name;
             uID = Int64.toStr(proc.uID);
             children = cast proc.children;
@@ -206,15 +215,14 @@ class Inspector extends EditorPanel
 
         var open : Bool = ImGui.treeNodeEx('$name###$name$uID', treeNodeFlags);
 
-        if(ImGui.isItemClicked())
+        if(ImGui.isItemClicked() && !locked)
             currentInspectable = inspectable;
 
+        //Righ click pop up
         if(ImGui.beginPopupContextWindow('HierarchyItemSettings##$uID'))
         {
-            if(Std.isOfType(inspectable, GameObject))
+            if(go != null)
             {
-                var go : GameObject = cast inspectable;
-
                 if(ImGui.menuItem("Destroy GameObject"))
                     go.destroy();
 
@@ -224,16 +232,53 @@ class Inspector extends EditorPanel
                 if(child != null)
                     go.addChild(child);
             }
-            else if(Std.isOfType(inspectable, Process))
+            else if(proc != null)
             {
-                var proc : Process = cast inspectable;
-
                 if(ImGui.menuItem("Destroy process"))
                 {
                     proc.destroy();
                 }
             }
             ImGui.endPopup();
+        }
+
+        //Drag drop
+        //Source
+        if(ImGui.beginDragDropSource())
+        {
+            if(go != null)
+            {
+                ImGui.setDragDropPayloadString(EditorPanel.ddGameObjectInspector, uID);
+            }
+            else if(proc != null)
+            {
+                ImGui.setDragDropPayloadString(EditorPanel.ddProcessInspector, uID);
+            }
+            ImGui.endDragDropSource();
+        }
+
+        //Target
+        if(ImGui.beginDragDropTarget())
+        {
+            if(go != null)
+            {
+                var goUID : String = ImGui.acceptDragDropPayloadString(EditorPanel.ddGameObjectInspector);
+                var g : GameObject = SceneManager.currentScene.getGameObjectFromUID(goUID);
+                if(g != null && !go.getParentRec().contains(g) && goUID != uID)
+                {
+                    go.addChild(g);
+                }
+            }
+            else if(proc != null)
+            {
+                var procUID : String = ImGui.acceptDragDropPayloadString(EditorPanel.ddGameObjectInspector);
+                var p : Process = SceneManager.currentScene.getChildRec(procUID);
+                if(p != null && !proc.getParentRec().contains(p) && procUID != uID)
+                {
+                    proc.addChild(p);
+                }
+            }
+            ImGui.endDragDropTarget();
         }
 
         if(open)
@@ -266,6 +311,20 @@ class Inspector extends EditorPanel
 
         return go;
     }
+
+    static function getClassNameFromRttiField(field : haxe.rtti.CType.ClassField) : String
+    {
+        switch (field.type)
+        {
+            case CClass(name, params) :
+                var f : Array<String> = name.split(".");
+                return f[f.length - 1];
+            
+            case _ :
+                return null;
+        }
+    }
+    //#endregion
 
     //-------------------------------
     //#region Static API
@@ -332,6 +391,8 @@ class Inspector extends EditorPanel
     static var tile : Tile;
     static var ev : EnumValue;
     static var e : Enum<Dynamic>;
+    static var go : GameObject;
+    static var comp : Component;
     static var index : Int = 0;
 
     public static function drawField<T>(u : Uniq, field : haxe.rtti.CType.ClassField, value : Dynamic) : Dynamic
@@ -388,7 +449,58 @@ class Inspector extends EditorPanel
                 Inspector.image(field.name, tile);
                 return tile;
 
+            case CClass("avenyrh.gameObject.GameObject", []) : //GameObject
+                go = cast(Reflect.getProperty(u, field.name), GameObject);
+                if(go != null)
+                    Inspector.labelText(field.name, go.name);
+                else 
+                    Inspector.labelText(field.name, "Null");
+
+                //Drag drop
+                if(ImGui.beginDragDropTarget())
+                {
+                    var goUID : String = ImGui.acceptDragDropPayloadString(EditorPanel.ddGameObjectInspector);
+                    var g : GameObject = SceneManager.currentScene.getGameObjectFromUID(goUID);
+
+                    if(g != null)
+                    {
+                        go = g;
+                    }
+
+                    ImGui.endDragDropTarget();
+                }
+
+                return go;
+
             default :
+                var f : String = getClassNameFromRttiField(field);
+                if(@:privateAccess EditorPanel.Editor.data.components.exists(f))
+                {
+                    comp = cast(Reflect.getProperty(u, field.name), Component);
+                    if(comp != null)
+                        Inspector.labelText(field.name, '${comp.gameObject.name}.${comp.name}');
+                    else 
+                        Inspector.labelText(field.name, "Null");
+    
+                    //Drag drop
+                    if(ImGui.beginDragDropTarget())
+                    {
+                        var goUID : String = ImGui.acceptDragDropPayloadString(EditorPanel.ddGameObjectInspector);
+                        var g : GameObject = SceneManager.currentScene.getGameObjectFromUID(goUID);
+    
+                        if(g != null)
+                        {
+                            var c : Null<Component> = g.getComponentByName(f);
+                            if(c != null)
+                                comp = c;
+                        }
+    
+                        ImGui.endDragDropTarget();
+                    }
+
+                    return comp;
+                }
+                
                 return null;
         }
     }
@@ -653,7 +765,7 @@ class Inspector extends EditorPanel
     }
 
     /**
-     * Returns true if one of the values has changed
+     * Returns the vector2 changed
      */
     public static function dragVector2(label : String, id : Int64, vec : Vector2, step : Float = 0.1, format : String = "%.3f", resetValue : Float = 0) : Vector2
     {

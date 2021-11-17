@@ -1,5 +1,6 @@
 package examples.src;
 
+import avenyrh.gameObject.GameObject;
 import avenyrh.gameObject.Component;
 
 class TestComponent extends Component
@@ -11,4 +12,8 @@ class TestComponent extends Component
     public var testBool : Bool = true;
 
     public var testString : String = "This is a test string";
+
+    public var testGo : GameObject = null;
+
+    public var testComp : TestComponent = null;
 }

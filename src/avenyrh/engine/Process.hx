@@ -1,5 +1,8 @@
 package avenyrh.engine;
 
+using Lambda;
+import avenyrh.scene.Scene;
+import avenyrh.scene.SceneManager;
 import haxe.Int64;
 import avenyrh.editor.Inspector;
 import avenyrh.editor.IInspectable;
@@ -192,6 +195,24 @@ class Process extends Uniq implements IInspectable
 		p.parent = this;
 		children.push(p);
     }
+
+    public function getChildRec(id : String) : Null<Process>
+    {
+        var p : Process = children.find((proc) -> Int64.toStr(proc.uID) == id);
+
+        if(p == null)
+        {
+            for(child in children)
+            {
+                p = child.getChildRec(id);
+
+                if(p != null)
+                    return p;
+            }
+        }
+
+        return p;
+    }
     
     /**
      * Removes the process in parameter from children
@@ -213,6 +234,20 @@ class Process extends Uniq implements IInspectable
     {
 		for(p in children)
 			p.destroy();
+    }
+
+    public function getParentRec() : Array<Process>
+    {
+        var arr : Array<Process> = [];
+        var p : Process = parent;
+        var scene : Scene = SceneManager.currentScene;
+        while (p.name != @:privateAccess scene.name)
+        {
+            arr.push(p);
+            p = p.parent;
+        }
+
+        return arr;
     }
 
     @:noCompletion
