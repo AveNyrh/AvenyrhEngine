@@ -45,7 +45,7 @@ class Animator extends Component
         super.drawInfo();
 
         play = Inspector.checkbox("Play", uID, play);
-        Inspector.labelText("Animation", uID, stateMachine.currentState.name);
+        Inspector.labelText("Animation", stateMachine.currentState.name);
 
         var anim : Animation = cast stateMachine.currentState;
         var sliderV = new hl.NativeArray<Single>(1);

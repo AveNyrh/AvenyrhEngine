@@ -32,7 +32,7 @@ class Inspector extends EditorPanel
 
     static var textures : Map<h3d.mat.Texture, Int> = [];
 
-    static var off : Int = 226;
+    static var labelWidth : Int = 120;
 
     //-------------------------------
     //#region Public API
@@ -348,7 +348,7 @@ class Inspector extends EditorPanel
                     Inspector.sliderFloats(field.name, u.uID, fv, minf, maxf);
                 }
                 else
-                    Inspector.dragFloats(field.name, u.uID, fv, 0.1);
+                    Inspector.dragFloats(field.name, u.uID, fv);
 
                 return cast fv[0];
 
@@ -380,9 +380,7 @@ class Inspector extends EditorPanel
 
             case CAbstract("avenyrh.Vector2", []) : //Vector2
                 vec2 = Reflect.getProperty(u, field.name);
-                fv = [vec2.x, vec2.y];
-                Inspector.dragFloats(field.name, u.uID, fv, 0.1);
-                vec2 = new Vector2(fv[0], fv[1]);
+                vec2 = Inspector.dragVector2(field.name, u.uID, vec2, 0.1);
                 return vec2;
 
             case CClass("h2d.Tile", []) : //Tile
@@ -395,24 +393,77 @@ class Inspector extends EditorPanel
         }
     }
 
+    static function drawLabel(label : String)
+    {
+        ImGui.columns(2);
+        ImGui.setColumnWidth(0, labelWidth);
+        ImGui.text(label);
+        ImGui.nextColumn();
+        ImGui.pushItemWidth(ImGui.getWindowWidth() - labelWidth - 20);
+    }
+
+    static function endField()
+    {
+        ImGui.popItemWidth();
+        ImGui.columns(1);
+    }
+
+    /**
+     * Returns the changed value
+     */
+    public static function inputFloat(label : String, id : Int64, data : Float, step : Float = 0.1, format : String = "%.3f") : Float
+    {
+        drawLabel(label);
+        var value = new hl.Ref<Float>(data);
+        ImGui.inputDouble('##$label$id', value, step, step, format);
+
+        endField();
+        return data;
+    }
+
     /**
      * Returns true if one of the values has changed
      */
-    public static function dragFloats(label : String, id : Int64, data : Array<Float>, step : Float = 1, format : String = "%.3f") : Bool
+    public static function inputFloats(label : String, id : Int64, data : Array<Float>, format : String = "%.3f") : Bool
     {
+        drawLabel(label);
         var na = new hl.NativeArray<Single>(data.length);
         var changed : Bool = false;
 
         for(i in 0 ... data.length)
             na[i] = data[i];
 
-        if(ImGui.dragFloat('$label###$label$id', na, step, format))
+        if(ImGui.inputFloat2('##$label$id', na, format))
         {
             changed = true;
             for(i in 0 ... data.length)
                 data[i] = na[i];
         }
 
+        endField();
+        return changed;
+    }
+
+    /**
+     * Returns true if one of the values has changed
+     */
+    public static function dragFloats(label : String, id : Int64, data : Array<Float>, step : Float = 1, format : String = "%.3f") : Bool
+    {
+        drawLabel(label);
+        var na = new hl.NativeArray<Single>(data.length);
+        var changed : Bool = false;
+
+        for(i in 0 ... data.length)
+            na[i] = data[i];
+
+        if(ImGui.dragFloat('##$label$id', na, step, format))
+        {
+            changed = true;
+            for(i in 0 ... data.length)
+                data[i] = na[i];
+        }
+
+        endField();
         return changed;
     }
 
@@ -421,40 +472,59 @@ class Inspector extends EditorPanel
      */
     public static function sliderFloats(label : String, id : Int64, data : Array<Float>, min : Float, max : Float, format : String = "%.3f") : Bool
     {
+        drawLabel(label);
         var na = new hl.NativeArray<Single>(data.length);
         var changed : Bool = false;
 
         for(i in 0 ... data.length)
             na[i] = data[i];
 
-        if(ImGui.sliderFloat('$label###$label$id', na, min, max, format))
+        if(ImGui.sliderFloat('##$label$id', na, min, max, format))
         {
             changed = true;
             for(i in 0 ... data.length)
                 data[i] = na[i];
         }
 
+        endField();
         return changed;
     }
 
+    /**
+     * Returns the changed value
+     */
+    public static function inputInt(label : String, id : Int64, data : Int) : Int
+    {
+        drawLabel(label);
+        var f : Float = cast data;
+        var value = new hl.Ref<Float>(f);
+
+        ImGui.inputDouble('##$label$id', value, 1, 1, "%.0f");
+
+        endField();
+        return AMath.floor(f);
+    }
+    
     /**
      * Returns true if one of the values has changed
      */
     public static function dragInts(label : String, id : Int64, data : Array<Int>, step : Float = 1) : Bool
     {
+        drawLabel(label);
         var na = new hl.NativeArray<Int>(data.length);
         var changed : Bool = false;
 
         for(i in 0 ... data.length)
             na[i] = data[i];
 
-        if(ImGui.dragInt('$label###$label$id', na, step))
+        if(ImGui.dragInt('##$label$id', na, step))
         {
             changed = true;
             for(i in 0 ... data.length)
                 data[i] = na[i];
         }
 
+        endField();
         return changed;
     }
 
@@ -463,19 +533,21 @@ class Inspector extends EditorPanel
      */
     public static function sliderInts(label : String, id : Int64, data : Array<Int>, min : Int, max : Int) : Bool
     {
+        drawLabel(label);
         var na = new hl.NativeArray<Int>(data.length);
         var changed : Bool = false;
 
         for(i in 0 ... data.length)
             na[i] = data[i];
 
-        if(ImGui.sliderInt('$label###$label$id', na, min, max))
+        if(ImGui.sliderInt('##$label$id', na, min, max))
         {
             changed = true;
             for(i in 0 ... data.length)
                 data[i] = na[i];
         }
 
+        endField();
         return changed;
     }
 
@@ -484,6 +556,7 @@ class Inspector extends EditorPanel
      */
     public static function enumDropdown<T>(label : String, id : Int64, e : Enum<T>, index : Int, maxItemShown : Int = 4) : Int
     {
+        drawLabel(label);
         var changed : Bool = false;
         var ea : Array<T> = haxe.EnumTools.createAll(e);
         var na = new hl.NativeArray<String>(ea.length);
@@ -491,7 +564,7 @@ class Inspector extends EditorPanel
         for(i in 0 ... ea.length)
             na[i] = Std.string(ea[i]);
 
-        if(ImGui.beginCombo('$label###$label$id', na[index]))
+        if(ImGui.beginCombo('##$label$id', na[index]))
         {
             for(i in 0 ... na.length)
             {
@@ -507,12 +580,13 @@ class Inspector extends EditorPanel
             ImGui.endCombo();
         }
 
+        endField();
         return index;
     }
 
     public static function button(label : String, id : Int64) : Bool
     {
-        return ImGui.button('$label###$label$id', {x : 200, y : 20});
+        return ImGui.button('$label##$label$id', {x : 200, y : 20});
     }
 
     /**
@@ -520,37 +594,104 @@ class Inspector extends EditorPanel
      */
     public static function checkbox(label : String, id : Int64, value : Bool)  : Bool
     {
+        drawLabel(label);
         var v : hl.Ref<Bool> = cast value;
-        ImGui.checkbox("", v);
-        ImGui.sameLine(off + 75);
-        ImGui.text('$label');
+        ImGui.checkbox('##$label$id', v);
+
+        endField();
         return v.get();
     }
 
     public static function inputText(label : String, id : Int64, text : String) : String
     {
+        drawLabel(label);
         var input_text_buffer = new hl.Bytes(128);
         input_text_buffer = @:privateAccess text.toUtf8();
 
-        if (ImGui.inputText('$label###$label$id', input_text_buffer, 128)) 
+        if (ImGui.inputText('##$label$id', input_text_buffer, 128)) 
         {
             var st = @:privateAccess String.fromUTF8(input_text_buffer);
             text = st;
         }
 
+        endField();
         return text;
     }
 
-    public static function labelText(label : String, id : Int64, text : String) 
+    public static function labelText(label : String, text : String) 
     {
-        ImGui.labelText('$label###$label$id', text);
+        drawLabel(label);
+        ImGui.text(text);
+        endField();
     }
 
     public static function image(label : String, tile : Tile) @:privateAccess
     {
+        drawLabel(label);
         ImGui.image(tile.getTexture(), {x : tile.width, y : tile.height}, {x : tile.u, y : tile.v}, {x : tile.u2, y : tile.v2});
-        ImGui.sameLine(off);
-        ImGui.text('$label');
+        endField();
+    }
+
+    /**
+     * Returns true if one of the values has changed
+     */
+    public static function inputVector2(label : String, id : Int64, vec : Vector2, step : Float = 0.1, format : String = "%.3f") : Vector2
+    {
+        drawLabel(label);
+
+        var x = new hl.Ref<Float>(vec.x);
+        var y = new hl.Ref<Float>(vec.y);
+        ImGui.inputDouble('##x$label$id', x, step, step, format);
+        ImGui.sameLine();
+        ImGui.text("X");
+        ImGui.inputDouble('##y$label$id', y, step, step, format);
+        ImGui.sameLine();
+        ImGui.text("Y");
+
+        endField();
+        return vec;
+    }
+
+    /**
+     * Returns true if one of the values has changed
+     */
+    public static function dragVector2(label : String, id : Int64, vec : Vector2, step : Float = 0.1, format : String = "%.3f", resetValue : Float = 0) : Vector2
+    {
+        drawLabel(label);
+
+        var space = ImGui.calcItemWidth();
+        var buttonSize = 20;
+        var dragSize = space / 2 - 2 * buttonSize + 8;
+        var x = new hl.NativeArray<Single>(1);
+        x[0] = vec.x;
+        var y = new hl.NativeArray<Single>(1);
+        y[0] = vec.y;
+        
+        ImGui.pushStyleColor2(Button, {x : 0.8, y : 0.1, z : 0.15, w : 1});
+        ImGui.pushStyleColor2(ButtonHovered, {x : 0.9, y : 0.2, z : 0.2, w : 1});
+        ImGui.pushStyleColor2(ButtonActive, {x : 0.8, y : 0.1, z : 0.15, w : 1});
+        if(ImGui.button("X", {x : buttonSize, y : buttonSize}))
+            x[0] = resetValue;
+        ImGui.popStyleColor(3);
+        ImGui.sameLine();
+        ImGui.pushItemWidth(dragSize);
+        ImGui.dragFloat('##x$label$id', x, step, step, format);
+        ImGui.popItemWidth();
+        ImGui.sameLine();
+
+        ImGui.pushStyleColor2(Button, {x : 0.1, y : 0.6, z : 0.1, w : 1});
+        ImGui.pushStyleColor2(ButtonHovered, {x : 0.2, y : 0.7, z : 0.2, w : 1});
+        ImGui.pushStyleColor2(ButtonActive, {x : 0.1, y : 0.6, z : 0.1, w : 1});
+        if(ImGui.button("Y", {x : buttonSize, y : buttonSize}))
+            y[0] = resetValue;
+        ImGui.popStyleColor(3);
+        ImGui.sameLine();
+        ImGui.pushItemWidth(dragSize);
+        ImGui.dragFloat('##y$label$id', y, step, step, format);
+        ImGui.popItemWidth();
+
+        endField();
+        return new Vector2(x[0], y[0]);
     }
     //#endregion
 }

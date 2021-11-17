@@ -203,22 +203,22 @@ class GameObject extends Uniq implements IInspectable
         var e : Bool = Inspector.checkbox("Enable", uID, enable);
         enable = e;
 
-        //Position
-        var pos : Array<Float> = [x, y];
-        Inspector.dragFloats("Position", uID, pos, 0.1);
-        x = pos[0];
-        y = pos[1];
-    
+        //Position      
+        var pos : Vector2 = new Vector2(x, y);
+        pos = Inspector.dragVector2("Position", uID, pos);
+        x = pos.x;
+        y = pos.y;
+
         //Rotation
         var rot : Array<Float> = [AMath.toDeg(rotation)];
         Inspector.dragFloats("Rotation", uID, rot, 0.1);
         rotation = AMath.toRad(rot[0]);
 
         //Scale
-        var scale : Array<Float> = [scaleX, scaleY];
-        Inspector.dragFloats("Scale", uID, scale, 0.1);
-        scaleX = scale[0];
-        scaleY = scale[1];
+        var scale : Vector2 = new Vector2(scaleX, scaleY);
+        scale = Inspector.dragVector2("Scale", uID, scale, 0.1);
+        scaleX = scale.x;
+        scaleY = scale.y;
 
         ImGui.spacing();
 
