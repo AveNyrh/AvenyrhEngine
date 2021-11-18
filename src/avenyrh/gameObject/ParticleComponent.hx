@@ -7,7 +7,7 @@ import avenyrh.engine.SaveLoader;
 import avenyrh.editor.Inspector;
 import h2d.Particles;
 
-class ParticleComponent extends GraphicComponent
+class ParticleComponent extends Component
 {
     static var data : StringMap<ParticleOptions>;
 
@@ -38,16 +38,6 @@ class ParticleComponent extends GraphicComponent
         group.frameCount = frameCount;
         
         loadParticle();
-    }
-
-    override function postUpdate(dt : Float) 
-    {
-        super.postUpdate(dt);
-    
-        if(@:privateAccess gameObject.transformChanged)
-        {
-            particles.setPosition(gameObject.x, gameObject.y);
-        }
     }
 
     //-------------------------------
@@ -338,43 +328,18 @@ class ParticleComponent extends GraphicComponent
 
         return loop;
     }
-    override function set_gameObject(go : GameObject) : GameObject 
+
+    override function set_gameObject(go : GameObject) : GameObject @:privateAccess
     {
+        go.obj = particles;
+
         if(gameObject != null)
-            return gameObject;
-
-        if(particles.parent != null)
-            return super.set_gameObject(go);
-
-        var p : GameObject = go;
-        var graph : Null<GraphicComponent>;
-        var added : Bool = false;
-        while(p != null)
         {
-            p = p.parent;
-
-            if(p == null)
-                break;
-
-            graph = p.getComponent(GraphicComponent);
-
-            if(graph != null)
-            {
-                graph.getObject().addChild(particles);
-                added = true;
-                break;
-            }
+            gameObject.obj = new Object();
         }
-
-        if(!added)
-            go.scene.scroller.addChildAt(particles, layer);
-
-        particles.name = 'Particle-${go.name}';
 
         return super.set_gameObject(go);
     }
-
-    public function getObject() : Object { return particles; }
     //#endregion
 }
 

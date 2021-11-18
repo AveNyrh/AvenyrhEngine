@@ -159,7 +159,7 @@ class SceneWindow extends EditorPanel
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
-        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.x, go.y);
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom);
         var xEnd : Vector2 = origin + Vector2.RIGHT * axisLength;
         var yEnd : Vector2 = origin + Vector2.DOWN * axisLength;
         var xLineOffset : Vector2 = Vector2.DOWN * -lineThickness / 4;
@@ -228,7 +228,7 @@ class SceneWindow extends EditorPanel
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
-        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.x, go.y);
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom);
         var radius : Float = 40;
 
         //Outer circle
@@ -278,7 +278,7 @@ class SceneWindow extends EditorPanel
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
-        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.x, go.y);
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom);
         var xEnd : Vector2 = origin + Vector2.RIGHT * axisLength;
         var yEnd : Vector2 = origin + Vector2.DOWN * axisLength;
         var xLineOffset : Vector2 = Vector2.DOWN * -lineThickness / 4;

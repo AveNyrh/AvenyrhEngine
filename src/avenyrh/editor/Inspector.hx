@@ -1,6 +1,5 @@
 package avenyrh.editor;
 
-import examples.src.EditorData;
 using Lambda;
 import haxe.Int64;
 import haxe.EnumTools;
@@ -80,7 +79,6 @@ class Inspector extends EditorPanel
         if(ImGui.treeNodeEx("Editor camera", treeNodeFlags))
             ImGui.treePop();
         
-
         if(ImGui.isItemClicked() && !locked)
             currentInspectable = editorCam;
 
@@ -99,10 +97,10 @@ class Inspector extends EditorPanel
         ImGui.spacing();
         if(ImGui.treeNodeEx("Game", treeNodeFlags))
         {
-            for(i in 0 ... @:privateAccess scene.rootGo.children.length)
+            for(i in 0 ... @:privateAccess scene.rootGO.length)
             {
                 ImGui.spacing();
-                drawHierarchy(@:privateAccess scene.rootGo.children[i]);
+                drawHierarchy(@:privateAccess scene.rootGO[i]);
             }
             ImGui.treePop();
         }
@@ -396,6 +394,7 @@ class Inspector extends EditorPanel
     static var go : GameObject;
     static var comp : Component;
     static var index : Int = 0;
+    static var na : hl.NativeArray<Single>;
 
     public static function drawField<T>(u : Uniq, field : haxe.rtti.CType.ClassField, value : Dynamic) : Dynamic
     {
@@ -560,7 +559,7 @@ class Inspector extends EditorPanel
     public static function inputFloats(label : String, id : Int64, data : Array<Float>, format : String = "%.3f") : Bool
     {
         drawLabel(label);
-        var na = new hl.NativeArray<Single>(data.length);
+        na = new hl.NativeArray<Single>(data.length);
         var changed : Bool = false;
 
         for(i in 0 ... data.length)
@@ -583,7 +582,7 @@ class Inspector extends EditorPanel
     public static function dragFloats(label : String, id : Int64, data : Array<Float>, step : Float = 1, format : String = "%.3f") : Bool
     {
         drawLabel(label);
-        var na = new hl.NativeArray<Single>(data.length);
+        na = new hl.NativeArray<Single>(data.length);
         var changed : Bool = false;
 
         for(i in 0 ... data.length)
@@ -606,7 +605,7 @@ class Inspector extends EditorPanel
     public static function sliderFloats(label : String, id : Int64, data : Array<Float>, min : Float, max : Float, format : String = "%.3f") : Bool
     {
         drawLabel(label);
-        var na = new hl.NativeArray<Single>(data.length);
+        na = new hl.NativeArray<Single>(data.length);
         var changed : Bool = false;
 
         for(i in 0 ... data.length)
@@ -833,6 +832,22 @@ class Inspector extends EditorPanel
 
         endField();
         return new Vector2(x[0], y[0]);
+    }
+
+    public static function colorPicker(label : String, id : Int64, color : h3d.Vector) : h3d.Vector
+    {
+        drawLabel(label);
+        na = new hl.NativeArray<Single>(3);
+        na[0] = color.r;
+        na[1] = color.g;
+        na[2] = color.b;
+        ImGui.colorPicker3('##$label$id', na);
+        color.r = cast na[0];
+        color.g = cast na[1];
+        color.b = cast na[2];
+        endField();
+
+        return color;
     }
     //#endregion
 }

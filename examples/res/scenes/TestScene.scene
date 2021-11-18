@@ -70,7 +70,10 @@
 		"e_testEnum": "Value2",
 		"i_testInt": 4,
 		"s_classPath": "examples.src.TestScene",
-		"f_testFloat": 2.6
+		"f_testFloat": 2.6,
+		"a_rootGO": {
+			"g_testGo": "366555165971"
+		}
 	},
 	"Components": [
 		{

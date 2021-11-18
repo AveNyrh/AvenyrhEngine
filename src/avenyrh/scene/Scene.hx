@@ -30,11 +30,12 @@ class Scene extends Process
     public var camera : Camera = null;
 
     @noSerial
-    public var miscInspectable : Array<IInspectable>;
+    public var miscInspectable : Array<IInspectable> = [];
 
     var allGO : Array<GameObject> = [];
 
-    var rootGo : GameObject;
+    @serializable
+    var rootGO : Array<GameObject> = [];
 
     var goToRemove : Array<GameObject> = [];
 
@@ -44,8 +45,6 @@ class Scene extends Process
         paused = true;
 
         createRoot(Process.S2D);
-
-        miscInspectable = [];
 
         if(camera == null)
             camera = new Camera("Camera", this);
@@ -73,9 +72,6 @@ class Scene extends Process
             scroller = new h2d.Layers();
             root.add(scroller, 0);
         }
-
-        if(rootGo == null)
-            rootGo = new GameObject("Root");
         
         paused = false;
 
@@ -207,13 +203,7 @@ class Scene extends Process
      */
     public function addGameObject(gameObject : GameObject) 
     {
-        if(rootGo == null)
-            return;
-
         allGO.push(gameObject);
-        
-        if(gameObject.parent == null)
-            gameObject.parent = rootGo;
     }
 
     /**
@@ -239,6 +229,9 @@ class Scene extends Process
             if(allGO.contains(go))
                 allGO.remove(go);
 
+            if(rootGO.contains(go))
+                rootGO.remove(go);
+            
             go.removed();
         }
 

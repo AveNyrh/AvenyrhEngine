@@ -1,5 +1,6 @@
 package avenyrh.gameObject;
 
+import h2d.Object;
 using Lambda;
 import haxe.Int64;
 import avenyrh.engine.Uniq;
@@ -39,34 +40,76 @@ class GameObject extends Uniq implements IInspectable
     public var name (default, null) : String;
 
     /**
-     * X position
+     * Local X position
+     * 
+     * Relative to its parent
      */
     @hideInInspector
-    public var x (default, set) : Float = 0;
+    public var x (get, set) : Float;
 
     /**
-     * Y position
+     * Absolute X position
      */
     @hideInInspector
-    public var y (default, set) : Float = 0;
+    public var absX (get, never) : Float;
 
     /**
-     * Current rotation
+     * Local Y position
+     * 
+     * Relative to its parent
      */
     @hideInInspector
-    public var rotation (default, set) : Float = 0;
+    public var y (get, set) : Float;
 
     /**
-     * Scale along the x axis
+     * Absolute Y position
      */
     @hideInInspector
-    public var scaleX (default, set) : Float = 1;
+    public var absY (get, never) : Float;
+
+    /**
+     * Local rotation
+     * 
+     * Relative to its parent
+     */
+    @hideInInspector
+    public var rotation (get, set) : Float;
+
+    /**
+     * Absolute rotation
+     */
+    @hideInInspector
+    public var absRotation (get, never) : Float;
+
+    /**
+     * Local scale along the x axis
+     * 
+     * Relative to its parent
+     */
+    @hideInInspector
+    public var scaleX (get, set) : Float;
+
+    /**
+     * Absolute scale along the x axis
+     * 
+     * Relative to its parent
+     */
+    @hideInInspector
+    public var absScaleX (get, never) : Float;
 
     /**
      * Scale along the y axis
      */
     @hideInInspector
-    public var scaleY (default, set) : Float = 1;
+    public var scaleY (get, set) : Float;
+
+    /**
+     * Absolute scale along the y axis
+     * 
+     * Relative to its parent
+     */
+    @hideInInspector
+    public var absScaleY (get, never) : Float;
     
     @noSerial
     @hideInInspector
@@ -75,9 +118,9 @@ class GameObject extends Uniq implements IInspectable
     @hideInInspector
     public var children (default, null) : Array<GameObject>;
 
-    var started : Bool = false;
+    var obj (default, set) : Object = null;
 
-    var transformChanged : Bool = false;
+    var started : Bool = false;
 
     @serializable
     var components : Array<Component>;
@@ -90,7 +133,7 @@ class GameObject extends Uniq implements IInspectable
             this.scene = SceneManager.currentScene;
         else
             this.scene = scene;
-        
+
         destroyed = false;
         components = [];
         children = [];
@@ -98,6 +141,8 @@ class GameObject extends Uniq implements IInspectable
         this.name = name;
         this.parent = parent;
         enable = true;
+
+        obj = new Object(parent == null ? this.scene.scroller : parent.obj);
 
         this.scene.addGameObject(this);
         
@@ -252,32 +297,24 @@ class GameObject extends Uniq implements IInspectable
      */
     public inline function setPosition(x : Float, y : Float)
     {
-        this.x = x;
-        this.y = y;
-
-        transformChanged = true;
+        obj.setPosition(x, y);
     }
 
     /**
      * Moves by the specified amount
      */
-    public function move(dx : Float, dy : Float)
+    public inline function move(dx : Float, dy : Float)
     {
-        x += dx;
-		y += dy;
-
-        transformChanged = true;
+        obj.x += dx;
+        obj.y += dy;
     }
 
     /**
      * Moves by the specified amount, takes in count the rotation
      */
-    public function moveWithRotation(dx : Float, dy : Float)
+    public inline function moveWithRotation(dx : Float, dy : Float)
     {
-        x += dx * Math.cos(rotation);
-		y += dy * Math.sin(rotation);
-
-        transformChanged = true;
+        obj.move(dx, dy);
     }
 
     /**
@@ -285,9 +322,7 @@ class GameObject extends Uniq implements IInspectable
      */
     public inline function rotate(a : Float) 
     {
-		rotation += a;
-
-        transformChanged = true;
+		obj.rotate(a);
 	}
 
     /**
@@ -295,10 +330,7 @@ class GameObject extends Uniq implements IInspectable
      */
     public inline function scale(s : Float) 
     {
-		scaleX *= s;
-		scaleY *= s;
-
-        transformChanged = true;
+		obj.scale(s);
 	}
 
     /**
@@ -306,10 +338,7 @@ class GameObject extends Uniq implements IInspectable
      */
     public inline function setScale(s : Float) 
     {
-		scaleX = s;
-		scaleY = s;
-
-        transformChanged = true;
+		obj.setScale(s);
 	}
     //#endregion
     
@@ -466,7 +495,7 @@ class GameObject extends Uniq implements IInspectable
     {
         var arr : Array<GameObject> = [];
         var p : GameObject = parent;
-        while (p.name != @:privateAccess scene.rootGo.name)
+        while (p != null)
         {
             arr.push(p);
             p = p.parent;
@@ -538,8 +567,6 @@ class GameObject extends Uniq implements IInspectable
         for (c in components)
             if(c.enable || !c.destroyed)
                 c.postUpdate(dt);
-
-        transformChanged = false;
     }
 
     /**
@@ -608,49 +635,103 @@ class GameObject extends Uniq implements IInspectable
         return this.enable;
     }
 
-    function set_x(x : Float) : Float
+    inline function get_x() : Float
     {
-        this.x = x;
-
-        transformChanged = true;
-
-        return x;
+        return obj.x;
     }
 
-    function set_y(y : Float) : Float
+    inline function set_x(x : Float) : Float
     {
-        this.y = y;
-
-        transformChanged = true;
-
-        return y;
+        return obj.x = x;
     }
 
-    function set_rotation(r : Float) : Float
+    inline function get_absX() : Float
     {
-        rotation = r;
-
-        transformChanged = true;
-
-        return rotation;
+        return @:privateAccess obj.absX - AMath.ceil(h3d.Engine.getCurrent().width / 2);
     }
 
-    function set_scaleX(s : Float) : Float
+    inline function get_y() : Float
     {
-        scaleX = s;
-
-        transformChanged = true;
-
-        return scaleX;
+        return obj.y;
     }
 
-    function set_scaleY(s : Float) : Float
+    inline function set_y(y : Float) : Float
     {
-        scaleY = s;
+        return obj.y = y;
+    }
 
-        transformChanged = true;
+    inline function get_absY() : Float
+    {
+        return @:privateAccess obj.absY - AMath.ceil(h3d.Engine.getCurrent().height / 2);
+    }
 
-        return scaleY;
+    inline function get_rotation() : Float
+    {
+        return obj.rotation;
+    }
+
+    inline function set_rotation(r : Float) : Float
+    {
+        return obj.rotation = r;
+    }
+
+    inline function get_absRotation() : Float
+    {
+        return obj.rotation;
+    }
+
+    inline function get_scaleX() : Float
+    {
+        return obj.scaleX;
+    }
+
+    inline function set_scaleX(s : Float) : Float
+    {
+        return obj.scaleX = s;
+    }
+
+    inline function get_absScaleX() : Float
+    {
+        return @:privateAccess obj.getAbsPos().getScale().x;
+    }
+
+    inline function get_scaleY() : Float
+    {
+        return obj.scaleY;
+    }
+
+    inline function set_scaleY(s : Float) : Float
+    {
+        return obj.scaleY = s;
+    }
+
+    inline function get_absScaleY() : Float
+    {
+        return @:privateAccess obj.getAbsPos().getScale().y;
+    }
+
+    function set_obj(o : Object) : Object
+    {
+        if(obj != null)
+        {
+            //Attach children to the new object
+            for(child in children)
+                o.addChild(child.obj);
+
+            //Set new object data 
+            o.setPosition(obj.x, obj.y);
+            o.rotation = obj.rotation;
+            o.scaleX = obj.scaleX;
+            o.scaleY = obj.scaleY;
+            o.alpha = obj.alpha;
+            o.visible = obj.visible;
+
+            //Attach the new object to the parent at the right index
+            obj.parent.addChildAt(o, obj.parent.getChildIndex(obj));
+            obj.parent.removeChild(obj);
+        }
+
+        return obj = o;
     }
 
     function set_parent(p : Null<GameObject>) : Null<GameObject>
@@ -658,15 +739,37 @@ class GameObject extends Uniq implements IInspectable
         if(p != null)
         {
             if(parent != null)
+            {
                 parent.children.remove(this);
+
+                if(obj != null)
+                    parent.obj.removeChild(obj);
+            }
+            else if(@:privateAccess scene.rootGO.contains(this))
+                @:privateAccess scene.rootGO.remove(this);
 
             parent = p;
 
             if(!parent.children.contains(this))
                 parent.children.push(this);
+            
+            if(obj != null)
+                parent.obj.addChild(obj);
         }
         else
+        {
             parent = null;
+            
+            if(@:privateAccess !scene.rootGO.contains(this))
+                @:privateAccess scene.rootGO.push(this);
+
+            if(obj != null)
+            {
+                if(obj.parent != null)
+                    obj.parent.removeChild(obj);
+                scene.scroller.addChild(obj);
+            }
+        }
 
         return parent;
     }

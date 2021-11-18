@@ -5,7 +5,7 @@ import avenyrh.editor.Inspector;
 import h2d.Tile;
 import h2d.Bitmap;
 
-class SpriteComponent extends GraphicComponent 
+class SpriteComponent extends Component 
 {
     /**
      * Actual graphic object
@@ -59,29 +59,22 @@ class SpriteComponent extends GraphicComponent
     override public function new(?name : String, ?parent : Object) 
     {
         super(name == null ? "SpriteComponent" : name);
+
         var t = Tile.fromColor(Color.iWHITE, 10, 10, 1);
         bitmap = new Bitmap(t, parent);
         pivot = CENTER;
-    }
-
-    override function postUpdate(dt : Float) 
-    {
-        super.postUpdate(dt);
-
-        if(@:privateAccess gameObject.transformChanged)
-        {
-            bitmap.setPosition(gameObject.x + dx, gameObject.y + dy);
-            bitmap.rotation = -gameObject.rotation - drot;
-            bitmap.scaleX = gameObject.scaleX * dsx;
-            bitmap.scaleY = gameObject.scaleY * dsy;
-        }
     }
 
     override function drawInfo()
     {
         super.drawInfo();
 
-        Inspector.image("tile", bitmap.tile);
+        //Alpha
+        var a : Array<Float> = [alpha];
+        Inspector.sliderFloats("Alpha", uID, a, 0, 1);
+        alpha = a[0];
+
+        bitmap.color = Inspector.colorPicker("Color", uID, bitmap.color);
     }
 
     override function onDestroy() 
@@ -161,45 +154,17 @@ class SpriteComponent extends GraphicComponent
         return bitmap.tile;
     }
 
-    override function set_gameObject(go : GameObject) : GameObject 
+    override function set_gameObject(go : GameObject) : GameObject @:privateAccess
     {
+        go.obj = bitmap;
+
         if(gameObject != null)
-            return gameObject;
-
-        if(bitmap.parent != null)
-            return super.set_gameObject(go);
-
-        var p : GameObject = go;
-        var graph : Null<GraphicComponent>;
-        var added : Bool = false;
-        while(p != null)
         {
-            p = p.parent;
-
-            if(p == null)
-                break;
-
-            graph = p.getComponent(GraphicComponent);
-
-            if(graph != null)
-            {
-                graph.getObject().addChild(bitmap);
-                added = true;
-                break;
-            }
+            gameObject.obj = new Object();
         }
 
-        if(!added)
-            go.scene.scroller.addChildAt(bitmap, layer);
-
-        if(pivot != null)
-            this.pivot = pivot;
-        else
-            this.pivot = Pivot.CENTER;
         return super.set_gameObject(go);
     }
-
-    public function getObject() : Object { return bitmap; } 
     //#endregion
 }
 

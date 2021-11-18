@@ -43,9 +43,6 @@ class SceneSerializer
         //Camera
         data.set("Camera", addObject(scene.camera));
 
-        //Root gameObject
-        data.set("RootGo", addObject(scene.rootGo));
-
         //Add gameObjects, components ...
         var gameObjects : Array<StringMap<Dynamic>> = [];
         var components : Array<StringMap<Dynamic>> = [];
@@ -75,7 +72,7 @@ class SceneSerializer
      * To do :
      *  - Deserialize process children
      */
-    public static function deserialize(name : String) : Scene
+    public static function deserialize(name : String) : Scene @:privateAccess
     {
         map = new StringMap<Dynamic>();
 
@@ -93,31 +90,16 @@ class SceneSerializer
         var c : Class<Dynamic> = Type.resolveClass(d.get("s_classPath"));
         var scene : Scene = cast Type.createInstance(c, [d.get("s_name")]);
 
+        //Add scroller manually
+        scene.scroller = new h2d.Layers();
+        scene.root.add(scene.scroller, 0);
+
         //Add scene to the uniqMap
         map.set(d.get("u_uID"), {inst : scene, data : d});
 
-        //------ Camera ------
-        d = JsonUtils.parseToStringMap(data.get("Camera"));
-        c = Type.resolveClass(d.get("s_classPath"));
-        var camera : Camera = cast Type.createInstance(c, [d.get("s_name"), scene]);
-        map.set(d.get("u_uID"), {inst : camera, data : d});
-
-        //Add this camera to the scene
-        @:privateAccess scene.children = [];
-        @:privateAccess scene.children.push(camera);
-        scene.camera = camera;
-
-        //------ RootGo ------
-        d = JsonUtils.parseToStringMap(data.get("RootGo"));
-        c = Type.resolveClass(d.get("s_classPath"));
-        var rootGo : GameObject = cast Type.createInstance(c, [d.get("s_name"), null, scene, Int64.parseString(d.get("u_uID"))]);
-
-        //Add the rootGo to the scene
-        @:privateAccess scene.rootGo = rootGo;
-
         //------ Hierarchy ------
         //Build the hierarchy with "empty" gameObjects and components
-        var children : StringMap<Dynamic> = JsonUtils.parseToStringMap(d.get("a_children"));
+        var children : StringMap<Dynamic> = JsonUtils.parseToStringMap(d.get("a_rootGO"));
         var goData : Array<Dynamic> = cast data.get("GameObjects");
         var goMap : StringMap<StringMap<Dynamic>> = new StringMap<StringMap<Dynamic>>();
         for(go in goData)
@@ -134,18 +116,28 @@ class SceneSerializer
         }
 
         //Create the hierarchy by creating each children recursively
-        dummy = new GameObject("Dummy", rootGo, scene);
+        dummy = new GameObject("Dummy", null, scene);
         for(k => v in children) //k = g_index, v = child uID
         {
             var value : Array<String> = k.split(underscore);
             var index : String = value[1];
 
             var goInst : GameObject = createGameObject(goMap, v, compMap, scene);
-            rootGo.children.insert(Std.parseInt(index), goInst);
-            goInst.parent = rootGo;
+            goInst.parent = null;
         }
-        rootGo.removeChild(dummy);
-        @:privateAccess scene.allGO.remove(dummy);
+        scene.rootGO.remove(dummy);
+        scene.allGO.remove(dummy);
+
+        //------ Camera ------
+        d = JsonUtils.parseToStringMap(data.get("Camera"));
+        c = Type.resolveClass(d.get("s_classPath"));
+        var camera : Camera = cast Type.createInstance(c, [d.get("s_name"), scene]);
+        map.set(d.get("u_uID"), {inst : camera, data : d});
+
+        //Add this camera to the scene
+        scene.children = [];
+        scene.children.push(camera);
+        scene.camera = camera;
 
         //------ Fields ------
         //Fill the all the fields of each instance
@@ -404,11 +396,11 @@ class SceneSerializer
     {
         var fieldName : String = key.split(underscore)[1];
         var arr : Array<Dynamic> = [];
-        var map : StringMap<Dynamic> = JsonUtils.parseToStringMap(value);
+        var m : StringMap<Dynamic> = JsonUtils.parseToStringMap(value);
         var type : String = "";
         var index : Int = -1;
 
-        for(k => v in map) //k = type_index, v = fieldValue
+        for(k => v in m) //k = type_index, v = fieldValue
         {
             type = k.split(underscore)[0];
             index = Std.parseInt(k.split(underscore)[1]);
@@ -423,10 +415,12 @@ class SceneSerializer
                     trace("Deserialization for enum array is not supported");
 
                 case "g" : //GameObject
-                    arr.insert(index, cast map.get(v));
+                    var instAndData : InstAndData = cast map.get(v);
+                    arr.insert(index, instAndData.inst);
 
                 case "c" : //Component
-                    arr.insert(index, cast map.get(v));
+                    var instAndData : InstAndData = cast map.get(v);
+                    arr.insert(index, instAndData.inst);
                 
                 case "u" : //UID
                     arr.insert(index, Int64.parseString(v));

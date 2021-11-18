@@ -161,7 +161,7 @@ class Component extends Uniq
     //-------------------------------
     //#region Getters & Setters
     //-------------------------------
-    private function set_enable(enable : Bool) : Bool
+    function set_enable(enable : Bool) : Bool
     {
         if(this.enable == enable)
             return this.enable;
@@ -173,7 +173,7 @@ class Component extends Uniq
         return this.enable;
     }
 
-    private function set_gameObject(go : GameObject) : GameObject 
+    function set_gameObject(go : GameObject) : GameObject 
     {
         if(gameObject != null)
             return gameObject;
