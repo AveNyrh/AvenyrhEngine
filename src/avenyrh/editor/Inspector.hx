@@ -94,6 +94,7 @@ class Inspector extends EditorPanel
 
         ImGui.spacing();
         ImGui.separator();
+        var separatorPos : Float = ImGui.getCursorPosY() + 20;
         ImGui.spacing();
         if(ImGui.treeNodeEx("Game", treeNodeFlags))
         {
@@ -122,7 +123,12 @@ class Inspector extends EditorPanel
         //Right click on blank space
         if(ImGui.beginPopupContextWindow("Blank space hierarchy context", 1, false))
         {
-            addChildGameObjectMenu(scene);
+            var mousePos : Vector2 = ImGui.getMousePos();
+            
+            if(mousePos.y < separatorPos)
+                addChildProcessMenu(scene);
+            else
+                addChildGameObjectMenu(scene);
             ImGui.endPopup();
         }
 
@@ -233,9 +239,12 @@ class Inspector extends EditorPanel
             else if(proc != null)
             {
                 if(ImGui.menuItem("Destroy process"))
-                {
                     proc.destroy();
-                }
+
+                ImGui.separator();
+                var child = addChildProcessMenu(SceneManager.currentScene);
+                if(child != null)
+                    proc.addChild(child);
             }
             ImGui.endPopup();
         }
@@ -290,6 +299,22 @@ class Inspector extends EditorPanel
         }
 
         ImGui.unindent(Inspector.indentSpace);
+    }
+
+    function addChildProcessMenu(scene : Scene) : Null<Process>
+    {
+        var proc : Process = null;
+
+        for(key => value in @:privateAccess editor.data.processes) //key = menu item, value = class
+        {
+            if(ImGui.menuItem('New $key'))
+                proc = cast Type.createInstance(value, [key, null, scene]);
+        }
+
+        if(proc != null)
+            scene.addChild(proc);
+
+        return proc;
     }
 
     function addChildGameObjectMenu(scene : Scene) : Null<GameObject>

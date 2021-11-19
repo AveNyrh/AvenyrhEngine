@@ -7,9 +7,13 @@ import haxe.ds.StringMap;
  */
 interface IEditorData 
 { 
+   /**
+    * Array of all processes to be included
+    */
+   var processes (default, null) : StringMap<Class<Dynamic>>;
 
    /**
-    * Array of all components to be included
+    * Array of all gameObjects to be included
     */
    var gameObjects (default, null) : StringMap<Class<Dynamic>>;
 
