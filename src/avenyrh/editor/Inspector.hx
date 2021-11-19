@@ -841,7 +841,7 @@ class Inspector extends EditorPanel
         na[0] = color.r;
         na[1] = color.g;
         na[2] = color.b;
-        ImGui.colorPicker3('##$label$id', na);
+        ImGui.colorEdit3('##$label$id', na);
         color.r = cast na[0];
         color.g = cast na[1];
         color.b = cast na[2];

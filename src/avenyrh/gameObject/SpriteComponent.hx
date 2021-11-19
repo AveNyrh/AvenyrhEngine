@@ -77,7 +77,7 @@ class SpriteComponent extends Component
         bitmap.color = Inspector.colorPicker("Color", uID, bitmap.color);
     }
 
-    override function onDestroy() 
+    override function onDestroy()
     {
         super.onDestroy();
 
