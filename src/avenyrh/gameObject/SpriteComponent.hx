@@ -1,5 +1,6 @@
 package avenyrh.gameObject;
 
+import haxe.Int64;
 import h2d.Object;
 import avenyrh.editor.Inspector;
 import h2d.Tile;
@@ -56,12 +57,14 @@ class SpriteComponent extends Component
 
     public var tile (get, set) : Tile;
 
-    override public function new(?name : String, ?parent : Object) 
+    public var color (get, set) : h3d.Vector;
+
+    override public function new(?name : String, ?id : Null<Int64>) 
     {
-        super(name == null ? "SpriteComponent" : name);
+        super(name == null ? "SpriteComponent" : name, id);
 
         var t = Tile.fromColor(Color.iWHITE, 10, 10, 1);
-        bitmap = new Bitmap(t, parent);
+        bitmap = new Bitmap(t, null);
         pivot = CENTER;
     }
 
@@ -152,6 +155,17 @@ class SpriteComponent extends Component
         set_pivot(pivot);
 
         return bitmap.tile;
+    }
+
+    inline function get_color() : h3d.Vector
+    {
+        return bitmap.color;
+    }
+
+    function set_color(c : h3d.Vector) : h3d.Vector
+    {
+        bitmap.color = c;
+        return bitmap.color;
     }
 
     override function set_gameObject(go : GameObject) : GameObject @:privateAccess

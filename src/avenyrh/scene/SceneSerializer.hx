@@ -119,9 +119,6 @@ class SceneSerializer
         dummy = new GameObject("Dummy", null, scene);
         for(k => v in children) //k = g_index, v = child uID
         {
-            var value : Array<String> = k.split(underscore);
-            var index : String = value[1];
-
             var goInst : GameObject = createGameObject(goMap, v, compMap, scene);
             goInst.parent = null;
         }
@@ -204,6 +201,7 @@ class SceneSerializer
      * u : uID
      * bm : bitmap
      * v2 : Vector2
+     * v3 : h3d.Vector
      */
     static function addValue(name : String, value : Dynamic, map : StringMap<Dynamic>)
     {
@@ -252,7 +250,11 @@ class SceneSerializer
                 m.set("f_width", tile.width);
                 m.set("f_height", tile.height);
                 m.set("f_xFlip", tile.xFlip);
-                m.set("f_yFlip", tile.yFlip);             
+                m.set("f_yFlip", tile.yFlip);  
+                
+            case TClass(h3d.Vector) :             //h3d.Vector
+                var v : h3d.Vector = cast value;
+                map.set('v3_$name', [v.r, v.g, v.b, v.a]);
 
             //TO DO : Maps
 
@@ -336,15 +338,22 @@ class SceneSerializer
 
     static function setInstanceFields(inst : Dynamic, dataMap : StringMap<Dynamic>)
     {
-        var uID : String = dataMap.get("u_uID");
-        var fields : Array<String> = Type.getClassFields(inst);
+        rtti = haxe.rtti.Rtti.getRtti(Type.getClass(inst));
+        var fields : Array<String> = [];
+        for(f in rtti.fields)
+        {
+            //Keep normal fields and those with setter
+            //Get rid of null setters and functions
+            if(!f.set.equals(RNo) && !f.set.equals(RMethod))
+                fields.push(f.name);
+        }
 
         for(key => value in dataMap) //key = type_fieldName, value = fieldValue
         {
             //Avoid to set hierarchy fields
             if(Std.isOfType(inst, GameObject) && key == "a_children" || Std.isOfType(inst, GameObject) && key == "a_components" || //GameObjects fields
                 Std.isOfType(inst, Component) && key == "g_gameObject" || //Components fields
-                Std.isOfType(inst, Process) && key == "a_children") //Process fields
+                Std.isOfType(inst, Process) && key == "a_children" || Std.isOfType(inst, Process) && key == "p_parent") //Process fields
                 continue;
 
             var arr : Array<String> = key.split(underscore);
@@ -357,34 +366,39 @@ class SceneSerializer
             switch (type)
             {
                 case "n" : //Null
-                    Reflect.setField(inst, fieldName, null);
+                    Reflect.setProperty(inst, fieldName, null);
 
                 case "f", "i", "s", "b" : //Float, int, string, bool
-                    Reflect.setField(inst, fieldName, dataMap.get(key));
+                    Reflect.setProperty(inst, fieldName, dataMap.get(key));
 
                 case "e": //Enum
                     var ev : EnumValue = cast Reflect.getProperty(inst, fieldName);
                     var e : Enum<Dynamic> = Type.getEnum(ev);
                     ev = e.createByName(value);
-                    Reflect.setField(inst, fieldName, Type.createEnumIndex(e, ev.getIndex()));
+                    Reflect.setProperty(inst, fieldName, Type.createEnumIndex(e, ev.getIndex()));
 
                 case "g" : //GameObject
                     var instAndData : InstAndData = cast map.get(value);
-                    Reflect.setField(inst, fieldName, instAndData.inst);
+                    Reflect.setProperty(inst, fieldName, instAndData.inst);
 
                 case "c" : //Component
                     var instAndData : InstAndData = cast map.get(value);
-                    Reflect.setField(inst, fieldName, instAndData.inst);
+                    Reflect.setProperty(inst, fieldName, instAndData.inst);
                 
                 case "u" : //UID
-                    Reflect.setField(inst, fieldName, Int64.parseString(dataMap.get(key)));
+                    Reflect.setProperty(inst, fieldName, Int64.parseString(dataMap.get(key)));
 
                 case "a" : //Array
-                    Reflect.setField(inst, fieldName, getArray(key, value));
+                    Reflect.setProperty(inst, fieldName, getArray(key, value));
 
                 case "v2" : //Vector2
                     var v : Array<Float> = cast value;
-                    Reflect.setField(inst, fieldName, new Vector2(v[0], v[1]));
+                    Reflect.setProperty(inst, fieldName, new Vector2(v[0], v[1]));
+
+                case "v3" : //h3d.Vector
+                    var v : Array<Float> = cast value;
+                    trace(v);
+                    Reflect.setProperty(inst, fieldName, new h3d.Vector(v[0], v[1], v[2], v[3]));
 
                 case _ :
                     trace('Deserialization not supported for ${fieldName}');
