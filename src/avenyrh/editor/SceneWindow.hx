@@ -1,5 +1,6 @@
 package avenyrh.editor;
 
+import avenyrh.engine.Process;
 import avenyrh.gameObject.GameObject;
 import avenyrh.scene.Scene;
 import avenyrh.scene.SceneManager;
@@ -21,6 +22,12 @@ class SceneWindow extends EditorPanel
     public var operation : TransformOperation = NONE;
 
     var windowOffset : Vector2 = new Vector2(8, 46);
+
+    var scene : Scene;
+
+    //Render
+    var renderTarget : h3d.mat.Texture = null;
+    var renderS2d : h2d.Scene = null;
 
     //Camera movement settings
     var left : Int = hxd.Key.Q;
@@ -95,12 +102,56 @@ class SceneWindow extends EditorPanel
         if(camera != null)
             camera.destroy();
 
+        this.scene = scene;
+
         camera = new Camera("Editor camera", scene);
-        scene.removeChild(camera);
-        scene.camera.pause();
+        this.scene.removeChild(camera);
+        this.scene.camera.pause();
 
         //@:privateAccess camera.forcePosition(260, 120);
         //camera.zoom = 1.6;
+    }
+
+    public function renderScene(engine : h3d.Engine) @:privateAccess
+    {
+        //Create new scene to render
+        if(renderS2d == null)
+            renderS2d = new h2d.Scene();
+
+        //Create target texture
+        if(renderTarget == null)
+            renderTarget = new h3d.mat.Texture(width, height, [Target]);
+
+        //Resize render target if necessary
+        if(width != renderTarget.width || height != renderTarget.height)
+        {
+            renderTarget.resize(width, height);
+            renderS2d.scaleMode = Stretch(width, height);
+        }
+
+        //Clear the render target
+        renderTarget.dispose();
+
+        //Add the root to the render scene
+        renderS2d.addChild(scene.root);
+
+        //Push new render targe
+        engine.pushTarget(renderTarget);
+
+        //Render the scene
+        renderS2d.render(engine);
+
+        //Set the scene texture of the windowScene
+        sceneTex = renderTarget;
+        
+        //Pop the render target
+        engine.popTarget();
+
+        //Render scene for ImGui
+        Process.S2D.render(engine);
+
+        //Add the root back to the correct scene
+        Process.S2D.addChild(scene.root);
     }
 
     public function centerScreenOn(x : Float, y : Float)

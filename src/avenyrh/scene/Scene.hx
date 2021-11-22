@@ -85,54 +85,6 @@ class Scene extends Process
         for (go in allGO)
             go.onResize();
     }
-
-    #if avenyrhEditor
-    var renderTarget : h3d.mat.Texture = null;
-    var renderS2d : h2d.Scene = null;
-
-    @:noCompletion
-    function _renderInEditor(engine : h3d.Engine, sceneWindow : avenyrh.editor.SceneWindow) 
-    {
-        //Create new scene to render
-        if(renderS2d == null)
-            renderS2d = new h2d.Scene();
-
-        //Create target texture
-        if(renderTarget == null)
-            renderTarget = new h3d.mat.Texture(sceneWindow.width, sceneWindow.height, [Target]);
-
-        //Resize render target if necessary
-        if(sceneWindow.width != renderTarget.width || sceneWindow.height != renderTarget.height)
-        {
-            renderTarget.resize(sceneWindow.width, sceneWindow.height);
-            renderS2d.scaleMode = Stretch(sceneWindow.width, sceneWindow.height);
-        }
-
-        //Clear the render target
-        renderTarget.dispose();
-
-        //Add the root to the render scene
-        renderS2d.addChild(root);
-
-        //Push new render targe
-        engine.pushTarget(renderTarget);
-
-        //Render the scene
-        renderS2d.render(engine);
-
-        //Set the scene texture of the windowScene
-        sceneWindow.sceneTex = renderTarget;
-        
-        //Pop the render target
-        engine.popTarget();
-
-        //Render scene for ImGui
-        Process.S2D.render(engine);
-
-        //Add the root back to the correct scene
-        Process.S2D.addChild(root);
-    }
-    #end
     //#endregion
 
     //-------------------------------

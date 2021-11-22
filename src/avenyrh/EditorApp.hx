@@ -1,5 +1,6 @@
 package avenyrh;
 
+import avenyrh.editor.EditorPanel;
 import avenyrh.scene.SceneManager;
 import h2d.Console;
 import avenyrh.editor.Editor;
@@ -74,6 +75,6 @@ class EditorApp extends hxd.App
     override function render(e : h3d.Engine) 
     {
         if(SceneManager.currentScene != null)
-            @:privateAccess SceneManager.currentScene._renderInEditor(e, editor.sceneWindow);
+            editor.sceneWindow.renderScene(e, editor.sceneWindow);
     }
 }
