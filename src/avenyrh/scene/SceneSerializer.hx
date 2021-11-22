@@ -397,7 +397,6 @@ class SceneSerializer
 
                 case "v3" : //h3d.Vector
                     var v : Array<Float> = cast value;
-                    trace(v);
                     Reflect.setProperty(inst, fieldName, new h3d.Vector(v[0], v[1], v[2], v[3]));
 
                 case _ :

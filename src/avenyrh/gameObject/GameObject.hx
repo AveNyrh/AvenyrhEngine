@@ -647,7 +647,7 @@ class GameObject extends Uniq implements IInspectable
 
     inline function get_absX() : Float
     {
-        return @:privateAccess obj.absX - AMath.ceil(h3d.Engine.getCurrent().width / 2);
+        return @:privateAccess (obj.absX - scene.scroller.x) / scene.scroller.scaleX;
     }
 
     inline function get_y() : Float
@@ -662,7 +662,7 @@ class GameObject extends Uniq implements IInspectable
 
     inline function get_absY() : Float
     {
-        return @:privateAccess obj.absY - AMath.ceil(h3d.Engine.getCurrent().height / 2);
+        return @:privateAccess (obj.absY - scene.scroller.y) / scene.scroller.scaleY;
     }
 
     inline function get_rotation() : Float

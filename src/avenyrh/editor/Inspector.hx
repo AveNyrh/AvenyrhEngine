@@ -222,6 +222,9 @@ class Inspector extends EditorPanel
         if(ImGui.isItemClicked() && !locked)
             currentInspectable = inspectable;
 
+        if(ImGui.isMouseDoubleClicked(0) && ImGui.isItemHovered() && go != null)
+            editor.sceneWindow.centerScreenOn(go.absX, go.absY);
+
         //Righ click pop up
         if(ImGui.beginPopupContextWindow('HierarchyItemSettings##$uID'))
         {
@@ -554,6 +557,7 @@ class Inspector extends EditorPanel
     {
         ImGui.columns(2);
         ImGui.setColumnWidth(0, labelWidth);
+        ImGui.pushItemWidth(labelWidth);
         ImGui.labelText('##$label', label);
         ImGui.nextColumn();
         ImGui.pushItemWidth(ImGui.getWindowWidth() - labelWidth - 20);

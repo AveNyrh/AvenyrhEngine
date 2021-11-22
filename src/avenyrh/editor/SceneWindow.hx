@@ -62,7 +62,7 @@ class SceneWindow extends EditorPanel
             ImGui.text('$width x $height');
             ImGui.sameLine(100);
             ImGui.text(Std.string(mode));
-        
+     
             ImGui.endMenuBar();
         }
 
@@ -101,6 +101,12 @@ class SceneWindow extends EditorPanel
 
         //@:privateAccess camera.forcePosition(260, 120);
         //camera.zoom = 1.6;
+    }
+
+    public function centerScreenOn(x : Float, y : Float)
+    {
+        var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
+        @:privateAccess editor.sceneWindow.camera.forcePosition(x + sceneTex.width / 2, y + sceneTex.height / 2);
     }
 
     function updateControls(dt : Float)
@@ -160,6 +166,10 @@ class SceneWindow extends EditorPanel
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
         var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom);
+        
+        if(!isInScreenBounds(origin))
+            return;
+
         var xEnd : Vector2 = origin + Vector2.RIGHT * axisLength;
         var yEnd : Vector2 = origin + Vector2.DOWN * axisLength;
         var xLineOffset : Vector2 = Vector2.DOWN * -lineThickness / 4;
@@ -228,8 +238,11 @@ class SceneWindow extends EditorPanel
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
-        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom);
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom) + new Vector2(camera.x, camera.y);
         var radius : Float = 40;
+
+        if(!isInScreenBounds(origin))
+            return;
 
         //Outer circle
         drawList.addCircle(origin, radius, operation.equals(ROTATE) ? highlightColor : Color.iWHITE, 40, 2);
@@ -278,7 +291,11 @@ class SceneWindow extends EditorPanel
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
-        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom);
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom) + new Vector2(camera.x, camera.y);
+        
+        if(!isInScreenBounds(origin))
+            return;
+
         var xEnd : Vector2 = origin + Vector2.RIGHT * axisLength;
         var yEnd : Vector2 = origin + Vector2.DOWN * axisLength;
         var xLineOffset : Vector2 = Vector2.DOWN * -lineThickness / 4;
