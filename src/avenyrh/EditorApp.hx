@@ -47,8 +47,8 @@ class EditorApp extends hxd.App
         @:privateAccess win.window.maximize();
 
         //Console
-        console = new h2d.Console(hxd.res.DefaultFont.get(), s2d);
-        console.shortKeyChar = "²".code;
+        // console = new h2d.Console(hxd.res.DefaultFont.get(), s2d);
+        // console.shortKeyChar = "²".code;
 
         //Editor
         editor = new Editor(editorData);
@@ -75,6 +75,6 @@ class EditorApp extends hxd.App
     override function render(e : h3d.Engine) 
     {
         if(SceneManager.currentScene != null)
-            editor.sceneWindow.renderScene(e, editor.sceneWindow);
+            editor.sceneWindow.renderScene(e);
     }
 }

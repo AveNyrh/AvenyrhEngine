@@ -45,6 +45,14 @@ class SceneWindow extends EditorPanel
 
     override function init() 
     {
+        //Create new scene to render
+        if(renderS2d == null)
+            renderS2d = new h2d.Scene();
+
+        //Create target texture
+        if(renderTarget == null)
+            renderTarget = new h3d.mat.Texture(width, height, [Target]);
+
         var scene : Scene = SceneManager.currentScene;
         setScene(scene);
     }
@@ -114,14 +122,6 @@ class SceneWindow extends EditorPanel
 
     public function renderScene(engine : h3d.Engine) @:privateAccess
     {
-        //Create new scene to render
-        if(renderS2d == null)
-            renderS2d = new h2d.Scene();
-
-        //Create target texture
-        if(renderTarget == null)
-            renderTarget = new h3d.mat.Texture(width, height, [Target]);
-
         //Resize render target if necessary
         if(width != renderTarget.width || height != renderTarget.height)
         {
@@ -216,7 +216,7 @@ class SceneWindow extends EditorPanel
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
-        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom);
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX, go.absY);
         
         if(!isInScreenBounds(origin))
             return;
