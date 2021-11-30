@@ -10,12 +10,12 @@
 		"i_deadzone": 6,
 		"a_children" : {},
 		"s_name": "Camera",
-		"u_uID": "103260641768",
+		"u_uID": "564587604444",
 		"i_zoom": 1,
 		"i_x": 0,
 		"i_y": 0,
 		"i_shakeSpeed": 1,
-		"p_parent": "933376125988",
+		"p_parent": "415789722245",
 		"b_paused": true,
 		"b_snap": false,
 		"s_classPath": "avenyrh.Camera"
@@ -59,11 +59,11 @@
 		},
 		"c_testComp": "362185239366",
 		"a_children": {
-			"p_0": "103260641768"
+			"p_0": "564587604444"
 		},
 		"s_name": "TestScene",
-		"u_uID": "933376125988",
-		"p_parent": "973835048803",
+		"u_uID": "415789722245",
+		"p_parent": "571055825833",
 		"b_paused": false,
 		"g_testGo": "366555165971",
 		"b_testBool": true,
@@ -88,12 +88,19 @@
 		},
 		{
 			"v3_color": [
-				1,
 				0,
-				0,
+				0.281862914562225,
+				0.416666686534882,
 				1
 			],
 			"s_name": "SpriteComponent",
+			"sp_sprite": {
+				"f_x": 0,
+				"f_y": 0,
+				"s_filePath": "Arrow.png",
+				"f_width": 500,
+				"f_height": 500
+			},
 			"u_uID": "702407639435",
 			"b_visible": true,
 			"g_gameObject": "366555165971",
