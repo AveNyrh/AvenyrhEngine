@@ -18,36 +18,6 @@ class SpriteComponent extends Component
      */
     public var pivot (default, set) : Pivot;
 
-    /**
-     * Delta position on the X axis
-     */
-    @hideInInspector
-    public var dx : Float = 0;
-
-    /**
-     * Delta position on the Y axis
-     */
-    @hideInInspector
-    public var dy : Float = 0;
-
-    /**
-     * Delta rotation
-     */
-    @hideInInspector
-    public var drot : Float = 0;
-
-    /**
-     * Delta scale on the X axis
-     */
-    @hideInInspector
-    public var dsx : Float = 1;
-
-    /**
-     * Delta scale on the Y axis
-     */
-    @hideInInspector
-    public var dsy : Float = 1;
-
     public var alpha (get, set) : Float;
 
     public var visible (get, set) : Bool;
@@ -55,7 +25,7 @@ class SpriteComponent extends Component
     @hideInInspector
     public var layer (default, null) : Int; //Change this to set this in the inspector
 
-    public var tile (get, set) : Tile;
+    public var sprite (default, set) : Sprite;
 
     public var color (get, set) : h3d.Vector;
 
@@ -66,6 +36,7 @@ class SpriteComponent extends Component
         var t = Tile.fromColor(Color.iWHITE, 10, 10, 1);
         bitmap = new Bitmap(t, null);
         pivot = CENTER;
+        sprite = new Sprite("", 0, 0, 10, 10);
     }
 
     override function drawInfo()
@@ -77,6 +48,7 @@ class SpriteComponent extends Component
         Inspector.sliderFloats("Alpha", uID, a, 0, 1);
         alpha = a[0];
 
+        //Color
         bitmap.color = Inspector.colorPicker("Color", uID, bitmap.color);
     }
 
@@ -143,18 +115,20 @@ class SpriteComponent extends Component
         return bitmap.visible;
     }
 
-    inline function get_tile() : Tile
+    inline function set_sprite(s : Sprite) : Sprite
     {
-        return bitmap.tile;
-    }
+        sprite = s;
 
-    inline function set_tile(t : Tile) : Tile
-    {
-        bitmap.tile = t;
+        if(sprite == null)
+            bitmap.tile = null;
+        else 
+        {
+            bitmap.tile = s.tile;
             
-        set_pivot(pivot);
+            set_pivot(pivot);
+        }
 
-        return bitmap.tile;
+        return sprite;
     }
 
     inline function get_color() : h3d.Vector
@@ -170,12 +144,11 @@ class SpriteComponent extends Component
 
     override function set_gameObject(go : GameObject) : GameObject @:privateAccess
     {
-        go.obj = bitmap;
+        if(go != null)
+            go.obj = bitmap;
 
         if(gameObject != null)
-        {
             gameObject.obj = new Object();
-        }
 
         return super.set_gameObject(go);
     }
