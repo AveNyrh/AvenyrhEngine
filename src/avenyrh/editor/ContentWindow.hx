@@ -3,6 +3,7 @@ package avenyrh.editor;
 import h2d.Tile;
 import sys.FileSystem;
 import haxe.io.Path;
+import haxe.ds.StringMap;
 import avenyrh.imgui.ImGui;
 
 class ContentWindow extends EditorPanel
@@ -13,7 +14,15 @@ class ContentWindow extends EditorPanel
 
     var icons : Array<h3d.mat.Texture> = [];
 
+    var sprites : StringMap<Array<Sprite>> = new StringMap<Array<Sprite>>();
+
+    var seeSprites : Bool = false;
+
     var buttonSize : Int = 100;
+
+    var tooltipSize : Vector2 = new Vector2(60, 60);
+
+    public var currentSprite : Null<Sprite>;
 
     override function init() 
     {
@@ -37,7 +46,17 @@ class ContentWindow extends EditorPanel
         //Menu bar
         ImGui.beginMenuBar();
 
+        //Sprite/Image button
+        if(ImGui.button(seeSprites ? "Sprite" : "Image", {x : 60, y : 20}))
+        {
+            seeSprites = !seeSprites;
+
+            if(seeSprites)
+                setSprites();
+        }
+
         //Back button
+        ImGui.sameLine();
         if(ImGui.button("Back", {x : 60, y : 20}))
         {
             var d : Array<String> = currentDir.split("/");
@@ -49,31 +68,32 @@ class ContentWindow extends EditorPanel
                 currentDir = p;
             }
         }
-        ImGui.sameLine(80);
 
         //Text of current directory
+        ImGui.sameLine();
         ImGui.text(currentDir);
-        ImGui.sameLine(300);
 
         //Slider to change icon size
+        var windowWidth : Float = cast ImGui.getWindowContentRegionWidth();
+        ImGui.sameLine(windowWidth - 240);
         var size = new hl.NativeArray<Int>(1);
         size[0] = buttonSize;
+        ImGui.setNextItemWidth(200);
         ImGui.sliderInt("Size", size, 40, 200);
         buttonSize = size[0];
 
         ImGui.endMenuBar();
 
-        //Content
-        arr = FileSystem.readDirectory(currentDir);
-
         //Calculate number of columns
-        var spaceLeft : Float = cast ImGui.getWindowContentRegionWidth();
-        var columnNb : Int = cast(spaceLeft / (buttonSize + 14));
+        var columnNb : Int = cast(windowWidth / (buttonSize + 14));
         columnNb = AMath.imax(columnNb, 1);
         ImGui.columns(columnNb, null, false);
 
         //Change button's background color 
         ImGui.pushStyleColor2(Button, {x : 1, y : 1, z : 1, w : 0});
+
+        //Content
+        arr = FileSystem.readDirectory(currentDir);
 
         for(entry in arr)
         {
@@ -84,10 +104,8 @@ class ContentWindow extends EditorPanel
                 //Directory
                 ImGui.pushID(e);
                 if(ImGui.imageButton(icons[FileIcon.Folder], {x : buttonSize, y : buttonSize}))
-                {
                     currentDir = e;
-                    trace(e);
-                }
+
                 ImGui.popID();
                 ImGui.text(entry);
             }
@@ -97,10 +115,55 @@ class ContentWindow extends EditorPanel
                 {
                     case "png", "PNG", "jpg" :
                         ImGui.pushID(e);
-                        if(ImGui.imageButton(hxd.Res.load(getPathFromRes(e)).toTexture(), {x : buttonSize, y : buttonSize}))
-                            trace(entry);
+
+                        if(seeSprites)
+                        {
+                            //Sprites
+                            var tex : h3d.mat.Texture = hxd.Res.load(getPathFromRes(e)).toTexture();
+                            var i : Int = 0;
+    
+                            for(sprite in sprites.get(e))
+                            {
+                                ImGui.imageButton(tex, {x : buttonSize, y : buttonSize}, {x : sprite.x, y : sprite.y});
+    
+                                var prefix : String = sprites.get(e).length == 1 ? "" : Std.string(i++);
+        
+                                //Drag drop source
+                                if(ImGui.beginDragDropSource())
+                                {
+                                    ImGui.setDragDropPayloadString(EditorPanel.ddSpriteContent, "");
+                                    currentSprite = sprite;
+        
+                                    ImGui.beginTooltip();
+                                    ImGui.image(tex, {x : tooltipSize.x, y : tooltipSize.y});
+                                    ImGui.endTooltip();
+        
+                                    ImGui.endDragDropSource();
+                                }
+                                ImGui.text(entry + prefix);
+                            }
+                        }
+                        else 
+                        {
+                            //Images
+                            var tex : h3d.mat.Texture = hxd.Res.load(getPathFromRes(e)).toTexture();
+                            ImGui.imageButton(tex, {x : buttonSize, y : buttonSize});
+
+                            //Drag drop source
+                            if(ImGui.beginDragDropSource())
+                            {
+                                ImGui.setDragDropPayloadString(EditorPanel.ddImageContent, getPathFromRes(e));
+        
+                                ImGui.beginTooltip();
+                                ImGui.image(tex, {x : tooltipSize.x, y : tooltipSize.y});
+                                ImGui.endTooltip();
+        
+                                ImGui.endDragDropSource();
+                            }
+
+                            ImGui.text(entry);
+                        }
                         ImGui.popID();
-                        ImGui.text(entry);
 
                     case "hx" :
                         ImGui.pushID(e);
@@ -128,6 +191,32 @@ class ContentWindow extends EditorPanel
         ImGui.popStyleColor();
         
         ImGui.end();
+    }
+
+    function setSprites()
+    {
+        sprites = new StringMap<Array<Sprite>>();
+        //Content
+        arr = FileSystem.readDirectory(currentDir);
+
+        for(entry in arr)
+        {
+            var e : String = currentDir + "/" + entry;
+            var extension : String = Path.extension(e);
+            if(extension == "png" || extension == "PNG" || extension == "jpg")
+            {
+                if(FileSystem.exists(e + ".sprite"))
+                {
+                    //Sprite
+                }
+                else 
+                {
+                    //Just image
+                    var sprite : Sprite = new Sprite(getPathFromRes(e));
+                    sprites.set(e, [sprite]);
+                }
+            }
+        }     
     }
 
     function getPathFromRes(entry : String)

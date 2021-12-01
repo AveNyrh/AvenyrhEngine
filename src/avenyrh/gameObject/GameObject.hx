@@ -278,7 +278,7 @@ class GameObject extends Uniq implements IInspectable
 
         //Scale
         var scale : Vector2 = new Vector2(scaleX, scaleY);
-        scale = Inspector.dragVector2("Scale", uID, scale, 0.1);
+        scale = Inspector.dragVector2("Scale", uID, scale, 0.1, 1);
         scaleX = scale.x;
         scaleY = scale.y;
 
@@ -322,7 +322,7 @@ class GameObject extends Uniq implements IInspectable
      */
     public inline function rotate(a : Float) 
     {
-		obj.rotate(a);
+		obj.rotate(-a);
 	}
 
     /**
@@ -667,12 +667,12 @@ class GameObject extends Uniq implements IInspectable
 
     inline function get_rotation() : Float
     {
-        return obj.rotation;
+        return -obj.rotation;
     }
 
     inline function set_rotation(r : Float) : Float
     {
-        return obj.rotation = r;
+        return obj.rotation = -r;
     }
 
     inline function get_absRotation() : Float

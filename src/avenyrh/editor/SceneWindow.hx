@@ -289,7 +289,7 @@ class SceneWindow extends EditorPanel
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
-        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom) + new Vector2(camera.x, camera.y);
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX, go.absY);
         var radius : Float = 40;
 
         if(!isInScreenBounds(origin))
@@ -342,7 +342,7 @@ class SceneWindow extends EditorPanel
         //------ Draw guizmo ------
         var drawList : ImDrawList = ImGui.getForegroundDrawList();
         var windowOrigin : Vector2 = ImGui.getWindowPos() + windowOffset;
-        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX / camera.zoom, go.absY / camera.zoom) + new Vector2(camera.x, camera.y);
+        var origin : Vector2 = windowOrigin + camera.worldToScreen(go.absX, go.absY);
         
         if(!isInScreenBounds(origin))
             return;

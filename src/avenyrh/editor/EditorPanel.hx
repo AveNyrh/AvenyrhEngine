@@ -10,6 +10,10 @@ class EditorPanel
 
     static var ddProcessInspector : String = "DD Process Inspector";
 
+    static var ddImageContent : String = "DD Sprite Content";
+
+    static var ddSpriteContent : String = "DD Sprite Content";
+
     /**
      * Is the widget running
      */

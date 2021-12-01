@@ -1,5 +1,6 @@
 package avenyrh.editor;
 
+import haxe.io.Path;
 using Lambda;
 import haxe.Int64;
 import haxe.EnumTools;
@@ -423,6 +424,7 @@ class Inspector extends EditorPanel
     static var comp : Component;
     static var index : Int = 0;
     static var na : hl.NativeArray<Single>;
+    static var s : Sprite;
 
     public static function drawField<T>(u : Uniq, field : haxe.rtti.CType.ClassField, value : Dynamic) : Dynamic
     {
@@ -478,15 +480,43 @@ class Inspector extends EditorPanel
                 Inspector.image(field.name, tile);
                 return tile;
 
+            case CClass("avenyrh.Sprite", []) : //Sprite
+                s = Reflect.getProperty(u, field.name);
+                setDragDropStyle();
+                if(s != null)
+                    Inspector.labelButton(field.name, Std.string(s.filePath), u.uID, cast(ImGui.getWindowContentRegionWidth() - labelWidth - 32));
+                else 
+                    Inspector.labelButton(field.name, "Null", u.uID, cast(ImGui.getWindowContentRegionWidth() - labelWidth - 32));
+                ImGui.popStyleColor(4);
+                
+                //Drag drop
+                if(ImGui.beginDragDropTarget())
+                {
+                    ImGui.acceptDragDropPayloadString(EditorPanel.ddSpriteContent);
+                    if(!ImGui.isMouseDown(0))
+                    {
+                        var sprite : Sprite = EditorPanel.Editor.contentWindow.currentSprite;
+    
+                        if(sprite != null)
+                            s = sprite;
+                    }
+    
+                    ImGui.endDragDropTarget();
+                }
+    
+                ImGui.sameLine();
+                if(ImGui.button("X##sprite", {x : 20, y : 20}))
+                    s = null;
+
+                Reflect.setProperty(u, field.name, s);
+                return null;
+
             default :
                 var f : String = getClassNameFromRttiField(field);
                 if(@:privateAccess EditorPanel.Editor.data.gameObjects.exists(f) || field.type.match(CClass("avenyrh.gameObject.GameObject", []))) //GameObjects
                 {
                     go = cast(Reflect.getProperty(u, field.name), GameObject);
-                    ImGui.pushStyleColor(Button, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
-                    ImGui.pushStyleColor(ButtonHovered, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
-                    ImGui.pushStyleColor(ButtonActive, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
-                    ImGui.pushStyleColor(Border, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+                    setDragDropStyle();
                     if(go != null)
                         Inspector.labelButton(field.name, go.name, u.uID, cast(ImGui.getWindowContentRegionWidth() - labelWidth - 32));
                     else 
@@ -551,6 +581,14 @@ class Inspector extends EditorPanel
                 
                 return null;
         }
+    }
+
+    static function setDragDropStyle()
+    {
+        ImGui.pushStyleColor(Button, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+        ImGui.pushStyleColor(ButtonHovered, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+        ImGui.pushStyleColor(ButtonActive, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
+        ImGui.pushStyleColor(Border, Color.rgbaToInt({r : 0, g : 0, b : 0, a : 0}));
     }
 
     static function drawLabel(label : String)
@@ -824,7 +862,7 @@ class Inspector extends EditorPanel
     /**
      * Returns the vector2 changed
      */
-    public static function dragVector2(label : String, id : Int64, vec : Vector2, step : Float = 0.1, format : String = "%.3f", resetValue : Float = 0) : Vector2
+    public static function dragVector2(label : String, id : Int64, vec : Vector2, step : Float = 0.1, resetValue : Float = 0, format : String = "%.3f") : Vector2
     {
         drawLabel(label);
 
@@ -839,7 +877,7 @@ class Inspector extends EditorPanel
         ImGui.pushStyleColor2(Button, {x : 0.8, y : 0.1, z : 0.15, w : 1});
         ImGui.pushStyleColor2(ButtonHovered, {x : 0.9, y : 0.2, z : 0.2, w : 1});
         ImGui.pushStyleColor2(ButtonActive, {x : 0.8, y : 0.1, z : 0.15, w : 1});
-        if(ImGui.button("X", {x : buttonSize, y : buttonSize}))
+        if(ImGui.button('X##$label', {x : buttonSize, y : buttonSize}))
             x[0] = resetValue;
         ImGui.popStyleColor(3);
         ImGui.sameLine();
@@ -851,7 +889,7 @@ class Inspector extends EditorPanel
         ImGui.pushStyleColor2(Button, {x : 0.1, y : 0.6, z : 0.1, w : 1});
         ImGui.pushStyleColor2(ButtonHovered, {x : 0.2, y : 0.7, z : 0.2, w : 1});
         ImGui.pushStyleColor2(ButtonActive, {x : 0.1, y : 0.6, z : 0.1, w : 1});
-        if(ImGui.button("Y", {x : buttonSize, y : buttonSize}))
+        if(ImGui.button('Y##$label', {x : buttonSize, y : buttonSize}))
             y[0] = resetValue;
         ImGui.popStyleColor(3);
         ImGui.sameLine();

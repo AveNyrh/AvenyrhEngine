@@ -199,7 +199,7 @@ class SceneSerializer
      * s : string
      * t : tile
      * u : uID
-     * bm : bitmap
+     * sp : sprite
      * v2 : Vector2
      * v3 : h3d.Vector
      */
@@ -242,16 +242,22 @@ class SceneSerializer
                 map.set('e_$name', value);
 
             case TClass(h2d.Tile) :             //h2d.Tile
-                var tile : Tile = cast value;
+                //Do not serialize Tile, see Sprite 
+                    
+            case TClass(h2d.Bitmap) :             //h2d.Bitmap
+                //Do not serialize Bitmap, see Sprite
+
+            case TClass(Sprite) :             //Sprite
+                var sprite : Sprite = cast value;
                 var m : StringMap<Dynamic> = new StringMap<Dynamic>();
-                //Set tile specific data
-                m.set("f_dx", tile.dx);
-                m.set("f_dy", tile.dy);
-                m.set("f_width", tile.width);
-                m.set("f_height", tile.height);
-                m.set("f_xFlip", tile.xFlip);
-                m.set("f_yFlip", tile.yFlip);  
-                
+                m.set("s_filePath", sprite.filePath);
+                m.set("f_x", sprite.x);
+                m.set("f_y", sprite.y);
+                m.set("f_width", sprite.width);
+                m.set("f_height", sprite.height);
+
+                map.set('sp_$name', m);
+
             case TClass(h3d.Vector) :             //h3d.Vector
                 var v : h3d.Vector = cast value;
                 map.set('v3_$name', [v.r, v.g, v.b, v.a]);
@@ -390,6 +396,11 @@ class SceneSerializer
 
                 case "a" : //Array
                     Reflect.setProperty(inst, fieldName, getArray(key, value));
+
+                case "sp" : //Sprite
+                    var m : StringMap<Dynamic> = JsonUtils.parseToStringMap(value);
+                    var sprite : Sprite = new Sprite(m.get("s_filePath"), m.get("f_x"), m.get("f_y"), m.get("f_width"), m.get("f_height"));
+                    Reflect.setProperty(inst, fieldName, sprite);
 
                 case "v2" : //Vector2
                     var v : Array<Float> = cast value;
