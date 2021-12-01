@@ -1,6 +1,6 @@
 # About
 
-Base framework for my games, using [**Heaps Game Engine**](https://heaps.io)
+Base framework for my 2D games, using [**Heaps Game Engine**](https://heaps.io)
 
 
 # Usage
@@ -22,9 +22,11 @@ In the examples folder, there are some examples on how to work with this framewo
 
 ## Base
 
-- Boot is the entry point. It launches the avenyrh engine and adds the first scene
+- EntryPoint is the entry point. It launches the avenyrh engine and adds the first scene
 
-- Engine is what handles everything in the background and scene management
+- Engine is what handles everything in the background
+
+- SceneManager handles scene management
 
 - Scene is where are all GameObjects and UI elements
 
@@ -33,10 +35,16 @@ In the examples folder, there are some examples on how to work with this framewo
 - Component is where you will moslty write code for the gameplay and add it to one or more GameObjects
 
 
-## Inspector
+## Scene
 
-You have an Inspector that can help you to debug the game. Press F4 to display the Hierarchy & Inspector window.
-It shows different informations about the object and its components.
+Scene data is serialized in a file ```.scene``` and has all the data it needs to reconstruct your scene.
+You have to implement ```SceneManagerData``` to tell the engine which scene you want in your game (look in the example file).
+I haven't programmed a way to make new scene from the editor at the moment, I will be working on it soon.
+
+
+## Editor
+
+There is an editor to help you create and debug your game. To activate it, add ```-avenyrhEditor``` in your hxml.
 You can put you own debug informations by overriding the `drawInfo` method.
 
 Here is an example :
@@ -78,6 +86,7 @@ public function drawInfo()
 ```
 
 There will be more wrapper in the future and I plan on making it simpler to use.
+To have custom GameObject and Components show up in the editor, implement ```EditorData``` and complete the stringMaps (look in the example folder).
 
 
 ## UI
@@ -113,6 +122,21 @@ You can Tween elements by addind tween to you objects.
 - Vector2 is a [x, y] representation
 
 - Input config is where you can define some custom keybindings
+
+
+## TO DO
+
+- Have a way to create scene files
+
+- Handle game UI in editor
+
+- Sprite editor, to seperate sprites from a spritesheet
+
+- Prefabs
+
+- Animation rework and animation editor
+
+- And a lot more
 
 
 # Misc
