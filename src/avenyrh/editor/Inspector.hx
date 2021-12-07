@@ -597,6 +597,7 @@ class Inspector extends EditorPanel
         ImGui.setColumnWidth(0, labelWidth);
         ImGui.pushItemWidth(labelWidth);
         ImGui.labelText('##$label', label);
+        ImGui.popItemWidth();
         ImGui.nextColumn();
         ImGui.pushItemWidth(ImGui.getWindowWidth() - labelWidth - 20);
     }

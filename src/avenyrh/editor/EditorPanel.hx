@@ -1,5 +1,6 @@
 package avenyrh.editor;
 
+import avenyrh.imgui.ImGui;
 import avenyrh.imgui.ImGui.ImGuiWindowFlags;
 
 class EditorPanel
@@ -13,6 +14,8 @@ class EditorPanel
     static var ddImageContent : String = "DD Sprite Content";
 
     static var ddSpriteContent : String = "DD Sprite Content";
+
+    var isFocused : Bool = false;
 
     /**
      * Is the widget running
@@ -37,6 +40,8 @@ class EditorPanel
     {
         if(!enable)
             return;
+
+        isFocused = ImGui.isWindowFocused(None);
     }
 
     public function open()

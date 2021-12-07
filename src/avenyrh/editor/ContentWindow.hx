@@ -1,6 +1,5 @@
 package avenyrh.editor;
 
-import h2d.Tile;
 import sys.FileSystem;
 import haxe.io.Path;
 import haxe.ds.StringMap;

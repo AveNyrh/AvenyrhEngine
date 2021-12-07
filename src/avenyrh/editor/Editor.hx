@@ -14,6 +14,8 @@ class Editor extends Process
 
     public var contentWindow : ContentWindow;
 
+    public var spriteEditor : SpriteEditor;
+
     var enable : Bool = true;
 
     var drawable : ImGuiDrawable;
@@ -37,6 +39,7 @@ class Editor extends Process
         inspector = new Inspector();
         sceneWindow = new SceneWindow();
         contentWindow = new ContentWindow();
+        spriteEditor = new SpriteEditor();
 
         applyDefaultStyle();
     }
@@ -79,6 +82,7 @@ class Editor extends Process
 
         menuBar.draw(dt);
         inspector.draw(dt);
+        spriteEditor.draw(dt);
         sceneWindow.draw(dt);
         contentWindow.draw(dt);
 

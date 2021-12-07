@@ -1,7 +1,5 @@
 package avenyrh.scene;
 
-import h2d.Bitmap;
-import h2d.Tile;
 using Lambda;
 import haxe.Int64;
 import avenyrh.engine.Uniq;

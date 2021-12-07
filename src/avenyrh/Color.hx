@@ -29,6 +29,12 @@ class Color
 		return new h3d.Vector(c.r / 255, c.g / 255, c.b / 255);
 	}
 	
+	public static inline function vectorToInt(c : h3d.Vector) : Int
+	{
+		var col = {r : Std.int(c.r * 255), g : Std.int(c.g * 255), b : Std.int(c.b * 255), a : 255};
+		return rgbaToInt(col);
+	}
+
 	public static inline function rgbaToInt(c : Col32) : Int 
 	{
 		return (c.a << 24) | (c.r<<16 ) | (c.g<<8) | c.b;
@@ -82,7 +88,8 @@ typedef Col =
 	b	: Int, // 0-255
 }
 
-typedef Col32 = {
+typedef Col32 = 
+{
 	>Col,
 	a	: Int, // 0-255
 }
