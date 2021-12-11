@@ -15,7 +15,9 @@ class EditorPanel
 
     static var ddSpriteContent : String = "DD Sprite Content";
 
-    var isFocused : Bool = false;
+    var isFocused (get, null) : Bool;
+
+    var isAppearing (get, null) : Bool;
 
     /**
      * Is the widget running
@@ -40,8 +42,6 @@ class EditorPanel
     {
         if(!enable)
             return;
-
-        isFocused = ImGui.isWindowFocused(None);
     }
 
     public function open()
@@ -65,5 +65,9 @@ class EditorPanel
     //#region Getters & Setters
     //-------------------------------
     function get_editor() : Editor {return EditorPanel.Editor;}
+
+    function get_isFocused() : Bool {return ImGui.isWindowFocused(None);}
+
+    function get_isAppearing() : Bool {return ImGui.isWindowAppearing();}
     //#endregion
 }

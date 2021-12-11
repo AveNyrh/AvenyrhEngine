@@ -35,7 +35,7 @@ class SceneWindow extends EditorPanel
     var up : Int = hxd.Key.Z;
     var down : Int = hxd.Key.S;
     var mvt : avenyrh.Vector2 = avenyrh.Vector2.ZERO;
-    var mvtSpeed : Float = 2;
+    var mvtSpeed : Float = 4;
     var zoomSpeed : Float = 0.1;
 
     //Mode inputs
@@ -61,12 +61,12 @@ class SceneWindow extends EditorPanel
     {        
         super.draw(dt);
 
-        updateControls(dt);
-
         flags |= MenuBar;
 
         //Scene window
         ImGui.begin("Scene", null, flags);
+
+        updateControls(dt);
 
         width = cast ImGui.getWindowWidth();
         height = cast ImGui.getWindowHeight() - 60;
@@ -162,6 +162,9 @@ class SceneWindow extends EditorPanel
 
     function updateControls(dt : Float)
     {
+        if(!isFocused)
+            return;
+
         //Camera
         mvt = avenyrh.Vector2.ZERO;
 

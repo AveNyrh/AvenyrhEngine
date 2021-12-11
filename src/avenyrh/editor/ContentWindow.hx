@@ -1,5 +1,8 @@
 package avenyrh.editor;
 
+import avenyrh.editor.SpriteEditor.SpriteMode;
+import avenyrh.utils.JsonUtils;
+import sys.io.File;
 import sys.FileSystem;
 import haxe.io.Path;
 import haxe.ds.StringMap;
@@ -97,6 +100,7 @@ class ContentWindow extends EditorPanel
         for(entry in arr)
         {
             var e : String = currentDir + "/" + entry;
+            var nextColumn : Bool = true;
 
             if(FileSystem.isDirectory(e))
             {
@@ -140,7 +144,10 @@ class ContentWindow extends EditorPanel
                                     ImGui.endDragDropSource();
                                 }
                                 ImGui.text(entry + prefix);
+
+                                ImGui.nextColumn();
                             }
+                            nextColumn = false;
                         }
                         else 
                         {
@@ -185,7 +192,8 @@ class ContentWindow extends EditorPanel
                 }
             }
 
-            ImGui.nextColumn();
+            if(nextColumn)
+                ImGui.nextColumn();
         }
         ImGui.popStyleColor();
         
@@ -195,6 +203,7 @@ class ContentWindow extends EditorPanel
     function setSprites()
     {
         sprites = new StringMap<Array<Sprite>>();
+
         //Content
         arr = FileSystem.readDirectory(currentDir);
 
@@ -204,9 +213,54 @@ class ContentWindow extends EditorPanel
             var extension : String = Path.extension(e);
             if(extension == "png" || extension == "PNG" || extension == "jpg")
             {
-                if(FileSystem.exists(e + ".sprite"))
+                var p : String = e + ".sprite";
+
+                if(FileSystem.exists(getPathFromRes(p)))
                 {
                     //Sprite
+                    var spiteArray : Array<Sprite> = [];
+                    
+                    //Retrieve content
+                    var tex : h3d.mat.Texture = hxd.Res.load(getPathFromRes(e)).toTexture();
+                    var s : String = File.getContent(getPathFromRes(p));
+                    var dyn : haxe.DynamicAccess<Dynamic> = haxe.Json.parse(s);
+                    var data : StringMap<Dynamic> = JsonUtils.parseToStringMap(dyn);
+                    var params : Vector2;
+
+                    params = new Vector2(data.get("Params X"), data.get("Params Y"));
+
+                    switch(data.get("Mode"))
+                    {
+                        case "Simple" : 
+                            spiteArray.push(new Sprite(getPathFromRes(e)));
+
+                        case "MultipleBySize" : 
+                            var x : Float = params.x / tex.width;
+                            var y : Float = params.y / tex.height;
+
+                            for(i in 0...Std.int(x))
+                            {
+                                for(j in 0...Std.int(y))
+                                {
+                                    spiteArray.push(new Sprite(getPathFromRes(e), i * params.x, j * params.y, params.x, params.y));
+                                }
+                            }
+
+                        case "MultipleByNumber" : 
+                            var width : Float = tex.width / params.x;
+                            var height : Float = tex.height / params.y;
+
+                            for(i in 0...Std.int(params.x))
+                            {
+                                for(j in 0...Std.int(params.y))
+                                {
+                                    spiteArray.push(new Sprite(getPathFromRes(e), i * width, j * height, width, height));
+                                }
+                            }
+                    }
+
+                    sprites.set(e, spiteArray);
+                    trace("Sprites added to " + e);
                 }
                 else 
                 {

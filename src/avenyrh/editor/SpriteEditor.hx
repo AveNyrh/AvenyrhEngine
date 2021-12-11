@@ -12,6 +12,8 @@ class SpriteEditor extends EditorPanel
 
     var tex : h3d.mat.Texture = null;
 
+    var offset : Vector2 = Vector2.ZERO;
+
     var zoom : Float = 1;
 
     var mode : SpriteMode = Simple;
@@ -20,12 +22,22 @@ class SpriteEditor extends EditorPanel
 
     var color : h3d.Vector = Color.intToVector(Color.iYELLOW);
 
+    //Camera movement settings
+    var left : Int = hxd.Key.Q;
+    var right : Int = hxd.Key.D;
+    var up : Int = hxd.Key.Z;
+    var down : Int = hxd.Key.S;
+    var mvtSpeed : Float = 4;
+    var zoomSpeed : Float = 0.1;
+
     public override function draw(dt : Float)
     {
         flags |= MenuBar;
 
         //Scene window
         ImGui.begin("Sprite editor", null, flags);
+        
+        updateControls(dt);
 
         //Main menu bar
         if(ImGui.beginMenuBar())
@@ -137,17 +149,17 @@ class SpriteEditor extends EditorPanel
             var drawList : ImDrawList = ImGui.getForegroundDrawList();
             var avail : Vector2 = ImGui.getContentRegionAvail();
             var size : Vector2 = new Vector2(tex.width, tex.height);
-            var center : Vector2 = new Vector2(avail.x / 2, avail.y / 2 + 40);
+            var center : Vector2 = new Vector2(avail.x / 2, avail.y / 2 + 40) + offset;
             var topLeft : Vector2 = new Vector2(center.x - size.x / 2, center.y - size.y / 2);
             ImGui.setCursorPos(topLeft);
             var cursor : Vector2 = ImGui.getCursorScreenPos();
             ImGui.image(tex, {x : size.x * zoom, y : size.y * zoom});
 
-            if(mode != Simple)
+            if(mode != Simple && isAppearing)
             {
                 var nbX : Int = mode.match(MultipleBySize) ? AMath.ceil(size.x / params.x) : Std.int(params.x);
                 var nbY : Int = mode.match(MultipleBySize) ? AMath.ceil(size.y / params.y) : Std.int(params.y);
-                var quadSize : Vector2 = new Vector2(size.x / nbX, size.y / nbY);
+                var quadSize : Vector2 = new Vector2(size.x * zoom / nbX, size.y * zoom / nbY);
 
                 for(x in 0...nbX)
                 {
@@ -169,19 +181,34 @@ class SpriteEditor extends EditorPanel
 
     function save()
     {
-        var p : String = currentImage + ".sprite";
-        if(!FileSystem.exists(p))
-        {
-            trace("File does not exist : " + p);
-        }
-
         var data : StringMap<Dynamic> = new StringMap();
 
         data.set("Mode", mode.getName());
         data.set("Params X", params.x);
         data.set("Params Y", params.y);
 
+        var p : String = currentImage + ".sprite";
         JsonUtils.saveJson(p, JsonUtils.stringify(data, Full));
+    }
+
+    function updateControls(dt : Float)
+    {
+        if(!isFocused)
+            return;
+
+        if(hxd.Key.isDown(left))
+            offset.x -= mvtSpeed;
+        if(hxd.Key.isDown(right))
+            offset.x += mvtSpeed;
+        if(hxd.Key.isDown(up))
+            offset.y -= mvtSpeed;
+        if(hxd.Key.isDown(down))
+            offset.y += mvtSpeed;
+
+        if(hxd.Key.isPressed(hxd.Key.MOUSE_WHEEL_UP))
+            zoom += zoomSpeed;
+        else if(hxd.Key.isPressed(hxd.Key.MOUSE_WHEEL_DOWN))
+            zoom -= zoomSpeed;
     }
 }
 
