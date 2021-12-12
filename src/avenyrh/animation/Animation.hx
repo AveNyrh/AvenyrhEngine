@@ -19,41 +19,32 @@ class Animation extends State
     var animator : Animator;
 
     /**
-     * List of all events
+     * List of all tracks
      */
-    var events : Array<EventKey>;
+    var tracks : Array<Track>;
 
     /**
      * Current time of the animation
      */
-    public var currentTime (default, null) : Float;
-
-    /**
-     * Time at the last frame
-     */
-    var oldTime : Float;
+    public var currentTime : Float;
 
     /**
      * Time max of the animation
      */
-    public var length (get, null) : Float;
+    public var length : Float;
 
     /**
      * Is the animation looping on itslef
      */
-    public var loop (default, null) : Bool;
+    public var loop : Bool;
 
     public function new(name : String, animator : Animator, loop : Bool = true) 
     {
         super(name, animator.stateMachine);
 
         this.animator = animator;
-        
-        events = [];
 
-        //Put -0.0001 to be able to handle the first event at 0
         currentTime = -0.0001;
-        oldTime = -0.0001;
 
         this.loop = loop; 
 
@@ -68,6 +59,9 @@ class Animation extends State
         super.onStateEnter(info);
 
         currentTime = -0.0001;
+
+        for(t in tracks)
+            t.currentTime = -0.0001;
     }
 
     override function onStateUpdate(dt : Float) 
@@ -78,16 +72,10 @@ class Animation extends State
         if(!loop && currentTime > length)
             return;
 
-        oldTime = currentTime;
         currentTime += dt;
 
-        for (e in events)
-        {
-            if(e.time > oldTime && e.time < currentTime)
-            {
-                e.event();
-            }        
-        }
+        for (t in tracks)
+            t.currentTime = currentTime;
 
         //Reset current time if looping
         if(currentTime > length && loop)
@@ -107,55 +95,13 @@ class Animation extends State
     //-------------------------------
     //#region Public API
     //-------------------------------
-    /**
-     * Adds a new key event
-     * @param time time of the event
-     * @param event function to call when the event is triggered
-     */
-    public function addEvent(time : Float, event : Void -> Void)
-    {
-        for (e in events)
-        {
-            if(e.time == time)
-                throw 'Animation $name has already an event at $time -> $e';
-        }
-
-        events.push({time : time, event : event});
-
-        //Sort events to have them in ascending order
-        events.sort(function(a, b) 
-        {
-            if(a.time < b.time) return -1;
-            else if(a.time > b.time) return 1;
-            else return 0;
-        });
-    }
-
     @:noCompletion
-    public function setCurrentTime(t : Float)
+    public function setCurrentTime(time : Float)
     {
-        oldTime = currentTime;
-        currentTime = t;
+        currentTime = time;
 
-        var i : Int = 0;
-        for (e in events)
-        {
-            //Check going forward
-            if(e.time > oldTime && e.time <= currentTime)
-            {
-                e.event();
-                break;
-            }
-            
-            //Check going backward
-            if(e.time <= oldTime && e.time > currentTime)
-            {
-                events[i - 1].event();
-                break;
-            }
-
-            i++;
-        }
+        for(t in tracks)
+            t.currentTime = currentTime;
     }
     //#endregion
 
@@ -174,16 +120,5 @@ class Animation extends State
 
         return sprite;
     }
-
-    inline function get_length() : Float
-    {
-        return events[events.length - 1].time;
-    }
     //#endregion
 }
-
-typedef EventKey =
-{
-    time : Float,
-    event : Void -> Void
-};

@@ -8,8 +8,8 @@ class SimpleAnimation2 extends Animation
     {
         super.init();
 
-        addEvent(0, () -> sprite.sprite.tile = hxd.Res.CarreBleu.toTile());
-        addEvent(1, () -> sprite.sprite.tile = hxd.Res.CarreVert.toTile());
-        addEvent(2, () -> sprite.sprite.tile = hxd.Res.CarreBleu.toTile());
+        // addEvent(0, () -> sprite.sprite.tile = hxd.Res.CarreBleu.toTile());
+        // addEvent(1, () -> sprite.sprite.tile = hxd.Res.CarreVert.toTile());
+        // addEvent(2, () -> sprite.sprite.tile = hxd.Res.CarreBleu.toTile());
     }
 }

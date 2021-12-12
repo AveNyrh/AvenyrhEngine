@@ -179,7 +179,7 @@ class Tween
         //Clamp time between 0 and maxTime
         time = AMath.fclamp(time + dt, 0, maxTime);
 
-        value = from + (to - from) * interpolate();
+        value = from + (to - from) * interpolate(type, time, maxTime);
         if(round)
             value = AMath.round(value);
 
@@ -201,8 +201,12 @@ class Tween
                 onEnd();
         }
     }
+    //#endregion
 
-    function interpolate() : Float
+    //-------------------------------
+    //#region Private API
+    //-------------------------------
+    public static function interpolate(type : TweenType, time : Float, maxTime : Float) : Float
     {
         var t : Float = time / maxTime;
 
@@ -232,7 +236,7 @@ class Tween
      * Try values here : \
      * https://docs.google.com/spreadsheets/d/1ACTsfkqyk4E5Y_nyJIFzQrdwwwlFPhPYhuReOxznFck/edit?usp=sharing
      */
-    inline function bezier(t : Float, p0 : Float, p1 : Float, p2 : Float, p3 : Float) : Float 
+    static inline function bezier(t : Float, p0 : Float, p1 : Float, p2 : Float, p3 : Float) : Float 
     {
 		return Math.pow(1 - t, 3) * p0 + 3 * t * Math.pow(1 - t, 2) * p1 + 3 * Math.pow(t, 2) * (1 - t) * p2 + Math.pow(t, 3) * p3;
 	}

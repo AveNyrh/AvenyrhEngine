@@ -32,9 +32,11 @@ class SpriteEditor extends EditorPanel
 
     public override function draw(dt : Float)
     {
+        super.draw(dt);
+
         flags |= MenuBar;
 
-        //Scene window
+        //Sprite window
         ImGui.begin("Sprite editor", null, flags);
         
         updateControls(dt);
